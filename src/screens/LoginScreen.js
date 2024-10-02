@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet } from 'react-native';
 
 // 일반 사용자 로그인 화면
-function UserLoginScreen() {
+function MemberLoginScreen({ onLogin }) {
   return (
     <View style={styles.formContainer}>
       <Text style={styles.label}>아이디</Text>
@@ -10,7 +10,7 @@ function UserLoginScreen() {
       <Text style={styles.label}>비밀번호</Text>
       <TextInput style={styles.input} placeholder="비밀번호를 입력해주세요" secureTextEntry />
       <View style={styles.loginButton}>
-        <TouchableOpacity onPress={() => alert('상담자 로그인')}>
+        <TouchableOpacity onPress={() => onLogin('Member')}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
       </View>  
@@ -33,7 +33,7 @@ function UserLoginScreen() {
 }
 
 // 상담자 로그인 화면
-function CounselorLoginScreen() {
+function CounselorLoginScreen({ onLogin }) {
   return (
     <View style={styles.formContainer}>
       <Text style={styles.label}>아이디</Text>
@@ -41,7 +41,7 @@ function CounselorLoginScreen() {
       <Text style={styles.label}>비밀번호</Text>
       <TextInput style={styles.input} placeholder="비밀번호를 입력해주세요" secureTextEntry />
       <View style={styles.loginButton}>
-        <TouchableOpacity onPress={() => alert('상담자 로그인')}>
+        <TouchableOpacity onPress={() => onLogin('Counselor')}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
       </View>  
@@ -63,8 +63,14 @@ function CounselorLoginScreen() {
   );
 }
 
-export default function LoginScreen() {
+export default function LoginScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState('User'); // 현재 활성화된 탭을 상태로 관리
+
+  const handleLogin = (userType) => {
+    // 로그인 성공 후 Tabs로 이동
+    navigation.navigate('Tabs', { userType });
+  };
+
 
   return (
     <View style={styles.container}>
@@ -85,7 +91,12 @@ export default function LoginScreen() {
       </View>
 
       {/* 선택된 탭에 따라 화면 전환 */}
-      {activeTab === 'User' ? <UserLoginScreen /> : <CounselorLoginScreen />}
+      {/* 선택된 탭에 따라 화면 전환 */}
+      {activeTab === 'User' ? (
+        <MemberLoginScreen onLogin={handleLogin} />
+      ) : (
+        <CounselorLoginScreen onLogin={handleLogin} />
+      )}
     </View>
   );
 }

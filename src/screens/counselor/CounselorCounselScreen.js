@@ -1,12 +1,12 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-function CounselScreen() {
+function CounselorCounselScreen() {
   return (
     <View>
-      <Text>Counsel Screen</Text>
+      <Text>Counselor Counsel Screen</Text>
     </View>
   );
 }
 
-export default CounselScreen;
+export default CounselorCounselScreen;

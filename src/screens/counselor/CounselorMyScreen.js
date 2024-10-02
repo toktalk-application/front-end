@@ -1,11 +1,12 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-function CounselorMainScreen() {
+function CounselorMyScreen() {
   return (
     <View>
-      <Text>Counselor Main Screen</Text>
+      <Text>Counselor My Screen</Text>
     </View>
   );
 }
-export default CounselorMainScreen;
+
+export default CounselorMyScreen;
