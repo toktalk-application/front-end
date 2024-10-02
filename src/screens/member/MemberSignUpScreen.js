@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import DatePicker from 'react-native-date-picker'; 
+import CustomDatePicker from '../../components/CustomDatePicker'; 
 import CheckBox from '@react-native-community/checkbox'; // CheckBox import
 
 function MemberSignUpScreen() {
@@ -17,6 +17,7 @@ function MemberSignUpScreen() {
   const [allAccepted, setAllAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState(new Date()); 
   const [open, setOpen] = useState(false); 
+
 
   // 본인인증 관련 상태. 
   const [name, setName] = useState('');
@@ -151,23 +152,7 @@ function MemberSignUpScreen() {
         </View>
 
         <View style={styles.inputContainer}>
-          <TouchableOpacity onPress={() => setOpen(true)} style={styles.input}>
-            <Text style={{ color: 'black' }}>{birthDate.toISOString().split('T')[0]}</Text>
-          </TouchableOpacity>
-          <DatePicker
-            locale='ko-KR' 
-            modal
-            open={open}
-            date={birthDate}
-            mode="date"
-            onConfirm={(date) => {
-              setOpen(false);
-              setBirthDate(date);
-            }}
-            onCancel={() => {
-              setOpen(false);
-            }}
-          />
+          <CustomDatePicker birthDate={birthDate} setBirthDate={setBirthDate} />
         </View>
       </View>
 
@@ -329,8 +314,8 @@ const styles = StyleSheet.create({
   },
   checkButton: {
     marginLeft: 10,
-    backgroundColor: '#007BFF',
-    paddingVertical: 8,
+    backgroundColor: '#66798C',
+    paddingVertical: 10,
     paddingHorizontal: 8,
     borderRadius: 5,
   },
@@ -338,7 +323,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#001F3F',
     paddingVertical: 10,
     borderRadius: 5,
   },
