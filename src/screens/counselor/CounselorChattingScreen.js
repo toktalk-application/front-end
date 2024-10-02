@@ -1,12 +1,12 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-function ChattingScreen() {
+function CounselorChattingScreen() {
   return (
     <View>
-      <Text>Chatting Screen</Text>
+      <Text>Counselor Chatting Screen</Text>
     </View>
   );
 }
 
-export default ChattingScreen;
+export default CounselorChattingScreen;

@@ -4,7 +4,7 @@ import {View, Text, StyleSheet} from 'react-native';
 function MemberChattingScreen() {
   return (
     <View>
-      <Text>Chatting Screen</Text>
+      <Text>Member Chatting Screen</Text>
     </View>
   );
 }

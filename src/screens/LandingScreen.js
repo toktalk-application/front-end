@@ -4,7 +4,7 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 const LandingScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace('Login'); // 2초 후에 'Tabs' 화면으로 이동
+      navigation.replace('로그인'); // 2초 후에 'Tabs' 화면으로 이동
     }, 1500);
 
     return () => clearTimeout(timer); // 타이머 정리

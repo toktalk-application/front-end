@@ -4,7 +4,7 @@ import {View, Text, StyleSheet} from 'react-native';
 function MemberMyScreen() {
   return (
     <View>
-      <Text>My Screen</Text>
+      <Text>Member My Screen</Text>
     </View>
   );
 }

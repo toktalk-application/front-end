@@ -1,12 +1,12 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-function MyScreen() {
+function MemberSignUpScreen() {
   return (
     <View>
-      <Text>My Screen</Text>
+      <Text>Member SignUp Screen</Text>
     </View>
   );
 }
 
-export default MyScreen;
+export default MemberSignUpScreen;
