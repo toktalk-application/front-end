@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet } from 'react-native';
 
 // 일반 사용자 로그인 화면
-function MemberLoginScreen({ onLogin }) {
+function MemberLoginScreen({ onLogin, navigation }) {
   return (
     <View style={styles.formContainer}>
       <Text style={styles.label}>아이디</Text>
@@ -24,7 +24,7 @@ function MemberLoginScreen({ onLogin }) {
         {/* 회원가입 안내 메시지와 버튼 */}
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>아직 회원이 아니신가요?  </Text>
-          <TouchableOpacity onPress={() => alert('회원가입 페이지로 이동')}>
+          <TouchableOpacity onPress={() => navigation.navigate('내담자 회원가입')}>
             <Text style={styles.signupButton}>회원가입</Text>
           </TouchableOpacity>
         </View>
@@ -33,7 +33,7 @@ function MemberLoginScreen({ onLogin }) {
 }
 
 // 상담자 로그인 화면
-function CounselorLoginScreen({ onLogin }) {
+function CounselorLoginScreen({ onLogin, navigation }) {
   return (
     <View style={styles.formContainer}>
       <Text style={styles.label}>아이디</Text>
@@ -55,7 +55,7 @@ function CounselorLoginScreen({ onLogin }) {
         {/* 회원가입 안내 메시지와 버튼 */}
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}> 상담자님을 기다리고 있어요!  </Text>
-          <TouchableOpacity onPress={() => alert('회원가입 페이지로 이동')}>
+          <TouchableOpacity onPress={() => navigation.navigate('상담자 회원가입')}>
             <Text style={styles.signupButton}>회원가입</Text>
           </TouchableOpacity>
         </View>
@@ -90,12 +90,10 @@ export default function LoginScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      {/* 선택된 탭에 따라 화면 전환 */}
-      {/* 선택된 탭에 따라 화면 전환 */}
       {activeTab === 'User' ? (
-        <MemberLoginScreen onLogin={handleLogin} />
+        <MemberLoginScreen onLogin={handleLogin} navigation={navigation}/>
       ) : (
-        <CounselorLoginScreen onLogin={handleLogin} />
+        <CounselorLoginScreen onLogin={handleLogin} navigation={navigation}/>
       )}
     </View>
   );
