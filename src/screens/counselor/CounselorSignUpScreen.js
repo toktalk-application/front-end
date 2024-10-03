@@ -16,7 +16,6 @@ function MemberSignUpScreen() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [allAccepted, setAllAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState(new Date()); 
-  const [open, setOpen] = useState(false); 
 
   // 본인인증 관련 상태. 
   const [name, setName] = useState('');
