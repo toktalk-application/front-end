@@ -19,16 +19,10 @@ function CounselorMainScreen() {
   useEffect(() => {
     const fetchMarkedDates = async () => {
       const dummyData = {
-        "2024-10-01": null,
-        "2024-10-02": null,
-        "2024-10-03": false,
         "2024-10-04": true,
         "2024-10-05": true,
         "2024-10-06": true,
-        "2024-10-07": false,
-        "2024-10-08": false,
         "2024-10-18": true,
-        "2024-10-30": false,
         "2024-10-31": true,
       };
 
