@@ -34,9 +34,6 @@ import CounselorSignUpScreen from './src/screens/counselor/CounselorSignUpScreen
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
-import messaging from '@react-native-firebase/messaging';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform, PermissionsAndroid } from 'react-native';
 
 const setupNotificationsOnFirstLogin = async (userId) => {
   try {

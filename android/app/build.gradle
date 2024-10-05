@@ -84,7 +84,7 @@ android {
 
     namespace "com.toktalk.applicaton"
     defaultConfig {
-        applicationId "com.toktalk.applicaton"
+        applicationId "com.toktalk.application"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -122,6 +122,6 @@ dependencies {
     } else {
         implementation jscFlavor
     }
-
-    
 }
+
+apply plugin: 'com.google.gms.google-services'
