@@ -6,9 +6,9 @@ function MemberLoginScreen({ onLogin, navigation }) {
   return (
     <View style={styles.formContainer}>
       <Text style={styles.label}>아이디</Text>
-      <TextInput style={styles.input} placeholder="아이디를 입력해주세요" />
+        <TextInput style={styles.input} placeholder="아이디를 입력해주세요" />
       <Text style={styles.label}>비밀번호</Text>
-      <TextInput style={styles.input} placeholder="비밀번호를 입력해주세요" secureTextEntry />
+        <TextInput style={styles.input} placeholder="비밀번호를 입력해주세요" secureTextEntry />
       <View style={styles.loginButton}>
         <TouchableOpacity onPress={() => onLogin('Member')}>
           <Text style={styles.loginButtonText}>로그인</Text>

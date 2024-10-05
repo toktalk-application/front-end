@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import CounselorCalendar from '../../components/Calendar/CounselorCalendar';
 
@@ -98,7 +98,7 @@ function CounselorMainScreen() {
         </View>
       )}
         renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
+          <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
           <View style={styles.row}>
             <View style={styles.timeContainer}>
               <Text style={styles.timeText}> {formatTime(item.startTime)} </Text> 
@@ -107,13 +107,13 @@ function CounselorMainScreen() {
             </View>
             <View style={styles.detailsContainer}>
               <View style={styles.detailsRow}>
-                <Text style={styles.nickNameText}>내담자        {item.nickName}</Text>
-                <Text style={styles.typeText}>  {item.type}  </Text>
+                <Text style={styles.nickNameText}>내담자 {item.nickName}</Text>
+                <Text style={styles.typeText}> {item.type} </Text>
               </View>
-              <Text style={styles.commentText}>상담 내용    {item.comment}</Text>
+              <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
         )}
     />
   );
