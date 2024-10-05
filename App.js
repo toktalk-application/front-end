@@ -18,11 +18,19 @@ import CounselorCounselScreen from './src/screens/counselor/CounselorCounselScre
 import CounselorChattingScreen from './src/screens/counselor/CounselorChattingScreen.js';
 import CounselorMyScreen from './src/screens/counselor/CounselorMyScreen.js';
 
+import CounselorProfileScreen from './src/screens/counselor/CounselorProfileScreen.js';
+import CounselorChargeScreen from './src/screens/counselor/CounselorChargeScreen.js';
+import CounselorPlanScreen from './src/screens/counselor/CounselorPlanScreen.js';
+import CounselorTimeSettingScreen from './src/screens/counselor/CounselorTimeSettingScreen.js';
+import CounselorEditScreen from './src/screens/counselor/CounselorEditScreen.js';
+
 import AlarmScreen from './src/screens/AlarmScreen.js'; 
 import LandingScreen from './src/screens/LandingScreen.js';
 import LoginScreen from './src/screens/LoginScreen';  
-import MemberSignUpScreen from './src/screens/member/MemberSignUpScreen.js'
-import CounselorSignUpScreen from './src/screens/counselor/CounselorSignUpScreen.js'
+import MemberSignUpScreen from './src/screens/member/MemberSignUpScreen.js';
+import CounselorSignUpScreen from './src/screens/counselor/CounselorSignUpScreen.js';
+
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -151,6 +159,12 @@ function App() {
         <Stack.Screen name="알림" component={AlarmScreen} />
         <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
         <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
+        <Stack.Screen name="프로필 관리" component={CounselorProfileScreen} />
+        <Stack.Screen name="프로필 수정" component={CounselorEditScreen} />
+        <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
+        <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
+        <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
+
       </Stack.Navigator>
     </NavigationContainer>
   );
