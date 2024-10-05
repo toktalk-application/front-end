@@ -1,6 +1,11 @@
-apply plugin: "com.android.application"
-apply plugin: "org.jetbrains.kotlin.android"
-apply plugin: "com.facebook.react"
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'com.facebook.react'
+    id 'com.google.gms.google-services'
+}
+
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -77,9 +82,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.toktalk"
+    namespace "com.toktalk.applicaton"
     defaultConfig {
-        applicationId "com.toktalk"
+        applicationId "com.toktalk.applicaton"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
@@ -108,12 +113,15 @@ android {
 }
 
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    implementation platform('com.google.firebase:firebase-bom:33.2.0')
+    implementation 'com.google.firebase:firebase-messaging'
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
     }
+
+    
 }

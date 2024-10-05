@@ -1,4 +1,4 @@
-package com.toktalk
+package com.toktalk.applicaton
 
 import android.app.Application
 import com.facebook.react.PackageList
