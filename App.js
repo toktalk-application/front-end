@@ -4,6 +4,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
+import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform, PermissionsAndroid } from 'react-native';
+
 import MemberMainScreen from './src/screens/member/MemberMainScreen.js';
 import MemberCounselScreen from './src/screens/member/MemberCounselScreen.js';
 import MemberChattingScreen from './src/screens/member/MemberChattingScreen.js';
@@ -22,6 +26,77 @@ import CounselorSignUpScreen from './src/screens/counselor/CounselorSignUpScreen
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform, PermissionsAndroid } from 'react-native';
+
+const setupNotificationsOnFirstLogin = async (userId) => {
+  try {
+    const hasSetupNotifications = await AsyncStorage.getItem('hasSetupNotifications');
+    
+    if (hasSetupNotifications !== 'true') {
+      let permissionGranted = false;
+
+      // iOS에서 권한 요청
+      if (Platform.OS === 'ios') {
+        const authStatus = await messaging().requestPermission();
+        permissionGranted = 
+          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+      } 
+      // Android에서 권한 요청 (Android 13 이상)
+      else if (Platform.OS === 'android' && Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        permissionGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
+      } 
+      // Android 13 미만에서는 별도의 권한 요청 불필요
+      else {
+        permissionGranted = true;
+      }
+
+      if (permissionGranted) {
+        console.log('Notification permission granted');
+        // FCM 토큰 얻기 및 서버로 전송
+        const token = await messaging().getToken();
+        console.log('FCM Token:', token);
+        await sendFcmTokenToServer(userId, token);
+        
+        // 설정 완료 표시
+        await AsyncStorage.setItem('hasSetupNotifications', 'true');
+      } else {
+        console.log('Notification permission denied');
+      }
+    } else {
+      console.log('Notifications already set up');
+    }
+  } catch (error) {
+    console.log('Error in notification setup:', error);
+  }
+};
+
+const sendFcmTokenToServer = async (userId, fcmToken) => {
+  try {
+    const userToken = await AsyncStorage.getItem('userToken'); // 저장된 인증 토큰
+    const response = await fetch(`https://your-api-url.com/api/members/${userId}/fcm-token`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userToken}`
+      },
+      body: JSON.stringify({ fcmToken })
+    });
+    if (response.ok) {
+      console.log('FCM token successfully sent to server');
+    } else {
+      console.error('Failed to send FCM token to server');
+    }
+  } catch (error) {
+    console.error('Error sending FCM token to server:', error);
+  }
+};
+
 
 const CustomHeader = ({ routeName, navigation }) => {
   return (
