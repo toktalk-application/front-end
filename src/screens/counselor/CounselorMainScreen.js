@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import CounselorCalendar from '../../components/Calendar/CounselorCalendar';
+import { useNavigation } from '@react-navigation/native';
 
 function CounselorMainScreen() {
+  const navigation = useNavigation();
   const [markedDates, setMarkedDates] = useState({});
   const [reservations, setReservations] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
@@ -15,6 +16,11 @@ function CounselorMainScreen() {
   //     setReservations([]); // 예약 목록도 비웁니다.
   //   }, [])
   // );
+
+
+  const handleReservationPress = (reservationId) => {
+      navigation.navigate('CounselDetail', { reservationId });
+  };
 
   useEffect(() => {
     const fetchMarkedDates = async () => {
@@ -40,10 +46,10 @@ function CounselorMainScreen() {
   const fetchReservations = async (date) => {
     const dummyReservations = [
       {
-        reservationId: 1,
+        reservationId: 5,
         counselorId: 1,
-        nickName: "홍길동",
-        comment: "힘들어요 속상해요",
+        nickName: "눈누난나",
+        comment: "지친다 정말루다가",
         type: "CHAT",
         status: "PENDING",
         date: "2024-10-18",
@@ -51,15 +57,15 @@ function CounselorMainScreen() {
         endTime: "10:50",
       },
       {
-        reservationId: 2,
+        reservationId: 6,
         counselorId: 1,
         nickName: "김철수",
         comment: "우울해요",
         type: "CALL",
-        status: "CONFIRMED",
+        status: "PENDING",
         date: "2024-10-18",
         startTime: "11:00",
-        endTime: "12:00",
+        endTime: "11:50",
       },
     ];
 
@@ -94,25 +100,24 @@ function CounselorMainScreen() {
       ListHeaderComponent={() => (
         <View>
           <CounselorCalendar markedDates={markedDates} onDayPress={handleDayPress} selectedDate={selectedDate} />
-          <Text>선택된 날짜: {selectedDate}</Text>
         </View>
       )}
         renderItem={({ item }) => (
           <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
-          <View style={styles.row}>
-            <View style={styles.timeContainer}>
-              <Text style={styles.timeText}> {formatTime(item.startTime)} </Text> 
-              <Text style={styles.timeText}> | </Text>  
-              <Text style={styles.timeText}> {formatTime(item.endTime)} </Text>
-            </View>
-            <View style={styles.detailsContainer}>
-              <View style={styles.detailsRow}>
-                <Text style={styles.nickNameText}>내담자 {item.nickName}</Text>
-                <Text style={styles.typeText}> {item.type} </Text>
+            <View style={styles.row}>
+              <View style={styles.timeContainer}>
+                <Text style={styles.timeText}> {formatTime(item.startTime)} </Text> 
+                <Text style={styles.timeText}> | </Text>  
+                <Text style={styles.timeText}> {formatTime(item.endTime)} </Text>
               </View>
-              <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
+              <View style={styles.detailsContainer}>
+                <View style={styles.detailsRow}>
+                  <Text style={styles.nickNameText}>내담자 {item.nickName}</Text>
+                  <Text style={styles.typeText}> {item.type} </Text>
+                </View>
+                <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
+              </View>
             </View>
-          </View>
         </TouchableOpacity>
         )}
     />
@@ -145,6 +150,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#001932', // 배경 색상
     flex: 7, // 공간을 더 차지하도록 설정
     paddingLeft: 10, // 약간의 여백
+    paddingVertical:3,
     borderRadius: 10,
   },
   detailsRow: {
@@ -164,6 +170,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     backgroundColor:'white',
     borderRadius: 10,
+    paddingHorizontal:5
   },
   commentText: {
     color: 'white',
