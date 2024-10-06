@@ -1,0 +1,498 @@
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button, Alert,TouchableOpacity, Modal, TextInput} from 'react-native';
+import { Picker } from '@react-native-picker/picker';
+import { useRoute, useNavigation } from '@react-navigation/native';
+
+const CounselDetailScreen = () => {
+    const route = useRoute();
+    const navigation = useNavigation();
+    const { reservationId } = route.params;
+    const [reservation, setReservation] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false); 
+    const [selectedValue, setSelectedValue] = useState("");
+
+    useEffect(() => {
+        const fetchReservationDetails = async () => {
+            try {
+                // 실제 API 호출 대신 더미 데이터 사용
+
+            const dummyData = [
+                {
+                    reservationId: 1,
+                    counselorId: 101,
+                    memberNickname: "홍길동",
+                    counselorName: "김상담사",
+                    comment: "제 고민은 이거고요...",
+                    type: "CHAT",
+                    status: "COMPLETED",
+                    date: "2024-01-17",
+                    startTime: "09:00",
+                    endTime: "10:50",
+                    price: 50000,
+                    review: {
+                        content: "오랜 심리적, 인간관계 상의 어려움에 대해 도움을 받고싶어 신청하였습니다.",
+                        rating: 4,
+                        createdAt: new Date().toISOString(),
+                    },
+                    report: {
+                        content: "최근 직장 내 갈등으로 힘들다고 하셨고...",
+                        createdAt: new Date().toISOString(),
+                    },
+                },
+                {
+                    reservationId: 2,
+                    counselorId: 102,
+                    memberNickname: "늄념",
+                    counselorName: "이상담사",
+                    comment: "지금 제 상황이 너무 힘들고...",
+                    type: "CALL",
+                    status: "CANCELLED_BY_CLIENT",
+                    cancelReason: "일정 변경",
+                    date: "2024-01-18",
+                    startTime: "11:00",
+                    endTime: "11:50",
+                    price: 50000,
+                },
+                {
+                    reservationId: 3,
+                    counselorId: 103,
+                    memberNickname: "이영희",
+                    counselorName: "박상담사",
+                    comment: "상담을 받고 싶습니다.",
+                    type: "CHAT",
+                    status: "COMPLETED",
+                    date: "2024-01-19",
+                    startTime: "12:00",
+                    endTime: "12:50",
+                    price: 50000,
+                    review: {
+                        content: "상담을 통해 많은 도움을 받았습니다.",
+                        rating: 5,
+                        createdAt: new Date().toISOString(),
+                    },
+                    report: {
+                    },
+                },
+                {
+                    reservationId: 4,
+                    counselorId: 104,
+                    memberNickname: "유재석",
+                    counselorName: "김상담사",
+                    comment: "상담을 받고 싶습니다.",
+                    type: "CALL",
+                    status: "CANCELLED_BY_COUNSELOR",
+                    cancelReason: "개인 사정",
+                    date: "2024-01-20",
+                    startTime: "13:00",
+                    endTime: "13:50",
+                    price: 50000,
+                },
+                {
+                    reservationId: 5,
+                    counselorId: 1,
+                    memberNickname: "눈누난나",
+                    comment: "지친다 정말루다가",
+                    type: "CHAT",
+                    status: "PENDING",
+                    date: "2024-10-18",
+                    startTime: "09:00",
+                    endTime: "10:50",
+                },
+                {
+                    reservationId: 6,
+                    counselorId: 1,
+                    memberNickname: "김철수",
+                    comment: "우울해요",
+                    type: "CALL",
+                    status: "PENDING",
+                    date: "2024-10-18",  
+                    startTime: "11:00",
+                    endTime: "11:50",
+                },
+            ];
+
+            const selectedReservation = dummyData.find(item => item.reservationId === reservationId);
+            setReservation(selectedReservation);
+            } catch (error) {
+                Alert.alert("오류", "예약 정보를 가져오는 데 실패했습니다.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchReservationDetails();
+    }, [reservationId]);
+
+    if (loading) {
+        return <ActivityIndicator size="large" color="#0000ff" />;
+    }
+
+    if (!reservation) {
+        return <Text>예약 정보를 찾을 수 없습니다.</Text>;
+    }
+    const formatDate = (dateString) => {
+        if (!dateString) {
+            console.warn("Invalid date string:", dateString);
+            return ""; // 기본값 반환 (예: 빈 문자열)
+        }
+    
+        const dateParts = dateString.split('-');
+        const year = dateParts[0].slice(-2); // "2024"에서 "24"를 가져옴
+        const month = dateParts[1];
+        const day = dateParts[2];
+    
+        return `${month}.${day}`; // "YY.MM.DD" 형식으로 반환
+    };
+    
+    // 상담 취소 시 사유 받기 
+    const handleCancelPress = () => {
+        setModalVisible(true); // 모달 열기
+    };
+
+    const handleConfirmCancellation = () => {
+        // 취소 사유를 처리하는 로직 추가
+        Alert.alert("상담 취소", `상담이 취소되었습니다.\n사유: ${selectedValue}`);
+        setModalVisible(false);
+        setSelectedValue(''); // 입력 필드 초기화
+    };
+
+    return (
+        <ScrollView style={styles.container}>
+            <View style={styles.infoContainer}>
+                <View style={styles.dateContainer}>
+                    <View style= {styles.dateDetailContainer}>
+                        <Text style={styles.subtitle}>상담 날짜</Text>
+                        <Text style={styles.dateText}>{formatDate(reservation.date)} {reservation.startTime} - {reservation.endTime}</Text>
+                    </View>
+                    <Text style={styles.type}>  {reservation.type}  </Text>
+                </View>
+                <View style={styles.memberContainer}>
+                    <Text style={styles.subtitle}>내담자 정보</Text>
+                    <View style={styles.memberDetailContainer}>
+                        <View style={styles.memberDetail}>
+                            <Text style={styles.memberDetailTitle}>닉네임</Text>   
+                            <Text style={styles.memberDetailContent}>{reservation.memberNickname}</Text>
+                            <Text style={styles.memberDetailTitle}>성별</Text>
+                            <Text style={styles.memberDetailContent}>여</Text>
+                        </View>
+                        <View style={styles.memberDetail}>
+                            <Text style={styles.memberDetailTitle}>나이</Text>
+                            <Text style={styles.memberDetailContent}>20대</Text>
+                            <Text style={styles.memberDetailTitle}>점수</Text>
+                            <Text style={styles.memberDetailContent}>42점</Text>
+                        </View>
+                    </View>
+                </View>
+                <View style={styles.contentContainer}>
+                    <Text style={styles.subtitle}>상담 내용</Text>
+                    <Text>{reservation.comment}</Text>
+                </View>
+            </View>
+            {reservation.status === "PENDING" ? (
+                    <View style={styles.pendingButtonContainer}>
+                        <TouchableOpacity style={styles.pendingButton}>
+                            <Text style={styles.buttonText}>채팅방 열기</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
+                            <Text style={styles.buttonText}>상담 취소</Text>
+                        </TouchableOpacity>
+                    </View>
+                ) : reservation.status === "CANCELLED_BY_CLIENT" || reservation.status === "CANCELLED_BY_COUNSELOR" ? (
+                    <View style={styles.cancelReasonContainer}>
+                        <Text style={styles.subtitle}>취소 사유</Text>
+                        <Text>{reservation.cancelReason}</Text>
+                    </View>
+                ) : (
+                    <>
+                        {reservation.review && (
+                            <View style={styles.reviewContainer}>
+                                <View style={styles.reviewTitle}>
+                                    <Text style={styles.subtitle}>내담자의 후기</Text>
+                                    <Text> {"⭐".repeat(reservation.review.rating)}</Text>
+                                </View>
+                                <Text style={styles.reviewContent}>{reservation.review.content}</Text>
+                            </View>
+                        )}
+                        {reservation.report && Object.keys(reservation.report).length > 0 ? (
+                            <View style={styles.reportContainer}>
+                                <Text style={styles.subtitle}>상담 리포트</Text>
+                                <Text>{reservation.report.content}</Text>
+                            </View>
+                        ) : (
+                            <View style={styles.reportContainer}>
+                                <Text style={styles.subtitle}>상담 리포트</Text>
+                                <TouchableOpacity 
+                                    style={styles.button} 
+                                    onPress={() => navigation.navigate('CounselWriteReport', { reservationId: reservation.reservationId })} 
+                                >
+                                    <Text style={styles.buttonText}>작성하기</Text>
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    </>
+                )}
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalTitle}>상담을 취소하시겠습니까? </Text>
+                        <View style={styles.centeredTextContainer}>
+                            <Text>상담일 전날 밤 12시까지만 상담을 취소할 수 있습니다.</Text>
+                        </View>
+                        <View style={styles.pickerContainer}>
+                            <Picker
+                                selectedValue={selectedValue}
+                                style={styles.picker}
+                                onValueChange={(itemValue) => setSelectedValue(itemValue)}
+                            >
+                                <Picker.Item label="사유를 선택하세요" value="" />
+                                <Picker.Item label="개인적인 사정" value="개인적인 사정" />
+                                <Picker.Item label="업무 일정 충돌" value="업무 일정 충돌" />
+                                <Picker.Item label="건강 문제" value="건강 문제" />
+                                <Picker.Item label="기타" value="기타" />
+                            </Picker>
+                        </View>
+                        <View style={styles.buttonContainer}>
+                            <TouchableOpacity style={styles.confirmButton} onPress={handleConfirmCancellation}>
+                                <Text style={styles.confirmButtonText}>확인</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                                <Text style={styles.cancelButtonText}>취소</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        </ScrollView>
+    );
+};
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 25,
+        backgroundColor: '#fff',
+    },
+    infoContainer: {
+        backgroundColor: '#f7f7f7',
+        borderRadius: 8,
+        padding: 20,
+        marginBottom: 20,
+        shadowColor: '#000', // 그림자 색상
+        shadowOffset: {
+            width: 0,
+            height: 2, // 수직 방향으로 그림자 이동
+        },
+        shadowOpacity: 0.1, // 그림자 투명도
+        shadowRadius: 4, // 그림자 퍼짐 정도
+        elevation: 5, // Android에서의 그림자 깊이
+    },
+    dateContainer: {
+        marginBottom: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    dateDetailContainer: {
+        flexDirection: 'row',
+    },
+    memberContainer: {
+        marginBottom: 0,
+    },
+    memberDetailContainer: {
+        flexDirection: 'cloum',
+        justifyContent: 'space-between',
+    },
+    memberDetail: {
+        flex: 1,
+        marginRight: 10,
+        flexDirection: 'row',
+    },
+    memberDetailTitle:{
+        width:50,
+        fontWeight: 'bold',
+    },
+    memberDetailContent:{
+        width:90
+    },
+    subtitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+    },
+    dateText: {
+        fontSize: 15,
+        color: '#333',
+        marginHorizontal: 10,
+        marginTop: 2
+    },
+    type: {
+        color: 'white',
+        fontSize: 13,
+        backgroundColor:'#778DA9',
+        borderRadius: 10,
+        marginTop: 2,
+        padding:2,
+        marginBottom:10
+    },
+    contentContainer: {
+        marginTop:20
+    },
+
+    reviewContainer: {
+        marginBottom: 20,
+        padding: 20,
+        borderRadius: 5,
+        backgroundColor: '#f7f7f7',
+        shadowColor: '#000', // 그림자 색상
+        shadowOffset: {
+            width: 0,
+            height: 2, // 수직 방향으로 그림자 이동
+        },
+        shadowOpacity: 0.1, // 그림자 투명도
+        shadowRadius: 4, // 그림자 퍼짐 정도
+        elevation: 5, // Android에서의 그림자 깊이
+    },
+    reviewTitle:{
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+
+    },
+    reportContainer: {
+        marginBottom: 50,
+        padding: 20,
+        borderRadius: 5,
+        backgroundColor: '#f7f7f7',
+        shadowColor: '#000', // 그림자 색상
+        shadowOffset: {
+            width: 0,
+            height: 2, // 수직 방향으로 그림자 이동
+        },
+        shadowOpacity: 0.1, // 그림자 투명도
+        shadowRadius: 4, // 그림자 퍼짐 정도
+        elevation: 5, // Android에서의 그림자 깊이
+    },
+    subtitle: {
+        fontSize: 17,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    cancelReasonContainer: {
+        marginBottom: 50,
+        padding: 20,
+        borderRadius: 5,
+        backgroundColor: '#f7f7f7',
+        shadowColor: '#000', // 그림자 색상
+        shadowOffset: {
+            width: 0,
+            height: 2, // 수직 방향으로 그림자 이동
+        },
+        shadowOpacity: 0.1, // 그림자 투명도
+        shadowRadius: 4, // 그림자 퍼짐 정도
+        elevation: 5, // Android에서의 그림자 깊이
+    },
+    pendingButtonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginHorizontal:50
+    }, 
+    pendingButton: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: '#001326',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    button: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: '#001326',
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    buttonText: {
+        color: '#fff',
+        fontWeight: 'bold',
+        textAlign: 'center',
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // 반투명 배경
+    },
+    modalContent: {
+        width: '80%',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        padding: 20,
+        alignItems: 'center',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    textInput: {
+        height: 40,
+        borderColor: 'gray',
+        borderWidth: 1,
+        width: '100%',
+        marginBottom: 20,
+        paddingHorizontal: 10,
+    },
+    centeredTextContainer: {
+        alignItems: 'center', // 가운데 정렬
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '70%',
+    },
+    confirmButton: {
+        backgroundColor: '#3C6894', // 확인 버튼 색상
+        borderRadius: 5,
+        padding: 10,
+        flex: 1,
+        marginRight: 20,
+        alignItems: 'center',
+    },
+    confirmButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    cancelButton: {
+        backgroundColor: '#CA6767', // 취소 버튼 색상
+        borderRadius: 5,
+        padding: 10,
+        flex: 1,
+        marginLeft: 20,
+        alignItems: 'center',
+    },
+    cancelButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    pickerContainer: {
+        borderWidth: 1, // 테두리 두께
+        borderColor: 'lightgray', // 테두리 색상
+        borderRadius: 5, // 모서리 둥글기
+        overflow: 'hidden', // 모서리 둥글기 효과 적용
+        width: '80%', // 너비 설정
+        marginBottom:20
+    },
+    picker: {
+        height: 40, // 높이를 줄임
+        width: '100%',
+        marginTop: -10,
+        marginBottom: 5,
+        padding: 0, // 패딩 줄임
+    },
+});
+
+export default CounselDetailScreen;

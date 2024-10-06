@@ -17,7 +17,6 @@ import CounselorMainScreen from './src/screens/counselor/CounselorMainScreen.js'
 import CounselorCounselScreen from './src/screens/counselor/CounselorCounselScreen.js';
 import CounselorChattingScreen from './src/screens/counselor/CounselorChattingScreen.js';
 import CounselorMyScreen from './src/screens/counselor/CounselorMyScreen.js';
-
 import CounselorProfileScreen from './src/screens/counselor/CounselorProfileScreen.js';
 import CounselorChargeScreen from './src/screens/counselor/CounselorChargeScreen.js';
 import CounselorPlanScreen from './src/screens/counselor/CounselorPlanScreen.js';
@@ -30,6 +29,8 @@ import LoginScreen from './src/screens/LoginScreen';
 import MemberSignUpScreen from './src/screens/member/MemberSignUpScreen.js';
 import CounselorSignUpScreen from './src/screens/counselor/CounselorSignUpScreen.js';
 
+import CounselDetailScreen from './src/screens/CounselDetailScreen.js';
+import CounselWriteReportScreen from './src/screens/CounselWriteReportScreen.js';
 
 
 const Tab = createBottomTabNavigator();
@@ -161,7 +162,8 @@ function App() {
         <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
         <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
         <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
-
+        <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
+        <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
