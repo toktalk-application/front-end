@@ -35,7 +35,7 @@ import CounselorSignUpScreen from './src/screens/counselor/CounselorSignUpScreen
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-const setupNotificationsOnFirstLogin = async (userId) => {
+const setupNotificationsOnFirstLogin = async (memberId) => {
   try {
     const hasSetupNotifications = await AsyncStorage.getItem('hasSetupNotifications');
     
@@ -66,7 +66,7 @@ const setupNotificationsOnFirstLogin = async (userId) => {
         // FCM 토큰 얻기 및 서버로 전송
         const token = await messaging().getToken();
         console.log('FCM Token:', token);
-        await sendFcmTokenToServer(userId, token);
+        await sendFcmTokenToServer(memberId, token);
         
         // 설정 완료 표시
         await AsyncStorage.setItem('hasSetupNotifications', 'true');
@@ -81,10 +81,10 @@ const setupNotificationsOnFirstLogin = async (userId) => {
   }
 };
 
-const sendFcmTokenToServer = async (userId, fcmToken) => {
+const sendFcmTokenToServer = async (memberId, fcmToken) => {
   try {
     const userToken = await AsyncStorage.getItem('userToken'); // 저장된 인증 토큰
-    const response = await fetch(`https://your-api-url.com/api/members/${userId}/fcm-token`, {
+    const response = await fetch(`https://localhost:8080/members/${memberId}/fcm-token`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
