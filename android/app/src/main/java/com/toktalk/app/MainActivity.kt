@@ -1,4 +1,4 @@
-package com.toktalk.applicaton
+package com.toktalk.app
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
