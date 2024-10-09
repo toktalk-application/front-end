@@ -10,8 +10,11 @@ import { Platform, PermissionsAndroid } from 'react-native';
 
 import MemberMainScreen from './src/screens/member/MemberMainScreen.js';
 import MemberCounselScreen from './src/screens/member/MemberCounselScreen.js';
+import MemberCounselorDetailScreen from './src/screens/member/MemberCounselorDetailScreen.js';
 import MemberChattingScreen from './src/screens/member/MemberChattingScreen.js';
 import MemberMyScreen from './src/screens/member/MemberMyScreen.js';
+import MemberReservationScreen from './src/screens/member/MemberReservationScreen.js';
+import TestScreen from './src/screens/member/TestScreen.js';
 
 import CounselorMainScreen from './src/screens/counselor/CounselorMainScreen.js';
 import CounselorCounselScreen from './src/screens/counselor/CounselorCounselScreen.js';
@@ -26,13 +29,15 @@ import CounselorEditScreen from './src/screens/counselor/CounselorEditScreen.js'
 import AlarmScreen from './src/screens/AlarmScreen.js'; 
 import LandingScreen from './src/screens/LandingScreen.js';
 import LoginScreen from './src/screens/LoginScreen';  
+
 import MemberSignUpScreen from './src/screens/member/MemberSignUpScreen.js';
 import CounselorSignUpScreen from './src/screens/counselor/CounselorSignUpScreen.js';
 
 import CounselDetailScreen from './src/screens/CounselDetailScreen.js';
 import CounselWriteReportScreen from './src/screens/CounselWriteReportScreen.js';
+import MemberWriteReviewScreen from './src/screens/MemberWriteReviewScreen.js';
 import ChatRoomScreen from './src/screens/ChatroomScreen.js'
-
+import SettingsScreen from './src/screens/SettingsScreen.js'
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -163,9 +168,14 @@ function App() {
         <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
         <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
         <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
+        <Stack.Screen name="내 상담 내역" component={MemberReservationScreen} />
+        <Stack.Screen name="우울 검사" component={TestScreen}/>
         <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
         <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
+        <Stack.Screen name="MemberWriteReview" component={MemberWriteReviewScreen} options={{ title: '' }} />
+        <Stack.Screen name="MemberCounselorDetail" component={MemberCounselorDetailScreen} options={{ title: '' }} />
         <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ headerShown: false }}/>
+        <Stack.Screen name="설정" component={SettingsScreen}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -121,6 +121,13 @@ const CounselorCalendar = ({ markedDates, onDayPress, selectedDate }) => {
         textDisabledColor: 'lightgray',
         textSectionTitleColor: '#001326',
       }}
+      style={{
+        margin: 20, // 마진 조정
+        padding: 0, // 패딩 조정
+        backgroundColor: 'white', // 배경 색상
+        borderRadius: 10, // 둥근 테두리
+        elevation: 5, // Android 그림자
+      }}
     />
   );
 };

@@ -5,7 +5,11 @@ import angleRightIcon from '../../assets/images/angleRight.png'
 const MenuItem = ({ icon, title, onPress }) => {
   return (
     <TouchableOpacity style={styles.container} onPress={onPress}>
-      <Image source={icon} style={styles.image} />
+      {icon ? ( // 아이콘이 있을 경우에만 렌더링
+        <Image source={icon} style={styles.image} />
+      ) : (
+        <View style={styles.placeholder} /> // 아이콘이 없을 경우 빈 공간
+      )}
       <Text style={styles.title}>{title}</Text>
       <Image source={angleRightIcon} style={styles.arrow} /> 
     </TouchableOpacity>
@@ -30,6 +34,10 @@ const styles = StyleSheet.create({
     flex: 1, // 텍스트가 가능한 공간을 차지하도록 설정
     fontSize: 16,
     fontWeight: '600',
+  },
+  placeholder: {
+    width: 20,
+    height: 20, // 아이콘과 같은 크기
   },
   arrow: {
     width: 20,

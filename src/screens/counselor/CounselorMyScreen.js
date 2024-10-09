@@ -27,14 +27,19 @@ const CounselorMyScreen = () => {
   return (
     <View style={styles.containder}>
       <View style={styles.infoContainer}>
-        <Image
-          source={{ uri: counselorData.imageUrl }}
-          style={styles.image}
-        />
-        <View style={styles.nameContainer}>
-          <Text style={styles.name}>{counselorData.name}</Text>
-          <Text style={styles.counselor}> 상담사님 </Text>
+        <View style={styles.nameBingContainer}>
+          <Image
+            source={{ uri: counselorData.imageUrl }}
+            style={styles.image}
+          />
+          <View style={styles.nameContainer}>
+            <Text style={styles.name}>{counselorData.name}</Text>
+            <Text style={styles.counselor}> 상담사님 </Text>
+          </View>
         </View>
+        <TouchableOpacity onPress={() => navigation.navigate('설정')}>
+          <Image source={require('../../../assets/images/settings.png')} style={styles.icon} />
+      </TouchableOpacity>
       </View>
       <View style={styles.menuContainer}>
         <MenuItem 
@@ -65,8 +70,14 @@ const styles = StyleSheet.create({
   infoContainer: {
     flexDirection: 'row', // 좌우 배치
     alignItems: 'center', // 수직 중앙 정렬
+    justifyContent: 'space-between', // 아이템 간격을 균등하게 배치
+    alignItems: 'center', // 세로 중앙 정렬
     backgroundColor: 'white',
     padding: 10, // 약간의 패딩 추가
+  },
+  nameBingContainer:{
+    flexDirection: 'row', // 가로 방향으로 배치
+
   },
   image: {
     width: 80,
@@ -92,6 +103,11 @@ const styles = StyleSheet.create({
   menuContainer: {
     flexDirection: 'column', // 좌우 배치
     padding: 20, 
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    marginRight:20
   },
 });
 
