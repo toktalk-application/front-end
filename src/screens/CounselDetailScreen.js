@@ -170,7 +170,7 @@ const CounselDetailScreen = () => {
     // 후에 UserInfo 받아서 처리 할 예정. 
     const userType = 'member'; 
 
-
+    
     return (
         <ScrollView style={styles.container}>
             <View style={styles.infoContainer}>
