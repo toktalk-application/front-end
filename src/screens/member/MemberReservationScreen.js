@@ -4,7 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import timeLine from '../../../assets/images/timeLine.png'
 import { useNavigation } from '@react-navigation/native';
 
-const CounselorCounselScreen = () => {
+const MemberReservationScreen = () => {
     const currentDate = new Date();
     const navigation = useNavigation();
     const [reservations, setReservations] = useState([]);
@@ -89,15 +89,28 @@ const CounselorCounselScreen = () => {
             },
             {
                 reservationId: 5,
-                counselorId: 104,
-                memberNickname: "노홍철",
-                counselorName: "김상담사",
-                comment: "상담을 받고 싶습니다.",
+                counselorId: 1,
+                memberNickname: "눈누난나",
+                counselorName: "안상담사",
+                comment: "지친다 정말루다가",
+                type: "CHAT",
+                status: "COMPLETED",
+                date: "2024-10-18",
+                startTime: "09:00",
+                endTime: "10:50",
+                price: 50000,
+            },
+            {
+                reservationId: 6,
+                counselorId: 1,
+                memberNickname: "김철수",
+                counselorName: "고상담사",
+                comment: "우울해요",
                 type: "CALL",
-                status: "CANCELLED_BY_COUNSELOR",
-                date: "2024-01-20",
-                startTime: "14:00",
-                endTime: "14:50",
+                status: "COMPLETED",
+                date: "2024-10-18",  
+                startTime: "11:00",
+                endTime: "11:50",
                 price: 50000,
             },
         ];
@@ -163,8 +176,8 @@ const CounselorCounselScreen = () => {
                             <View style={styles.contentsContainer}>
                                 <View style={styles.detailsFirstContainer}>
                                     <View style={styles.nicknameContainer}> 
-                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894'}}>내담자     </Text>
-                                        <Text style={styles.nickname}>{reservation.memberNickname}</Text>
+                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894'}}>상담사    </Text>
+                                        <Text style={styles.nickname}>{reservation.counselorName}</Text>
                                     </View>
                                     <Text style={styles.type}>{reservation.type}</Text>
                                 </View>
@@ -191,7 +204,7 @@ const CounselorCounselScreen = () => {
             </ScrollView>
             <View style={styles.totalAmountContainer}>
                 <View style={styles.totalAmountTitle}>
-                    <Text style={styles.totalAmount}>총 매출액 </Text>
+                    <Text style={styles.totalAmount}>결제액 </Text>
                     <Text style= {{ marginTop:3}}> {completedCount} 건 </Text>
                 </View>
                 <Text style={{ fontSize: 16}} >{totalAmount.toLocaleString()} 원</Text>
@@ -335,4 +348,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default CounselorCounselScreen;
+export default MemberReservationScreen;
