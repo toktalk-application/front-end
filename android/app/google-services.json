@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "621434557942",
-    "project_id": "toktalk-4e546",
-    "storage_bucket": "toktalk-4e546.appspot.com"
+    "project_number": "589923257121",
+    "project_id": "toktalk-app",
+    "storage_bucket": "toktalk-app.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:621434557942:android:a271600a6905b4700b63d7",
+        "mobilesdk_app_id": "1:589923257121:android:72b2a57a8e0e2dfbbe8c60",
         "android_client_info": {
-          "package_name": "com.toktalk.application"
+          "package_name": "com.toktalk.app"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyDYqGrpqwsVfhmS5AQafDiOPy25r2LV3mE"
+          "current_key": "AIzaSyAFTbJwMyV7aDSyLTZbITBPoGtLABGIEOA"
         }
       ],
       "services": {
