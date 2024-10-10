@@ -2,56 +2,72 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet } from 'react-native';
 
 // 일반 사용자 로그인 화면
-function MemberLoginScreen({ onLogin, navigation }) {
+function MemberLoginScreen({ navigation }) {
 
-  const [username, setUsername] = useState('');
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
-  const [usernameError, setUsernameError] = useState('');
+
+  const [userIdError, setUserIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
-  const validateInputs = () => {
-    const usernameRegex = /^[a-zA-Z0-9]{4,20}$/;
-    const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?=\\S+$).{10,20}$/;
-
-    let isValid = true;
-
-    // 아이디 유효성 검사
-    if (!usernameRegex.test(username)) {
-      setUsernameError("아이디는 영문 또는 숫자로만 입력해야 합니다. (4~20자)");
-      isValid = false;
+  const validateUserId = (input) => {
+    const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
+    if (!userIdPattern.test(input)) {
+      setUserIdError('영문 또는 숫자로만 입력해야 합니다.(4~20자)');
     } else {
-      setUsernameError('');
+      setUserIdError(''); 
     }
+    setUserId(input);
+  };
 
-    // 비밀번호 유효성 검사
-    if (!passwordRegex.test(password)) {
-      setPasswordError("비밀번호는 영문 대소문자와 숫자, 특수문자를 포함하여 10~20글자로 작성해야 합니다.");
-      isValid = false;
+  const validatePassword = (input) => {
+    const passwordPattern = /(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?=\S+$).{10,20}/;
+    if (!passwordPattern.test(input)) {
+      setPasswordError('영문 대소문자와 숫자, 특수문자를 포함하여 입력해야 합니다.(10~20자)' );
     } else {
-      setPasswordError('');
+      setPasswordError(''); 
     }
-
-    return isValid;
+    setPassword(input); 
   };
 
   return (
     <View style={styles.formContainer}>
-      <Text style={styles.label}>아이디</Text>
-        <TextInput style={styles.input} placeholder="아이디를 입력해주세요" />
-      <Text style={styles.label}>비밀번호</Text>
-        <TextInput style={styles.input} placeholder="비밀번호를 입력해주세요" secureTextEntry />
+      <View style={{ height : 65 , marginBottom : 40}}>
+        <Text style={styles.label}>아이디</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="아이디를 입력해주세요"
+            value={userId}
+            onChangeText={validateUserId}
+          />
+          {userIdError ? ( // 오류 메시지 표시
+            <Text style={styles.errorText}>{userIdError}</Text>
+          ) : null}
+      </View>
+      <View style={{ height : 65 , marginBottom : 40}}>
+        <Text style={styles.label}>비밀번호</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="비밀번호를 입력해주세요"
+              value={password}
+              onChangeText={validatePassword}
+              secureTextEntry
+            />
+          {passwordError ? ( // 오류 메시지 표시
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+      </View>
       <View style={styles.loginButton}>
-        <TouchableOpacity onPress={() => onLogin('Member')}>
+        <TouchableOpacity >
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
-      </View>  
+      </View>
           {/* 로그인 버튼 아래에 줄 추가 */}
     <View style={styles.dividerContainer}>
         <View style={styles.divider} />
         <Text style={styles.orText}>또는</Text>
         <View style={styles.divider} />
     </View>
-  
         {/* 회원가입 안내 메시지와 버튼 */}
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}>아직 회원이 아니신가요?  </Text>
@@ -64,25 +80,72 @@ function MemberLoginScreen({ onLogin, navigation }) {
 }
 
 // 상담자 로그인 화면
-function CounselorLoginScreen({ onLogin, navigation }) {
+function CounselorLoginScreen({ navigation }) {
+
+  const [userId, setUserId] = useState('');
+  const [password, setPassword] = useState('');
+
+  const [userIdError, setUserIdError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateUserId = (input) => {
+    const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
+    if (!userIdPattern.test(input)) {
+      setUserIdError('영문 또는 숫자로만 입력해야 합니다.(4~20자)');
+    } else {
+      setUserIdError(''); 
+    }
+    setUserId(input);
+  };
+
+  const validatePassword = (input) => {
+    const passwordPattern = /(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?=\S+$).{10,20}/;
+    if (!passwordPattern.test(input)) {
+      setPasswordError('영문 대소문자와 숫자, 특수문자를 포함하여 입력해야 합니다.(10~20자)' );
+    } else {
+      setPasswordError(''); 
+    }
+    setPassword(input); 
+  };
+
   return (
     <View style={styles.formContainer}>
-      <Text style={styles.label}>아이디</Text>
-      <TextInput style={styles.input} placeholder="아이디를 입력해주세요" />
-      <Text style={styles.label}>비밀번호</Text>
-      <TextInput style={styles.input} placeholder="비밀번호를 입력해주세요" secureTextEntry />
+      <View style={{ height : 65 , marginBottom : 40}}>
+        <Text style={styles.label}>아이디</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="아이디를 입력해주세요"
+            value={userId}
+            onChangeText={validateUserId}
+          />
+          {userIdError ? ( // 오류 메시지 표시
+            <Text style={styles.errorText}>{userIdError}</Text>
+          ) : null}
+      </View>
+      <View style={{ height : 65 , marginBottom : 40}}>
+        <Text style={styles.label}>비밀번호</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="비밀번호를 입력해주세요"
+              value={password}
+              onChangeText={validatePassword}
+              secureTextEntry
+            />
+          {passwordError ? ( // 오류 메시지 표시
+            <Text style={styles.errorText}>{passwordError}</Text>
+          ) : null}
+      </View>
       <View style={styles.loginButton}>
-        <TouchableOpacity onPress={() => onLogin('Counselor')}>
+        <TouchableOpacity>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
-      </View>  
+      </View>
           {/* 로그인 버튼 아래에 줄 추가 */}
-    <View style={styles.dividerContainer}>
-        <View style={styles.divider} />
-        <Text style={styles.orText}>또는</Text>
-        <View style={styles.divider} />
-    </View>
-  
+      <View style={styles.dividerContainer}>
+          <View style={styles.divider} />
+          <Text style={styles.orText}>또는</Text>
+          <View style={styles.divider} />
+      </View>
         {/* 회원가입 안내 메시지와 버튼 */}
         <View style={styles.signupContainer}>
           <Text style={styles.signupText}> 상담자님을 기다리고 있어요!  </Text>
@@ -96,12 +159,6 @@ function CounselorLoginScreen({ onLogin, navigation }) {
 
 export default function LoginScreen({ navigation }) {
   const [activeTab, setActiveTab] = useState('User'); // 현재 활성화된 탭을 상태로 관리
-
-  const handleLogin = (userType) => {
-    // 로그인 성공 후 Tabs로 이동
-    navigation.navigate('Tabs', { userType });
-  };
-
 
   return (
     <View style={styles.container}>
@@ -122,9 +179,9 @@ export default function LoginScreen({ navigation }) {
       </View>
 
       {activeTab === 'User' ? (
-        <MemberLoginScreen onLogin={handleLogin} navigation={navigation}/>
+        <MemberLoginScreen navigation={navigation}/>
       ) : (
-        <CounselorLoginScreen onLogin={handleLogin} navigation={navigation}/>
+        <CounselorLoginScreen navigation={navigation}/>
       )}
     </View>
   );
@@ -170,7 +227,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
-    marginBottom: 10, // 입력 필드 간 간격 조정
     paddingHorizontal: 5,
   },
   loginButton: {
@@ -213,5 +269,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#334C65',
     textDecorationLine: 'underline',
+  },
+  errorText: {
+    height:20,
+    color: 'red', // 오류 메시지 색상
+    fontSize: 11,
+    marginLeft:3,
   },
 });
