@@ -89,7 +89,7 @@ function MemberSignUpScreen() {
   };
 
   const handleSignUp = () => {
-    if (!username || !password || !confirmPassword || !nickname || !verificationCode) {
+    if (!userId || !password || !confirmPassword || !nickname || !verificationCode) {
       Alert.alert('오류', '모든 필드를 입력해주세요.');
       return;
     }
@@ -103,12 +103,10 @@ function MemberSignUpScreen() {
       Alert.alert('오류', '필수 약관에 동의해야 합니다.');
       return;
     }
-
-    console.log('회원가입 정보:', { username, password, nickname, phoneNumber, verificationCode, gender });
     Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!');
 
     // 입력 필드 초기화
-    setUsername('');
+    setUserrId('');
     setPassword('');
     setConfirmPassword('');
     setNickname('');
