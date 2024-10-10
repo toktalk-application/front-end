@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import CustomDatePicker from '../../components/CustomDatePicker'; 
 import CheckBox from '@react-native-community/checkbox';
 import {REACT_APP_API_URL} from '@env';
+import axios from 'axios';
 
 
 function MemberSignUpScreen() {
@@ -82,9 +83,7 @@ function MemberSignUpScreen() {
   };
 
   const handleSignUp = async () => {
-    console.log(REACT_APP_API_URL);
-
-    if (!userId || !password || !confirmPassword || !nickname || !verificationCode) {
+    if (!userId || !password || !confirmPassword || !nickname || !birthDate || !gender) {
       Alert.alert('오류', '모든 필드를 입력해주세요.');
       return;
     }
@@ -106,7 +105,7 @@ function MemberSignUpScreen() {
       return;
     }
     try {
-      const response = await axios.post(`${process.env.REACT_APP_API_URL}/members`, signUpData);
+      const response = await axios.post(`${REACT_APP_API_URL}/members`, signUpData);
       console.log('회원가입 성공:', response.data);
       Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!');
       
