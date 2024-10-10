@@ -3,6 +3,37 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet } from 'rea
 
 // 일반 사용자 로그인 화면
 function MemberLoginScreen({ onLogin, navigation }) {
+
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateInputs = () => {
+    const usernameRegex = /^[a-zA-Z0-9]{4,20}$/;
+    const passwordRegex = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?=\\S+$).{10,20}$/;
+
+    let isValid = true;
+
+    // 아이디 유효성 검사
+    if (!usernameRegex.test(username)) {
+      setUsernameError("아이디는 영문 또는 숫자로만 입력해야 합니다. (4~20자)");
+      isValid = false;
+    } else {
+      setUsernameError('');
+    }
+
+    // 비밀번호 유효성 검사
+    if (!passwordRegex.test(password)) {
+      setPasswordError("비밀번호는 영문 대소문자와 숫자, 특수문자를 포함하여 10~20글자로 작성해야 합니다.");
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+
+    return isValid;
+  };
+
   return (
     <View style={styles.formContainer}>
       <Text style={styles.label}>아이디</Text>

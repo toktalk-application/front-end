@@ -5,7 +5,7 @@ import CustomDatePicker from '../../components/CustomDatePicker';
 import CheckBox from '@react-native-community/checkbox'; // CheckBox import
 
 function MemberSignUpScreen() {
-  const [username, setUsername] = useState('');
+  const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [nickname, setNickname] = useState('');
@@ -16,6 +16,12 @@ function MemberSignUpScreen() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [allAccepted, setAllAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState(new Date()); 
+
+  // 유효성 검증. 빨간 줄 올라오기. 
+  const [userIdError, setUserIdError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
+  const [nicknameError, setNicknameError] = useState('');
 
   // 본인인증 관련 상태. 
   const [name, setName] = useState('');
@@ -35,7 +41,44 @@ function MemberSignUpScreen() {
     {classification:'', company_name:'', responsibility:''},
   ])
 
+  const validateUserId = (input) => {
+    const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
+    if (!userIdPattern.test(input)) {
+      setUserIdError('영문 또는 숫자로만 입력해야 합니다. (4~20자)');
+    } else {
+      setUserIdError(''); // 오류 메시지 초기화
+    }
+    setUserId(input);
+  };
 
+  const validatePassword = (input) => {
+    const passwordPattern = /(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*\W)(?=\S+$).{10,20}/;
+    if (!passwordPattern.test(input)) {
+      setPasswordError('영문 대소문자와 숫자, 특수문자를 포함하여 입력해야 합니다. (10~20자)' );
+    } else {
+      setPasswordError(''); // 오류 메시지 초기화
+    }
+    setPassword(input); // 비밀번호 상태 업데이트
+  };
+
+  const validateConfirmPassword = (input) => {
+    if (input !== password) {
+      setConfirmPasswordError('비밀번호가 일치하지 않습니다.');
+    } else {
+      setConfirmPasswordError('');
+    }
+    setConfirmPassword(input);
+  };
+
+  const validateNickname = (input) => {
+    const nicknamePattern = /^[ㄱ-ㅎ가-힣a-zA-Z0-9]{2,10}$/
+    if (!nicknamePattern.test(input)) {
+      setNicknameError('닉네임은 영문 및 한글 또는 숫자로만 입력해야 합니다. (2~10자)');
+    } else {
+      setNicknameError('');
+    }
+    setNickname(input);
+  };
 
   const checkUsernameAvailability = () => {
     Alert.alert('중복 확인', '아이디 중복 확인 로직을 여기에 구현합니다.');
@@ -83,6 +126,10 @@ function MemberSignUpScreen() {
     setBirthDate('');
     setCompany('');
     setCompanyPhone('');
+    setUserIdError('');
+    setPasswordError('');
+    setConfirmPasswordError('');
+    setNicknameError('');
     setLicenses([
       { license_name: '', organization: '' }
     ]); 
@@ -157,85 +204,109 @@ function MemberSignUpScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.sectionContainer}>
-        <Text style={styles.title}>계정정보</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="아이디를 입력해주세요"
-            value={username}
-            onChangeText={setUsername}
-          />
-          <TouchableOpacity style={styles.checkButton} onPress={checkUsernameAvailability}>
-            <Text style={styles.checkButtonText}>중복 확인</Text>
-          </TouchableOpacity>
+        <View style={{ height : 105 }}>
+          <Text style={styles.title}>계정정보</Text>
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="아이디를 입력해주세요"
+                value={userId}
+                onChangeText={validateUserId}
+              />
+              <TouchableOpacity style={styles.checkButton} onPress={checkUsernameAvailability}>
+                <Text style={styles.checkButtonText}>중복 확인</Text>
+              </TouchableOpacity>
+            </View>
+            {userIdError ? ( // 오류 메시지 표시
+                <Text style={styles.errorText}>{userIdError}</Text>
+              ) : null}
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="비밀번호를 입력해주세요"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+        <View style={{ height : 65 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="비밀번호를 입력해주세요"
+              value={password}
+              onChangeText={validatePassword}
+              secureTextEntry
+            />
+          </View>
+          {passwordError ? ( // 오류 메시지 표시
+                <Text style={styles.errorText}>{passwordError}</Text>
+              ) : null}
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="비밀번호 재확인"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            secureTextEntry
-          />
+        <View style={{ height : 65 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="비밀번호 재확인"
+              value={confirmPassword}
+              onChangeText={validateConfirmPassword} 
+              secureTextEntry
+            />
+          </View>
+          {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="닉네임을 입력해주세요"
-            value={nickname}
-            onChangeText={setNickname}
-            keyboardType="default"
-          />
-          <TouchableOpacity style={styles.checkButton} onPress={checkNicknameAvailability}>
-            <Text style={styles.checkButtonText}>중복 확인</Text>
-          </TouchableOpacity>
+        <View style={{ height : 65 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="닉네임을 입력해주세요"
+              value={nickname}
+              onChangeText={validateNickname}
+              keyboardType="default"
+            />
+            <TouchableOpacity style={styles.checkButton} onPress={checkNicknameAvailability}>
+              <Text style={styles.checkButtonText}>중복 확인</Text>
+            </TouchableOpacity>
+          </View>
+          {nicknameError ? <Text style={styles.errorText}>{nicknameError}</Text> : null}
         </View>
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={gender}
-            style={styles.picker}
-            onValueChange={(itemValue, itemIndex) => {
-              setGender(itemValue);
-              setGenderLabel(itemIndex === 0 ? '성별 선택' : itemValue);
-            }}
-          >
-            <Picker.Item label="성별 선택" value="" />
-            <Picker.Item label="여자" value="FEMALE" />
-            <Picker.Item label="남자" value="MALE" />
-            <Picker.Item label="기타" value="ETC" />
-          </Picker>
+        <View style={{ height : 65 }}>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={gender}
+              style={styles.picker}
+              onValueChange={(itemValue, itemIndex) => {
+                setGender(itemValue);
+                setGenderLabel(itemIndex === 0 ? '성별 선택' : itemValue);
+              }}
+            >
+              <Picker.Item label="성별 선택" value="" />
+              <Picker.Item label="여자" value="FEMALE" />
+              <Picker.Item label="남자" value="MALE" />
+              <Picker.Item label="기타" value="ETC" />
+            </Picker>
+          </View>
         </View>
-        <View style={styles.inputContainer}>
-          <CustomDatePicker birthDate={birthDate} setBirthDate={setBirthDate} />
+        <View style={{ width : '100%' }}>
+          <View style={styles.datePickerContainer}>
+            <CustomDatePicker style={styles.datePicker} birthDate={birthDate} setBirthDate={setBirthDate} />
+          </View>
         </View>
       </View>
 
       <View style={styles.sectionContainer}>
         <Text style={styles.title}>본인 인증</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="이름을 입력해주세요"
-            value={name}
-            onChangeText={setName}
-          />
+        <View style={{ height : 65 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="이름을 입력해주세요"
+              value={name}
+              onChangeText={setName}
+            />
+          </View>
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="전화번호를 입력해주세요"
-            value={password}
-            onChangeText={setPassword}
-          />
+        <View style={{ height : 65 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="전화번호를 입력해주세요"
+              value={password}
+              onChangeText={setPassword}
+            />
+          </View>
         </View>
         <View style={styles.rnInputContainer}>
           <TextInput
@@ -275,22 +346,26 @@ function MemberSignUpScreen() {
       </View>
       <View style={styles.sectionContainer}>
         <Text style={styles.title}>자격 인증</Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="소속(센터명, 회사명)"
-            value={company}
-            onChangeText={setCompany}
-          />
+        <View style={{ height : 65 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="소속(센터명, 회사명)"
+              value={company}
+              onChangeText={setCompany}
+            />
+          </View>
         </View>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="소속 전화번호"
-            value={companyPhone}
-            onChangeText={setCompanyPhone}
-            keyboardType="phone-pad"
-          />
+        <View style={{ height : 65 }}>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="소속 전화번호"
+              value={companyPhone}
+              onChangeText={setCompanyPhone}
+              keyboardType="phone-pad"
+            />
+          </View>
         </View>
         <View style={styles.detailSectionContainer}>
         <Text style={styles.detailTitle}>공인 자격</Text>
@@ -436,6 +511,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 15,
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height:40
+  },
   input: {
     flex: 1,
     height: 40,
@@ -560,6 +640,11 @@ const styles = StyleSheet.create({
   },
   removeButtonText: {
     color: '#fff',
+  },
+  errorText: {
+    color: 'red', // 오류 메시지 색상
+    fontSize: 12,
+    marginLeft:5,
   },
 });
 
