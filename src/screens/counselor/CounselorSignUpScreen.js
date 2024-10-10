@@ -3,8 +3,12 @@ import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert 
 import { Picker } from '@react-native-picker/picker';
 import CustomDatePicker from '../../components/CustomDatePicker'; 
 import CheckBox from '@react-native-community/checkbox'; // CheckBox import
+import sendGetRequest from '../../axios/SendGetRequest';
+import sendPostRequest from '../../axios/SendPostRequest';
+import { useNavigation } from '@react-navigation/native';
 
 function MemberSignUpScreen() {
+  const navigation = useNavigation();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -16,6 +20,9 @@ function MemberSignUpScreen() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [allAccepted, setAllAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState(new Date()); 
+
+  const [userIdDuplChecked, setUserIdDuplChecked] = useState();
+  const [nicknameDuplChecked, setNicknameDuplChecked] = useState();
 
   // 유효성 검증. 빨간 줄 올라오기. 
   const [userIdError, setUserIdError] = useState('');
@@ -35,10 +42,10 @@ function MemberSignUpScreen() {
   const [companyPhone, setCompanyPhone] = useState(''); // 소속 전화번호
   // 자격증
   const [licenses, setLicenses] = useState( [
-    {license_name:'', organization:''}
+    {licenseName:'', organization:''}
   ])
   const [careers, setCareers] = useState( [
-    {classification:'', company_name:'', responsibility:''},
+    {classification:'', company:'', responsibility:''},
   ])
 
   const validateUserId = (input) => {
@@ -49,6 +56,7 @@ function MemberSignUpScreen() {
       setUserIdError(''); // 오류 메시지 초기화
     }
     setUserId(input);
+    setUserIdDuplChecked(false);
   };
 
   const validatePassword = (input) => {
@@ -59,6 +67,11 @@ function MemberSignUpScreen() {
       setPasswordError(''); // 오류 메시지 초기화
     }
     setPassword(input); // 비밀번호 상태 업데이트
+
+    console.log("password: ", input, " confirmPassword: ", confirmPassword);
+    if(confirmPassword.length !== 0){
+      setConfirmPasswordError(input !== confirmPassword ? '비밀번호가 일치하지 않습니다.' : '');
+    }
   };
 
   const validateConfirmPassword = (input) => {
@@ -78,18 +91,60 @@ function MemberSignUpScreen() {
       setNicknameError('');
     }
     setNickname(input);
+    setNicknameDuplChecked(false);
   };
 
   const checkUsernameAvailability = () => {
-    Alert.alert('중복 확인', '아이디 중복 확인 로직을 여기에 구현합니다.');
+    //Alert.alert('중복 확인', '아이디 중복 확인 로직을 여기에 구현합니다.');
+    console.log("userId: ", userId);
+    if(userId.length === 0) {
+      Alert.alert("아이디를 입력해주세요");
+      return;
+    }
+    if(userIdError){
+      Alert.alert("올바른 형식으로 입력해주세요");
+      return;
+    }
+
+    sendGetRequest(
+      {
+        endPoint: "/members/userid-availabilities",
+        requestParams: {
+          userId: userId
+        },
+        onSuccess: () => {
+          setUserIdDuplChecked(true);
+          Alert.alert("사용 가능한 아이디입니다.")
+        },
+        onFailure: () => Alert.alert("이미 사용중인 아이디입니다.")
+      }
+    );
   };
 
   const checkNicknameAvailability = () => {
-    Alert.alert('중복 확인', '닉네임 중복 확인 로직을 여기에 구현합니다.');
+    if(nickname.length === 0){
+      Alert.alert("닉네임을 입력해주세요");
+      return;
+    }
+    if(nicknameError){
+      Alert.alert("올바른 형식으로 입력해주세요");
+      return;
+    }
+    sendGetRequest({
+      endPoint: "/members/nickname-availabilities",
+      requestParams: {
+        nickname: nickname,
+      },
+      onSuccess: () => {
+        setNicknameDuplChecked(true);
+        Alert.alert("사용 가능한 닉네임입니다.");
+      },
+      onFailure: () => Alert.alert("이미 사용중인 닉네임입니다."),
+    })
   };
 
   const handleSignUp = () => {
-    if (!userId || !password || !confirmPassword || !nickname || !verificationCode) {
+    if (!userId || !password || !confirmPassword || !nickname) {
       Alert.alert('오류', '모든 필드를 입력해주세요.');
       return;
     }
@@ -103,37 +158,27 @@ function MemberSignUpScreen() {
       Alert.alert('오류', '필수 약관에 동의해야 합니다.');
       return;
     }
-    Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!');
 
-    // 입력 필드 초기화
-    setUserrId('');
-    setPassword('');
-    setConfirmPassword('');
-    setNickname('');
-    setPhoneNumber('');
-    setVerificationCode('');
-    setGender('');
-    setGenderLabel('성별 선택');
-    setTermsAccepted(false);
-    setPrivacyAccepted(false);
-    setAllAccepted(false); 
-    setName('');
-    setResidentNumber1('');
-    setResidentNumber2('');
-    setCarrier('');
-    setBirthDate('');
-    setCompany('');
-    setCompanyPhone('');
-    setUserIdError('');
-    setPasswordError('');
-    setConfirmPasswordError('');
-    setNicknameError('');
-    setLicenses([
-      { license_name: '', organization: '' }
-    ]); 
-    setCareers([
-      {classification:'', company_name:'', responsibility:''}
-    ])
+    sendPostRequest({
+      endPoint: "/counselors",
+      requestBody: {
+        userId: userId,
+        password: password,
+        phone: phoneNumber,
+        birth: birthDate.toISOString().split('T')[0],
+        gender: gender,
+        name: name,
+        currentCompany: company,
+        currentCompanyPhone: companyPhone,
+        licenses: licenses,
+        careers: careers,
+      },
+      onSuccess: () => {
+        Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!')
+        navigation.navigate("CounselorMain");
+      },
+      onFailure: () => Alert.alert('회원가입 실패', '회원가입 실패~'),
+    });
   };
 
   const handleLicenseChange = (index, field, value) => {
@@ -161,7 +206,7 @@ function MemberSignUpScreen() {
 
   const addCareer = () => {
     if (careers.length < 3) {
-      setCareers([...careers, {classification:'', companyName:'', responsibility:''}]);
+      setCareers([...careers, {classification:'', company:'', responsibility:''}]);
     } else {
       Alert.alert('오류', '경력 사항은 최대 3개까지 등록할 수 있습니다.');
     }
@@ -212,7 +257,7 @@ function MemberSignUpScreen() {
                 onChangeText={validateUserId}
               />
               <TouchableOpacity style={styles.checkButton} onPress={checkUsernameAvailability}>
-                <Text style={styles.checkButtonText}>중복 확인</Text>
+                <Text style={styles.checkButtonText}>{userIdDuplChecked ? "중복 확인  ✓" : "중복 확인"}</Text>
               </TouchableOpacity>
             </View>
             {userIdError ? ( // 오류 메시지 표시
@@ -255,7 +300,7 @@ function MemberSignUpScreen() {
               keyboardType="default"
             />
             <TouchableOpacity style={styles.checkButton} onPress={checkNicknameAvailability}>
-              <Text style={styles.checkButtonText}>중복 확인</Text>
+              <Text style={styles.checkButtonText}>{nicknameDuplChecked ? "중복 확인  ✓" : "중복 확인"}</Text>
             </TouchableOpacity>
           </View>
           {nicknameError ? <Text style={styles.errorText}>{nicknameError}</Text> : null}
@@ -301,8 +346,8 @@ function MemberSignUpScreen() {
             <TextInput
               style={styles.input}
               placeholder="전화번호를 입력해주세요"
-              value={password}
-              onChangeText={setPassword}
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
             />
           </View>
         </View>
@@ -381,8 +426,8 @@ function MemberSignUpScreen() {
             <TextInput
               style={styles.detailInput}
               placeholder="자격이름"
-              value={license.license_name}
-              onChangeText={(value) => handleLicenseChange(index, 'license_name', value)}
+              value={license.licenseName}
+              onChangeText={(value) => handleLicenseChange(index, 'licenseName', value)}
             />
             {licenses.length > 1 && (
               <TouchableOpacity style={styles.removeButton} onPress={() => removeLicense(index)}>
@@ -417,8 +462,8 @@ function MemberSignUpScreen() {
               <TextInput
                 style={styles.detailInput}
                 placeholder="기관/회사명"
-                value={career.company_name}
-                onChangeText={(value) => handleCareerChange(index, 'companyName', value)}
+                value={career.company}
+                onChangeText={(value) => handleCareerChange(index, 'company', value)}
               />
               <TextInput
                 style={styles.detailInput}
