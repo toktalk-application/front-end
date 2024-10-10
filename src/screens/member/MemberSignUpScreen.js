@@ -3,6 +3,8 @@ import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert 
 import { Picker } from '@react-native-picker/picker';
 import CustomDatePicker from '../../components/CustomDatePicker'; 
 import CheckBox from '@react-native-community/checkbox';
+import {REACT_APP_API_URL} from '@env';
+
 
 function MemberSignUpScreen() {
   const [userId, setUserId] = useState('');
@@ -80,6 +82,7 @@ function MemberSignUpScreen() {
   };
 
   const handleSignUp = async () => {
+    console.log(REACT_APP_API_URL);
 
     if (!userId || !password || !confirmPassword || !nickname || !verificationCode) {
       Alert.alert('오류', '모든 필드를 입력해주세요.');
