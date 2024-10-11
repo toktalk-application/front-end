@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button, Alert} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button, Alert } from 'react-native';
 import CounselorPlanCalendar from '../../components/Calendar/CounselorPlanCalendar';
 import { useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+import sendPatchRequest from '../../axios/PatchRequest';
 
 function CounselorPlanScreen() {
   const { state } = useAuth();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDay, setSelectedDay] = useState('일요일'); // 현재 선택된 요일
-  const [availability, setAvailability] = useState({
-    '일요일': { '9:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false },
-    '월요일': { '9:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false },
-    '화요일': { '9:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false },
-    '수요일': { '9:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false },
-    '목요일': { '9:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false },
-    '금요일': { '9:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false },
-    '토요일': { '9:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false },
-  });
+  const initialTimeslots = { '09:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false };
+  const [timeslots, setTimeslots] = useState(initialTimeslots);
 
   const navigation = useNavigation();
 
@@ -27,6 +21,28 @@ function CounselorPlanScreen() {
     '일요일': ['12:00', '13:00', '16:00', '17:00', '18:00', '20:00'],
     // 다른 요일의 기본 시간 추가 가능
   };
+
+  useEffect(() => {
+    if(!selectedDate) return;
+
+    sendGetRequest({
+      token: state.token,
+      endPoint: "/counselors/available-dates",
+      requestParams: {
+        date: selectedDate
+      },
+      onSuccess: (data) => {
+        console.log("data: ", data);
+        let newTimeslots = initialTimeslots;
+        Object.keys(data.data.availableTimes).forEach(time => {
+          newTimeslots[time] = true;
+        });
+        console.log("newTimeslots: ", newTimeslots);
+        setTimeslots(newTimeslots);
+      },
+      onFailure: () => Alert.alert("실패", "내 상담시간 조회 실패!")
+    });
+  }, [selectedDate]);
 
   const handleDayPress = (day) => {
     if (selectedDate === day.dateString) {
@@ -41,7 +57,7 @@ function CounselorPlanScreen() {
       console.log('선택된 요일:', dayOfWeek); // 요일 출력
 
       // 기본 시간 설정
-      if (defaultTimes[dayOfWeek]) {
+      /* if (defaultTimes[dayOfWeek]) {
         const updatedAvailability = { ...availability[dayOfWeek] };
         defaultTimes[dayOfWeek].forEach(time => {
           updatedAvailability[time] = true; // 해당 시간의 상태를 true로 설정
@@ -50,17 +66,14 @@ function CounselorPlanScreen() {
           ...prev,
           [dayOfWeek]: updatedAvailability,
         }));
-      }
+      } */
     }
   };
 
   const handleTimePress = (time) => {
-    setAvailability((prevAvailability) => ({
+    setTimeslots((prevAvailability) => ({
       ...prevAvailability,
-      [selectedDay]: {
-        ...prevAvailability[selectedDay],
-        [time]: !prevAvailability[selectedDay][time], // 현재 상태를 반전시킴
-      },
+      [time]: !timeslots[time],
     }));
   };
   const handleComplete = () => {
@@ -69,21 +82,25 @@ function CounselorPlanScreen() {
       return;
     }
 
-    const availableTimes = Object.keys(availability[selectedDay]).filter(time => availability[selectedDay][time]);
-
-    // 선택된 날짜에 해당하는 예약 가능 시간만 담기
-    const dataToSend = {
-      date: selectedDate,  // 선택된 날짜 추가
-      [selectedDay]: availableTimes,
-    };
-
+    const availableTimes = Object.keys(timeslots).filter(time => timeslots[time]);
+    
     // 각 요일 및 날짜에 해당하는 배열을 콘솔에 출력
-    console.log('예약 가능 시간:', dataToSend);
+    console.log('예약 가능 시간:', availableTimes);
 
     // 여기에 POST 요청 코드를 추가할 수 있습니다.
+    sendPatchRequest({
+      token: state.token,
+      endPoint: "/counselors/available-dates",
+      requestBody: {
+        date: selectedDate,
+        times: availableTimes,
+      },
+      onSuccess: () => Alert.alert("요청 성공", "상담 시간 변경 완료"),
+      onFailure: () => Alert.alert("요청 실패", "상담 시간 변경 실패"),
+    })
   };
 
-  
+
 
   return (
     <ScrollView style={styles.container}>
@@ -94,22 +111,22 @@ function CounselorPlanScreen() {
       </View>
       <CounselorPlanCalendar onDayPress={handleDayPress} selectedDate={selectedDate} />
       <View style={styles.timeDetailContainer}>
-      <View style={styles.timeGrid}>
-        {Object.keys(availability[selectedDay]).map((time) => (
-          <TouchableOpacity
-            key={time}
-            style={[styles.timeButton, availability[selectedDay][time] && styles.selectedButton]}
-            onPress={() => handleTimePress(time)}
-          >
-            <Text style={styles.timeButtonText}>{time}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <Text style={styles.notice}>변경 시,</Text>
-      <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>
-        <View style={styles.buttonContainer}>
-            <Button title="변경 완료" onPress={handleComplete} color="#001932" />
-        </View>
+        {!selectedDate ? <View/> : <View style={styles.timeGrid}>
+          {Object.keys(timeslots).map((time) => (
+            <TouchableOpacity
+              key={time}
+              style={[styles.timeButton, timeslots[time] && styles.selectedButton]}
+              onPress={() => handleTimePress(time)}
+            >
+              <Text style={styles.timeButtonText}>{time}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>}
+        {!selectedDate ? <View /> : <Text style={styles.notice}>변경 시,</Text>}
+        {!selectedDate ? <View /> : <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>}
+        {!selectedDate ? <View /> : <View style={styles.buttonContainer}>
+          <Button title="변경 완료" onPress={handleComplete} color="#001932" />
+        </View>}
       </View>
     </ScrollView>
   );
@@ -138,9 +155,9 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   timeDetailContainer: {
-    marginLeft:20,
-    marginRight:20,
-    marginBottom:20
+    marginLeft: 20,
+    marginRight: 20,
+    marginBottom: 20
   },
   timeGrid: {
     flexDirection: 'row',
