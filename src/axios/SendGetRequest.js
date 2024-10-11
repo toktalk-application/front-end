@@ -2,6 +2,10 @@ import axios from "axios";
 import {REACT_APP_API_URL} from '@env';
 
 const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFailure }) => {
+    /* console.log("token: ", token);
+    console.log("endPoint: ", endPoint);
+    console.log("requestParams: ", requestParams); */
+    
     try{
         const response = await axios.get(
             REACT_APP_API_URL + endPoint, 
