@@ -3,11 +3,14 @@ import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Alert 
 import { Picker } from '@react-native-picker/picker';
 import CustomDatePicker from '../../components/CustomDatePicker'; 
 import CheckBox from '@react-native-community/checkbox';
-import {REACT_APP_API_URL} from '@env';
-import axios from 'axios';
+import sendPostRequest from '../../axios/SendPostRequest';
+import sendGetRequest from '../../axios/SendGetRequest';
+import PassModal from '../../components/PassModal';
+import { useNavigation } from '@react-navigation/native';
 
 
 function MemberSignUpScreen() {
+  const navigation = useNavigation();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -19,7 +22,6 @@ function MemberSignUpScreen() {
   const [privacyAccepted, setPrivacyAccepted] = useState(false);
   const [allAccepted, setAllAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState(new Date()); 
-  const [open, setOpen] = useState(false); 
 
   // 유효성 검증. 빨간 줄 올라오기. 
   const [userIdError, setUserIdError] = useState('');
@@ -34,6 +36,8 @@ function MemberSignUpScreen() {
   const [residentNumber1, setResidentNumber1] = useState('');
   const [residentNumber2, setResidentNumber2] = useState('');
   const [carrier, setCarrier] = useState('');
+  // 본인인증 내용이 다 맞으면 패스 인증으로 넘어감. 
+  const [modalVisible, setModalVisible] = useState(false);
 
   const validateUserId = (input) => {
     const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
@@ -75,15 +79,55 @@ function MemberSignUpScreen() {
   };
 
   const checkUsernameAvailability = () => {
-    Alert.alert('중복 확인', '아이디 중복 확인 로직을 여기에 구현합니다.');
+    console.log("userId: ", userId);
+    if(userId.length === 0) {
+      Alert.alert("아이디를 입력해주세요");
+      return;
+    }
+    if(userIdError){
+      Alert.alert("올바른 형식으로 입력해주세요");
+      return;
+    }
+
+    sendGetRequest(
+      {
+        endPoint: "/members/userid-availabilities",
+        requestParams: {
+          userId: userId
+        },
+        onSuccess: () => {
+          setUserIdDuplChecked(true);
+          Alert.alert("사용 가능한 아이디입니다.")
+        },
+        onFailure: () => Alert.alert("이미 사용중인 아이디입니다.")
+      }
+    );
   };
 
   const checkNicknameAvailability = () => {
-    Alert.alert('중복 확인', '닉네임 중복 확인 로직을 여기에 구현합니다.');
+    if(nickname.length === 0){
+      Alert.alert("닉네임을 입력해주세요");
+      return;
+    }
+    if(nicknameError){
+      Alert.alert("올바른 형식으로 입력해주세요");
+      return;
+    }
+    sendGetRequest({
+      endPoint: "/members/nickname-availabilities",
+      requestParams: {
+        nickname: nickname,
+      },
+      onSuccess: () => {
+        setNicknameDuplChecked(true);
+        Alert.alert("사용 가능한 닉네임입니다.");
+      },
+      onFailure: () => Alert.alert("이미 사용중인 닉네임입니다."),
+    })
   };
 
-  const handleSignUp = async () => {
-    if (!userId || !password || !confirmPassword || !nickname || !birthDate || !gender) {
+  const handleSignUp = () => {
+    if (!userId || !password || !confirmPassword || !nickname) {
       Alert.alert('오류', '모든 필드를 입력해주세요.');
       return;
     }
@@ -92,59 +136,54 @@ function MemberSignUpScreen() {
       Alert.alert('오류', '비밀번호가 일치하지 않습니다.');
       return;
     }
-    const signUpData = {
-      userId,
-      password,
-      nickname,
-      birth: birthDate.toISOString().split('T')[0], // YYYY-MM-DD 형식으로 변환
-      gender: gender === 'MALE' ? 'MALE' : 'FEMALE', // 성별 처리
-    };
 
     if (!termsAccepted || !privacyAccepted) {
       Alert.alert('오류', '필수 약관에 동의해야 합니다.');
       return;
     }
-    try {
-      const response = await axios.post(`${REACT_APP_API_URL}/members`, signUpData);
-      console.log('회원가입 성공:', response.data);
-      Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!');
-      
-      // 입력 필드 초기화
-      setUserId('');
-      setPassword('');
-      setConfirmPassword('');
-      setNickname('');
-      setPhoneNumber('');
-      setVerificationCode('');
-      setGender('');
-      setGenderLabel('성별 선택');
-      setTermsAccepted(false);
-      setPrivacyAccepted(false);
-      setAllAccepted(false); 
-      setName('');
-      setResidentNumber1('');
-      setResidentNumber2('');
-      setCarrier('');
-      setBirthDate(new Date()); // birthDate 초기화
-      setUserIdError('');
-      setPasswordError('');
-      setConfirmPasswordError('');
-      setNicknameError('');
-    } catch (error) {
-      console.error('회원가입 실패:', error);
-      Alert.alert('오류', '회원가입에 실패했습니다. 다시 시도해 주세요.');
-    }
+
+    sendPostRequest({
+      endPoint: "/members",
+      requestBody: {
+        userId: userId,
+        password: password,
+        birth: birthDate.toISOString().split('T')[0],
+        gender: gender,
+        nickname: nickname,
+      },
+      onSuccess: () => {
+        Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!')
+        navigation.navigate('Tabs', { userType: 'MEMBER' });
+      },
+      onFailure: () => Alert.alert('회원가입 실패', '회원가입 실패~'),
+    });
   };
 
+  //PASS 인증으로 넘어가는 로직. 
   const handleCertification = () => {
+
     // 모든 필드가 입력되었는지 확인
-    if (!name || !phoneNumber || !carrier) {
+    if (!name || !phoneNumber || !carrier ||!residentNumber1 ||!residentNumber2) {
       Alert.alert('오류', '모든 본인 인증 필드를 입력해주세요.');
       return;
     }
-  
-    // 인증 로직 구현
-    Alert.alert('인증 진행', '인증 로직을 구현할 예정입니다.');
+    const fullResidentNumber = residentNumber1 + residentNumber2;
+
+    const queryParams = new URLSearchParams({
+      name: name,
+      phoneNo: phoneNumber,
+      identity: fullResidentNumber,
+      telecom: carrier
+    }).toString();
+
+    sendPostRequest({
+      endPoint: `/identity/verify?${queryParams}`, 
+      onSuccess: () => {
+        setModalVisible(true);
+        
+      },
+      onFailure: () => Alert.alert("본인 인증 필드를 다시 확인해주세요.")
+    })
   };
   
   const toggleAllAccepted = () => {
@@ -255,8 +294,8 @@ function MemberSignUpScreen() {
             <TextInput
               style={styles.input}
               placeholder="전화번호를 입력해주세요"
-              value={password}
-              onChangeText={setPassword}
+              value={phoneNumber}
+              onChangeText={setPhoneNumber}
             />
           </View>
         </View>
@@ -336,6 +375,16 @@ function MemberSignUpScreen() {
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>회원가입</Text>
       </TouchableOpacity>
+
+      <PassModal 
+        visible={modalVisible} 
+        onClose={() => setModalVisible(false)} 
+        name={name} 
+        phoneNumber={phoneNumber} 
+        carrier={carrier} 
+        residentNumber1={residentNumber1} 
+        residentNumber2={residentNumber2}
+      />
     </ScrollView>
   );
 }

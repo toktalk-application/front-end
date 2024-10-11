@@ -16,8 +16,8 @@ const sendPostRequest = async({ token, endPoint, requestBody, requestParams, onS
             },
         )
         /* console.log("response: ", response); */
-        if(response.status === 201){
-            if(onSuccess) onSuccess();
+        if (response.status === 200 || response.status === 201) {
+            if (onSuccess) onSuccess();
         }
     }catch(error){
         console.error('요청 실패: ', error);
