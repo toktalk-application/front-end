@@ -1,18 +1,17 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import MenuItem from '../../components/MenuItem.js'; 
 import calendarIcon from '../../../assets/images/calendar.png'
 import chargeIcon from '../../../assets/images/charge.png'
 import profileIcon from '../../../assets/images/profile.png'
 import { useNavigation } from '@react-navigation/native';
+import sendGetRequest from '../../axios/SendGetRequest.js';
+import { useAuth } from '../../auth/AuthContext.js';
 
 const CounselorMyScreen = () => {
+  const { state } = useAuth();
   const navigation = useNavigation();
-  // 더미 데이터
-  const counselorData = {
-    name: "홍길동",
-    imageUrl: "https://via.placeholder.com/80", // 더미 이미지 URL
-  };
+
   const handleMenuPress = (menu) => {
     if (menu === '프로필 관리') {
       navigation.navigate('프로필 관리'); // 프로필 관리 화면으로 이동
@@ -22,6 +21,19 @@ const CounselorMyScreen = () => {
       navigation.navigate('일정 관리'); // 일정 관리 화면으로 이동
     }
   };
+  const [myData, setMyData] = useState({data:{}});
+
+  useEffect(() => {
+    sendGetRequest({
+      token: state.token,
+      endPoint: `/counselors/${state.identifier}`,
+      onSuccess: (data) => {
+        console.log("data: ", data);
+        setMyData(data.data);
+      },
+      onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
+    });
+  }, []);
 
 
   return (
@@ -29,11 +41,11 @@ const CounselorMyScreen = () => {
       <View style={styles.infoContainer}>
         <View style={styles.nameBingContainer}>
           <Image
-            source={{ uri: counselorData.imageUrl }}
+            source={{ uri: myData.profileImage || "https://via.placeholder.com/80" }}
             style={styles.image}
           />
           <View style={styles.nameContainer}>
-            <Text style={styles.name}>{counselorData.name}</Text>
+            <Text style={styles.name}>{myData.name}</Text>
             <Text style={styles.counselor}> 상담사님 </Text>
           </View>
         </View>

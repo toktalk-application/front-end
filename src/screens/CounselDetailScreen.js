@@ -168,7 +168,7 @@ const CounselDetailScreen = () => {
     };
 
     // 후에 UserInfo 받아서 처리 할 예정. 
-    const userType = 'member'; 
+    const userType = 'counselor'; 
 
     
     return (
