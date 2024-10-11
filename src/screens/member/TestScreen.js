@@ -1,21 +1,24 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import sendPostRequest from '../../axios/SendPostRequest';
+import { useAuth } from '../../auth/AuthContext';
+
 
 const questions = [
-  "최근에 기분이 좋지 않거나 우울한 기분이 드는    경우가 많았나요?",
-  "일상적인 활동에 대한 흥미가 줄어들었나요?",
-  "쉽게 피로를 느끼거나 에너지가 없다고 느끼나요?",
-  "불안하거나 긴장되는 상황을 자주 경험하나요?",
-  "미래에 대한 걱정이나 두려움이 자주 드나요?",
-  "수면의 질이 나빠졌거나 불면증을 겪고 있나요?",
-  "집중력이 저하되어 일이나 공부에 어려움을 겪고 있나요?",
-  "사소한 일에도 쉽게 화가 나거나 짜증이 나나요?",
-  "자신의 감정을 표현하는 것이 어렵다고 느끼나요?",
-  "어려운 상황을 스스로 해결하는 데 어려움을      느끼나요?"
+  "일 또는 여가 활동을 하는데 흥미나 즐거움을       느끼지 못한다.",
+  "기분이 가라앉거나 우울하거나 희망이 없다.",
+  "잠이 들거나 계속 잠을 자는 것이 어렵거나 잠을    너무 많이 잔다.",
+  "피곤하다고 느끼거나 기운이 거의 없다.",
+  "입맛이 없거나 과식을 한다.",
+  "자신을 부정적으로 보거나 자신이 실패자라고     느끼거나 자신 또는 가족을 실망시킨다.",
+  "신문을 읽거나 텔레비전을 보는 것과 같은 일에    집중하는 것이 어렵다.",
+  "다른 사람들이 주목할 정도로 너무 느리게 움직이거나 말을 하거나, 반대로 평상시보다 많이 움직여서 너무 안절부절 못하거나 들떠 있다.",
+  "자신이 죽는 것이 더 낫다고 생각하거나 어떤 식으로든 자신을 해칠 것이라고 생각한다."
 ];
 
 const TestScreen = () => {
+  const { state } = useAuth();
   const navigation = useNavigation();
   const [responses, setResponses] = useState(Array(questions.length).fill(null)); // null로 초기화
   const progressAnim = useRef(new Animated.Value(0)).current; // 애니메이션 값 초기화
@@ -61,6 +64,25 @@ const TestScreen = () => {
     }
   
     const totalScore = responses.reduce((acc, curr) => acc + curr, 0);
+
+    // post 점수 보내는 로직. memberId, score
+
+    sendPostRequest({
+      token: state.token,
+      endPoint: `/test`,
+      requestBody: {
+        score: totalScore
+      },
+      onSuccess: () => {
+        // TestResultScreen으로 이동.  점수에 따라 보여지는 내용이 다름. 
+        navigation.navigate('',)
+        navigation.navigate('TestResult', { score: totalScore });
+      },
+      onFailure: () => {
+          Alert.alert("오류", "테스트에 실패했습니다. 다시 시도해주세요.")
+      }
+  });
+
     Alert.alert("설문이 완료되었습니다!", `응답: ${responses.join(', ')}\n총 점수: ${totalScore}`, [
       {
         text: "확인",
@@ -97,7 +119,7 @@ const TestScreen = () => {
             <View key={index} style={styles.questionContainer}>
               <Text style={styles.questionText}>{`Q${index + 1}. ${question}`}</Text>
               <View style={styles.buttonContainer}>
-                {[1, 2, 3, 4, 5].map((value) => (
+                {[0, 1, 2, 3].map((value) => (
                   <TouchableOpacity
                     key={value}
                     style={[
@@ -186,7 +208,7 @@ const styles = StyleSheet.create({
   },
   button: {
     flex: 1,
-    marginHorizontal: 10,
+    marginHorizontal:17,
     borderWidth: 1,
     borderColor: '#001F3F',
     backgroundColor: 'white',

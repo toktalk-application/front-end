@@ -23,6 +23,9 @@ function MemberSignUpScreen() {
   const [allAccepted, setAllAccepted] = useState(false);
   const [birthDate, setBirthDate] = useState(new Date()); 
 
+  const [userIdDuplChecked, setUserIdDuplChecked] = useState();
+  const [nicknameDuplChecked, setNicknameDuplChecked] = useState();
+
   // 유효성 검증. 빨간 줄 올라오기. 
   const [userIdError, setUserIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -38,6 +41,8 @@ function MemberSignUpScreen() {
   const [carrier, setCarrier] = useState('');
   // 본인인증 내용이 다 맞으면 패스 인증으로 넘어감. 
   const [modalVisible, setModalVisible] = useState(false);
+
+  const residentNumber2InputRef = React.useRef(null);
 
   const validateUserId = (input) => {
     const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
@@ -95,9 +100,15 @@ function MemberSignUpScreen() {
         requestParams: {
           userId: userId
         },
-        onSuccess: () => {
-          setUserIdDuplChecked(true);
-          Alert.alert("사용 가능한 아이디입니다.")
+        onSuccess: (response) => {
+          console.log('response: ', response);
+          if(response.data){
+            setUserIdDuplChecked(true);
+            Alert.alert("사용 가능한 아이디입니다.")
+          }else{
+            setUserIdDuplChecked(false);
+            Alert.alert("이미 사용중인 아이디입니다.")
+          }
         },
         onFailure: () => Alert.alert("이미 사용중인 아이디입니다.")
       }
@@ -118,11 +129,15 @@ function MemberSignUpScreen() {
       requestParams: {
         nickname: nickname,
       },
-      onSuccess: () => {
-        setNicknameDuplChecked(true);
-        Alert.alert("사용 가능한 닉네임입니다.");
+      onSuccess: (response) => {
+        if(response.data){
+          setNicknameDuplChecked(true);
+          Alert.alert("사용 가능한 닉네임입니다.");
+        }else{
+          setNicknameDuplChecked(false);
+          Alert.alert("이미 사용중인 닉네임입니다.")
+        } 
       },
-      onFailure: () => Alert.alert("이미 사용중인 닉네임입니다."),
     })
   };
 
@@ -141,6 +156,16 @@ function MemberSignUpScreen() {
       Alert.alert('오류', '필수 약관에 동의해야 합니다.');
       return;
     }
+    if(!userIdDuplChecked) {
+      Alert.alert('오류', '아이디 중복 확인을 진행해주세요.');
+      return;
+    }
+
+    if(!nicknameDuplChecked) {
+      Alert.alert('오류', '닉네임 중복 확인을 진행해주세요.');
+      return;
+    }
+
 
     sendPostRequest({
       endPoint: "/members",
@@ -163,10 +188,11 @@ function MemberSignUpScreen() {
   const handleCertification = () => {
 
     // 모든 필드가 입력되었는지 확인
-    if (!name || !phoneNumber || !carrier ||!residentNumber1 ||!residentNumber2) {
+    if (!name || !phoneNumber || !carrier ||!residentNumber1 || !residentNumber2) {
       Alert.alert('오류', '모든 본인 인증 필드를 입력해주세요.');
       return;
     }
+
     const fullResidentNumber = residentNumber1 + residentNumber2;
 
     const queryParams = new URLSearchParams({
@@ -177,12 +203,14 @@ function MemberSignUpScreen() {
     }).toString();
 
     sendPostRequest({
-      endPoint: `/identity/verify?${queryParams}`, 
+      endPoint: `/api/identity/verify?${queryParams}`, 
       onSuccess: () => {
         setModalVisible(true);
-        
+
       },
-      onFailure: () => Alert.alert("본인 인증 필드를 다시 확인해주세요.")
+      onFailure: () => {
+        Alert.alert("본인 인증 필드를 다시 확인해주세요.")
+      }
     })
   };
   
@@ -190,6 +218,16 @@ function MemberSignUpScreen() {
     setAllAccepted(!allAccepted);
     setTermsAccepted(!allAccepted);
     setPrivacyAccepted(!allAccepted);
+  };
+
+  const handleResidentNumber1Change = (text) => {
+    const newValue = text.replace(/[^0-9]/g, ''); // 숫자만 입력 가능
+    setResidentNumber1(newValue);
+
+    // 6자 입력 시 자동으로 residentNumber2로 포커스 이동
+    if (newValue.length === 6) {
+        residentNumber2InputRef.current.focus(); // 포커스 이동
+    }
   };
 
 
@@ -206,7 +244,7 @@ function MemberSignUpScreen() {
                 onChangeText={validateUserId}
               />
               <TouchableOpacity style={styles.checkButton} onPress={checkUsernameAvailability}>
-                <Text style={styles.checkButtonText}>중복 확인</Text>
+              <Text style={styles.checkButtonText}>{userIdDuplChecked ? "중복 확인  ✓" : "중복 확인"}</Text>
               </TouchableOpacity>
             </View>
             {userIdError ? ( // 오류 메시지 표시
@@ -249,7 +287,7 @@ function MemberSignUpScreen() {
               keyboardType="default"
             />
             <TouchableOpacity style={styles.checkButton} onPress={checkNicknameAvailability}>
-              <Text style={styles.checkButtonText}>중복 확인</Text>
+            <Text style={styles.checkButtonText}>{nicknameDuplChecked ? "중복 확인  ✓" : "중복 확인"}</Text>
             </TouchableOpacity>
           </View>
           {nicknameError ? <Text style={styles.errorText}>{nicknameError}</Text> : null}
@@ -291,20 +329,22 @@ function MemberSignUpScreen() {
         </View>
         <View style={{ height : 65 }}>
           <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="전화번호를 입력해주세요"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-            />
-          </View>
+              <TextInput
+                  style={styles.input}
+                  placeholder="전화번호를 입력해주세요"
+                  value={phoneNumber}
+                  onChangeText={text => setPhoneNumber(text.replace(/[^0-9]/g, ''))} // 숫자만 입력 가능
+                  keyboardType="numeric" // 숫자 키패드 표시
+              />
+        </View>
+          <Text style={styles.note}>하이픈(-) 없이 입력해주세요.</Text>
         </View>
         <View style={styles.rnInputContainer}>
           <TextInput
             style={styles.rninput}
             placeholder="주민등록번호 앞자리"
             value={residentNumber1}
-            onChangeText={setResidentNumber1}
+            onChangeText={handleResidentNumber1Change}
             keyboardType="number-pad"
           />
         <View>
@@ -314,7 +354,8 @@ function MemberSignUpScreen() {
             style={styles.rninput}
             placeholder="주민등록번호 뒷자리"
             value={residentNumber2}
-            onChangeText={setResidentNumber2}
+            ref={residentNumber2InputRef}
+            onChangeText={text => setResidentNumber2(text.replace(/[^0-9]/g, ''))} 
             secureTextEntry // 뒷자리는 *****로 표시
             keyboardType="number-pad"
           />
@@ -400,6 +441,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 10,
     marginBottom: 20,
+    marginHorizontal:10
   },
   title: {
     backgroundColor: 'lightgray',
@@ -491,8 +533,14 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red', // 오류 메시지 색상
-    fontSize: 12,
+    fontSize: 11,
     marginLeft:5,
+  },
+  note: {
+    marginTop:2,
+    marginLeft:5,
+    fontSize: 11, // 폰트 크기
+    color: 'gray', // 텍스트 색상
   },
 });
 
