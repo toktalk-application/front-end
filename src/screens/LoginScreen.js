@@ -3,7 +3,6 @@ import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet,Alert } fro
 import axios from 'axios';
 import {REACT_APP_API_URL} from '@env';
 import { useAuth } from '../auth/AuthContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // 일반 사용자 로그인 화면
 function MemberLoginScreen({ navigation }) {
@@ -58,6 +57,12 @@ function MemberLoginScreen({ navigation }) {
       }
   };
 
+  // 에러 메시지가 있는지 확인하고 boolean으로 변환
+  const isUserIdError = userIdError !== '';
+  const isPasswordError = passwordError !== '';
+  // 로그인 버튼 활성화 조건
+  const isLoginButtonDisabled = userId.trim() === '' || password.trim() === '' || isUserIdError || isPasswordError;
+
   return (
     <View style={styles.formContainer}>
       <View style={{ height : 65 , marginBottom : 40}}>
@@ -85,8 +90,11 @@ function MemberLoginScreen({ navigation }) {
             <Text style={styles.errorText}>{passwordError}</Text>
           ) : null}
       </View>
-      <View style={styles.loginButton}>
-      <TouchableOpacity onPress={onLogin}>
+      <View style={[
+            styles.loginButton,
+            { backgroundColor: isLoginButtonDisabled ? 'lightgray' : '#99A5B2' } // 비활성화 시 색상 변경
+          ]}>
+        <TouchableOpacity onPress={onLogin} disabled={isLoginButtonDisabled}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
       </View>
@@ -160,6 +168,12 @@ function CounselorLoginScreen({ navigation }) {
     }
   };
 
+  // 에러 메시지가 있는지 확인하고 boolean으로 변환
+  const isUserIdError = userIdError !== '';
+  const isPasswordError = passwordError !== '';
+  // 로그인 버튼 활성화 조건
+  const isLoginButtonDisabled = userId.trim() === '' || password.trim() === '' || isUserIdError || isPasswordError;
+
   return (
     <View style={styles.formContainer}>
       <View style={{ height : 65 , marginBottom : 40}}>
@@ -187,8 +201,11 @@ function CounselorLoginScreen({ navigation }) {
             <Text style={styles.errorText}>{passwordError}</Text>
           ) : null}
       </View>
-      <View style={styles.loginButton}>
-        <TouchableOpacity onPress={onLogin}>
+      <View style={[
+            styles.loginButton,
+            { backgroundColor: isLoginButtonDisabled ? 'lightgray' : '#99A5B2' } // 비활성화 시 색상 변경
+          ]}>
+        <TouchableOpacity onPress={onLogin} disabled={isLoginButtonDisabled}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
       </View>
