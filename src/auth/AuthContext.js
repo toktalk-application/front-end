@@ -10,15 +10,17 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated: false,
         token: null,
         usertype: null,
+        identifier: null,
     };
 
     const [state, setState] = useState(initialState);
 
-    const login = async (token, usertype, navigation) => {
+    const login = async (token, usertype, navigation, identifier) => {
         const newState = {
             isAuthenticated: true,
             token,
             usertype,
+            identifier,
         };
         setState(newState);
         await AsyncStorage.setItem('authState', JSON.stringify(newState));
@@ -41,10 +43,15 @@ export const AuthProvider = ({ children }) => {
             isAuthenticated: false,
             token: null,
             usertype: null,
+            identifier: null,
         };
         setState(newState);
         AsyncStorage.removeItem('authState'); 
     };
+
+    const clearState = () => {
+        
+    }
 
     useEffect(() => {
         const loadAuthState = async () => {
