@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet,Alert } from 'react-native';
+import axios from 'axios';
+import {REACT_APP_API_URL} from '@env';
+import { useAuth } from '../auth/AuthContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // 일반 사용자 로그인 화면
 function MemberLoginScreen({ navigation }) {
-
+  const { login } = useAuth('');
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
 
@@ -28,6 +32,29 @@ function MemberLoginScreen({ navigation }) {
       setPasswordError(''); 
     }
     setPassword(input); 
+  };
+
+  const onLogin = async () => {
+      try {
+        const response = await axios.post(`${REACT_APP_API_URL}/auth/login`, {
+          userId: userId,
+          password: password,
+          userType: 'MEMBER' // 사용자의 타입을 필요에 따라 설정
+        });
+
+        // 로그인 성공 처리
+        if (response.status === 200) {
+          const token = response.headers.get('Authorization');
+          const usertype = response.data.usertype;
+          Alert.alert("로그인 성공", "환영합니다!");
+          login(token, usertype, navigation);
+        }
+
+      } catch (error) {
+        // 로그인 실패 처리
+        Alert.alert("로그인 실패", "아이디 또는 비밀번호가 올바르지 않습니다.");
+        console.error(error);
+      }
   };
 
   return (
@@ -58,7 +85,7 @@ function MemberLoginScreen({ navigation }) {
           ) : null}
       </View>
       <View style={styles.loginButton}>
-        <TouchableOpacity >
+      <TouchableOpacity onPress={onLogin}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
       </View>
@@ -108,6 +135,25 @@ function CounselorLoginScreen({ navigation }) {
     setPassword(input); 
   };
 
+  const onLogin = async () => {
+    try {
+      const response = await axios.post(`${REACT_APP_API_URL}/auth/login`, {
+        userId: userId,
+        password: password,
+        userType: 'COUNSELOR' // 사용자의 타입을 필요에 따라 설정
+      });
+
+      // 로그인 성공 처리
+      Alert.alert("로그인 성공", "환영합니다!");
+      console.log(response.data); // 서버 응답 데이터 처리
+
+    } catch (error) {
+      // 로그인 실패 처리
+      Alert.alert("로그인 실패", "아이디 또는 비밀번호가 올바르지 않습니다.");
+      console.error(error);
+    }
+  };
+
   return (
     <View style={styles.formContainer}>
       <View style={{ height : 65 , marginBottom : 40}}>
@@ -136,7 +182,7 @@ function CounselorLoginScreen({ navigation }) {
           ) : null}
       </View>
       <View style={styles.loginButton}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={onLogin}>
           <Text style={styles.loginButtonText}>로그인</Text>
         </TouchableOpacity>
       </View>
