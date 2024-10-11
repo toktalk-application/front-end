@@ -7,6 +7,11 @@
     <uses-permission android:name="android.permission.MICROPHONE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
+    <!-- 알림 표시 권한 -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+  
+
     <application
       android:name=".MainApplication"
       android:label="@string/app_name"
@@ -16,6 +21,9 @@
       android:allowBackup="false"
       android:theme="@style/AppTheme"
       android:supportsRtl="true">
+
+      <service android:name="io.invertase.firebase.messaging.ReactNativeFirebaseMessagingHeadlessService" />
+      
       <activity
         android:name=".MainActivity"
         android:label="@string/app_name"

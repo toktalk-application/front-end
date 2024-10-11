@@ -90,26 +90,29 @@ const setupNotificationsOnFirstLogin = async (memberId) => {
   }
 };
 
-const sendFcmTokenToServer = async (memberId, fcmToken) => {
-  try {
-    const userToken = await AsyncStorage.getItem('userToken'); // 저장된 인증 토큰
-    const response = await fetch(`https://localhost:8080/members/${memberId}/fcm-token`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userToken}`
-      },
-      body: JSON.stringify({ fcmToken })
-    });
-    if (response.ok) {
-      console.log('FCM token successfully sent to server');
-    } else {
-      console.error('Failed to send FCM token to server');
-    }
-  } catch (error) {
-    console.error('Error sending FCM token to server:', error);
-  }
-};
+// const sendFcmTokenToServer = async (memberId, fcmToken) => {
+//   try {
+//     const userToken = await AsyncStorage.getItem('userToken'); // 저장된 인증 토큰
+//     const response = await fetch(`http://10.0.2.2:8080/members/${memberId}/fcm-token`, {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'Authorization': `Bearer ${userToken}`
+//       },
+//       body: JSON.stringify({ fcmToken })
+//     });
+//     console.log(memberId);
+//     console.log(userToken);
+//     console.log(fcmToken);
+//     if (response.ok) {
+//       console.log('FCM token successfully sent to server');
+//     } else {
+//       console.error('Failed to send FCM token to server');
+//     }
+//   } catch (error) {
+//     console.error('Error sending FCM token to server:', error);
+//   }
+// };
 
 
 const CustomHeader = ({ routeName, navigation }) => {
@@ -156,6 +159,7 @@ function Tabs({ route, navigation }) {
 }
 
 function App() {
+  setupNotificationsOnFirstLogin();
   return (
     <AuthProvider>
       <NavigationContainer>

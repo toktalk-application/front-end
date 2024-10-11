@@ -8,7 +8,6 @@ import sendGetRequest from '../../axios/SendGetRequest';
 import PassModal from '../../components/PassModal';
 import { useNavigation } from '@react-navigation/native';
 
-
 function MemberSignUpScreen() {
   const navigation = useNavigation();
   const [userId, setUserId] = useState('');
