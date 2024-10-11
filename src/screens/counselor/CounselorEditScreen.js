@@ -1,12 +1,31 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
+import sendPatchRequest from '../../axios/PatchRequest';
+import { useAuth } from '../../auth/AuthContext';
+import sendGetRequest from '../../axios/SendGetRequest';
 
 function CounselorEditScreen() {
+    const { state } = useAuth();
     const [profileImage, setProfileImage] = useState(null);
     const [introduction, setIntroduction] = useState(''); // 자기 소개
     const [expertise, setExpertise] = useState(''); // 전문 분야
     const [sessionDescription, setSessionDescription] = useState(''); // 상담 세션 설명
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        sendGetRequest({
+            token: state.token,
+            endPoint: `/counselors/${state.identifier}`,
+            onSuccess: (data) => {
+                /* console.log("data: ", data); */
+                setIntroduction(data.data.introduction);
+                setExpertise(data.data.expertise);
+                setSessionDescription(data.data.sessionDescription);
+            },
+            onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패")
+        });
+    }, []);
 
     const selectImage = async () => {
         const options = {
@@ -33,12 +52,23 @@ function CounselorEditScreen() {
     const handleSubmit = async () => {
         const data = {
             profileImage: profileImage ? profileImage.uri : null,
-            introduction,
-            expertise,
-            sessionDescription,
         };
 
-        console.log(data);
+        if (introduction) data.introduction = introduction;
+        if (expertise) data.expertise = expertise;
+        if (sessionDescription) data.sessionDescription = sessionDescription;
+
+        /* console.log(data); */
+
+        sendPatchRequest({
+            token: state.token,
+            endPoint: "/counselors",
+            requestBody: data,
+            onSuccess: () => {
+                Alert.alert("수정 성공", "성공!");
+            },
+            onFailure: () => Alert.alert("수정 실패", "실패!")
+        });
     };
 
     return (
@@ -57,14 +87,14 @@ function CounselorEditScreen() {
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>자기 소개</Text>
                 <Text style={styles.sectionDescription}>- 자신이 어떤 상담사인지 한 줄로 설명해 주세요.</Text>
-                <TextInput style={styles.input} placeholder="입력해주세요" 
-                    value={introduction} 
+                <TextInput style={styles.input} placeholder= {isLoading ? "입력해주세요" : introduction}
+                    value={introduction}
                     onChangeText={setIntroduction} />
             </View>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>전문 분야 소개</Text>
                 <Text style={styles.sectionDescription}>- 자신의 전문 분야와 강점을 소개해주세요.</Text>
-                <TextInput style={styles.bingInput} placeholder="입력해주세요" multiline numberOfLines={4} textAlignVertical="top"  
+                <TextInput style={styles.bingInput} placeholder="입력해주세요" multiline numberOfLines={4} textAlignVertical="top"
                     value={expertise}
                     onChangeText={setExpertise} />
             </View>
@@ -72,7 +102,7 @@ function CounselorEditScreen() {
                 <Text style={styles.sectionTitle}>상담 세션 소개</Text>
                 <Text style={styles.sectionDescription}>- 상담이 어떻게 진행되는지 구체적으로 설명해주세요.</Text>
                 <Text style={styles.sectionDescription}>- 상담을 통해 얻을 수 있는 긍정적인 변화나 기대할 수 있는 효과를 구체적으로 적어주세요.</Text>
-                <TextInput style={styles.bigInput} placeholder="입력해주세요" multiline numberOfLines={4} textAlignVertical="top" 
+                <TextInput style={styles.bigInput} placeholder="입력해주세요" multiline numberOfLines={4} textAlignVertical="top"
                     value={sessionDescription}
                     onChangeText={setSessionDescription} />
             </View>
@@ -105,7 +135,7 @@ const styles = StyleSheet.create({
         padding: 7,
         backgroundColor: '#f0c14b',
         borderRadius: 5,
-        fontSize:12,
+        fontSize: 12,
         textAlign: 'center',
         fontWeight: 'bold',
     },
@@ -162,7 +192,7 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         marginTop: 10,
-        marginBottom:40,
+        marginBottom: 40,
         padding: 10,
         backgroundColor: '#001326',
         borderRadius: 5,
