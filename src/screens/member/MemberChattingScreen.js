@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 // 더미 데이터
 const chatRooms = [
   // counselor 이미지까지 있으면 좋을 듯. 
-  // get/chatRooms 인데 authentication 전달해서 지금 로그인 한 사람의 채팅방 목록 데리고 오기.
+  // get/chatRooms 인데 authentication 전달해서 지금 로그인 한 사람의 채팅방 목록 데리고 오기. 
   {
     roomId: 1,
     counselorId: 1,
