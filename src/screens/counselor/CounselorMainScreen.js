@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import CounselorCalendar from '../../components/Calendar/CounselorCalendar';
 import { useNavigation } from '@react-navigation/native';
+import sendGetRequest from '../../axios/SendGetRequest';
+import { useAuth } from '../../auth/AuthContext';
 
 function CounselorMainScreen() {
+  const { state } = useAuth();
   const navigation = useNavigation();
   const [markedDates, setMarkedDates] = useState({});
   const [reservations, setReservations] = useState([]);
@@ -19,28 +22,36 @@ function CounselorMainScreen() {
 
 
   const handleReservationPress = (reservationId) => {
-      navigation.navigate('CounselDetail', { reservationId });
+    navigation.navigate('CounselDetail', { reservationId });
   };
 
   useEffect(() => {
-    const fetchMarkedDates = async () => {
-      const dummyData = {
-        "2024-10-04": true,
-        "2024-10-05": true,
-        "2024-10-06": true,
-        "2024-10-18": true,
-        "2024-10-31": true,
-      };
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // 두 자리로 맞추기 위해 padStart 사용
 
-      const formattedData = Object.keys(dummyData).reduce((acc, date) => {
-        acc[date] = { marked: dummyData[date] === true };
-        return acc;
-      }, {});
+    const formattedMonth = `${year}-${month}`;
 
-      setMarkedDates(formattedData);
-    };
-
-    fetchMarkedDates();
+    sendGetRequest({
+      token: state.token,
+      endPoint: "/reservations",
+      requestParams: {
+        counselorId: state.identifier,
+        month: formattedMonth,
+      },
+      onSuccess: (data) => {
+        /* console.log(data); */
+        const filteredData = Object.keys(data.data).reduce((acc, key) => {
+          if (data.data[key] === true) {  // 값이 true인 경우만
+            acc[key] = data.data[key];    // 결과 객체에 추가
+          }
+          return acc;
+        }, {});
+        /* console.log(filteredData); */
+        setMarkedDates(filteredData);
+      },
+      onFailure: () => Alert.alert("실패", "월별 일정 조회 실패")
+    })
   }, []);
 
   const fetchReservations = async (date) => {
@@ -102,32 +113,32 @@ function CounselorMainScreen() {
           <CounselorCalendar markedDates={markedDates} onDayPress={handleDayPress} selectedDate={selectedDate} />
         </View>
       )}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
-            <View style={styles.row}>
-              <View style={styles.timeContainer}>
-                <Text style={styles.timeText}> {formatTime(item.startTime)} </Text> 
-                <Text style={styles.timeText}> | </Text>  
-                <Text style={styles.timeText}> {formatTime(item.endTime)} </Text>
-              </View>
-              <View style={styles.detailsContainer}>
-                <View style={styles.detailsRow}>
-                  <Text style={styles.nickNameText}>내담자 {item.nickName}</Text>
-                  <Text style={styles.typeText}> {item.type} </Text>
-                </View>
-                <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
-              </View>
+      renderItem={({ item }) => (
+        <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
+          <View style={styles.row}>
+            <View style={styles.timeContainer}>
+              <Text style={styles.timeText}> {formatTime(item.startTime)} </Text>
+              <Text style={styles.timeText}> | </Text>
+              <Text style={styles.timeText}> {formatTime(item.endTime)} </Text>
             </View>
+            <View style={styles.detailsContainer}>
+              <View style={styles.detailsRow}>
+                <Text style={styles.nickNameText}>내담자 {item.nickName}</Text>
+                <Text style={styles.typeText}> {item.type} </Text>
+              </View>
+              <Text style={styles.commentText}>상담 내용: {item.comment}</Text>
+            </View>
+          </View>
         </TouchableOpacity>
-        )}
+      )}
     />
   );
 }
 
 const styles = StyleSheet.create({
   itemContainer: {
-    marginLeft:10,
-    marginRight:20,
+    marginLeft: 10,
+    marginRight: 20,
     padding: 5,
     borderRadius: 5,
   },
@@ -138,7 +149,7 @@ const styles = StyleSheet.create({
   },
   timeContainer: {
     flex: 2, // 공간을 차지하도록 설정
-    padding:5,
+    padding: 5,
     alignItems: 'center', // 왼쪽 정렬
     flexDirection: 'colum',
   },
@@ -150,15 +161,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#001932', // 배경 색상
     flex: 7, // 공간을 더 차지하도록 설정
     paddingLeft: 10, // 약간의 여백
-    paddingVertical:3,
+    paddingVertical: 3,
     borderRadius: 10,
   },
   detailsRow: {
     flexDirection: 'row', // 좌우 배치
     justifyContent: 'space-between', // 양쪽 끝 정렬
-    marginTop:5,
-    marginLeft:5,
-    marginRight:10
+    marginTop: 5,
+    marginLeft: 5,
+    marginRight: 10
   },
   nickNameText: {
     color: 'white',
@@ -168,16 +179,16 @@ const styles = StyleSheet.create({
   typeText: {
     color: 'black',
     fontSize: 11,
-    backgroundColor:'white',
+    backgroundColor: 'white',
     borderRadius: 10,
-    paddingHorizontal:5
+    paddingHorizontal: 5
   },
   commentText: {
     color: 'white',
-    marginLeft:5,
-    marginRight:5,
-    marginTop:5,
-    marginBottom:10,
+    marginLeft: 5,
+    marginRight: 5,
+    marginTop: 5,
+    marginBottom: 10,
     fontSize: 12,
   },
 });
