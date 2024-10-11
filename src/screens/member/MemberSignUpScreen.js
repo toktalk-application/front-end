@@ -7,7 +7,7 @@ import {REACT_APP_API_URL} from '@env';
 import axios from 'axios';
 
 
-function MemberSignUpScreen() {
+function MemberSignUpScreen() { 
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
