@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button, Alert} from 'react-native';
 import CounselorPlanCalendar from '../../components/Calendar/CounselorPlanCalendar';
 import { useNavigation } from '@react-navigation/native';
+import sendGetRequest from '../../axios/SendGetRequest';
+import { useAuth } from '../../auth/AuthContext';
 
 function CounselorPlanScreen() {
+  const { state } = useAuth();
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDay, setSelectedDay] = useState('일요일'); // 현재 선택된 요일
   const [availability, setAvailability] = useState({
@@ -18,9 +21,10 @@ function CounselorPlanScreen() {
 
   const navigation = useNavigation();
 
+
   // 기본 시간 설정 예시
   const defaultTimes = {
-    '일요일': ['12:00', '13:00', '16:00', '17:00', '18:00', '20:00', '22:00'],
+    '일요일': ['12:00', '13:00', '16:00', '17:00', '18:00', '20:00'],
     // 다른 요일의 기본 시간 추가 가능
   };
 
