@@ -32,8 +32,7 @@ export const AuthProvider = ({ children }) => {
         } else {
             console.log('데이터가 저장되지 않았습니다.');
         }
-    
-        // Tabs로 이동하며 userType 전달
+        
         navigation.navigate('Tabs', { userType: usertype });
     };
 
