@@ -7,7 +7,7 @@ import sendGetRequest from '../../axios/SendGetRequest';
 import sendPostRequest from '../../axios/SendPostRequest';
 import { useNavigation } from '@react-navigation/native';
 
-function MemberSignUpScreen() {
+function CounselorSignUpScreen() {
   const navigation = useNavigation();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
@@ -68,7 +68,6 @@ function MemberSignUpScreen() {
     }
     setPassword(input); // 비밀번호 상태 업데이트
 
-    console.log("password: ", input, " confirmPassword: ", confirmPassword);
     if(confirmPassword.length !== 0){
       setConfirmPasswordError(input !== confirmPassword ? '비밀번호가 일치하지 않습니다.' : '');
     }
@@ -112,11 +111,17 @@ function MemberSignUpScreen() {
         requestParams: {
           userId: userId
         },
-        onSuccess: () => {
-          setUserIdDuplChecked(true);
-          Alert.alert("사용 가능한 아이디입니다.")
+        onSuccess: (response) => {
+          console.log('response: ', response);
+          if(response.data){
+            setUserIdDuplChecked(true);
+            Alert.alert("사용 가능한 아이디입니다.")
+          }else{
+            setUserIdDuplChecked(false);
+            Alert.alert("이미 사용중인 아이디입니다.")
+          }
         },
-        onFailure: () => Alert.alert("이미 사용중인 아이디입니다.")
+        onFailure: () => Alert.alert("요청 실패")
       }
     );
   };
@@ -135,10 +140,16 @@ function MemberSignUpScreen() {
       requestParams: {
         nickname: nickname,
       },
-      onSuccess: () => {
-        setNicknameDuplChecked(true);
-        Alert.alert("사용 가능한 닉네임입니다.");
+      onSuccess: (response) => {
+        if(response){
+          setNicknameDuplChecked(true);
+          Alert.alert("사용 가능한 닉네임입니다.");
+        }else{
+          setNicknameDuplChecked(false);
+          Alert.alert("이미 사용중인 닉네임입니다.")
+        } 
       },
+      
       onFailure: () => Alert.alert("이미 사용중인 닉네임입니다."),
     })
   };
@@ -175,7 +186,7 @@ function MemberSignUpScreen() {
       },
       onSuccess: () => {
         Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!')
-        navigation.navigate("CounselorMain");
+        navigation.navigate("Tabs", {userType: "COUNSELOR"});
       },
       onFailure: () => Alert.alert('회원가입 실패', '회원가입 실패~'),
     });
@@ -691,4 +702,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MemberSignUpScreen;
+export default CounselorSignUpScreen;
