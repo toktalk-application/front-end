@@ -16,6 +16,7 @@ import MemberChattingScreen from './src/screens/member/MemberChattingScreen.js';
 import MemberMyScreen from './src/screens/member/MemberMyScreen.js';
 import MemberReservationScreen from './src/screens/member/MemberReservationScreen.js';
 import TestScreen from './src/screens/member/TestScreen.js';
+import TestResultScreen from './src/screens/member/TestResultScreen.js';
 
 import CounselorMainScreen from './src/screens/counselor/CounselorMainScreen.js';
 import CounselorCounselScreen from './src/screens/counselor/CounselorCounselScreen.js';
@@ -176,6 +177,7 @@ function App() {
           <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
           <Stack.Screen name="내 상담 내역" component={MemberReservationScreen} />
           <Stack.Screen name="우울 검사" component={TestScreen}/>
+          <Stack.Screen name="TestResult" component={TestResultScreen} options={{ title: '' }} />
           <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
           <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
           <Stack.Screen name="MemberWriteReview" component={MemberWriteReviewScreen} options={{ title: '' }} />

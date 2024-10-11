@@ -1,38 +1,94 @@
-import React, { useState } from 'react';
-import { View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Alert, View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
+import sendGetRequest from '../../axios/SendGetRequest';
+import { useAuth } from '../../auth/AuthContext';
+import sendPatchRequest from '../../axios/PatchRequest';
 
 function CounselorTimeSettingScreen() {
+  const { state } = useAuth();
   const [selectedDay, setSelectedDay] = useState('일'); // 현재 선택된 요일
+  const [isLoading, setIsLoading] = useState(true);
   const [availability, setAvailability] = useState({
     '일': {
-      '9:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
+      '09:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
       '16:00': false,'17:00': false, '18:00': false, '19:00': false,'20:00': false, '21:00': false, '22:00': false, '23:00': false,
     },
     '월': {
-      '9:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
+      '09:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
       '16:00': false,'17:00': false, '18:00': false, '19:00': false,'20:00': false, '21:00': false, '22:00': false, '23:00': false,
     },
     '화': {
-      '9:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
+      '09:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
       '16:00': false,'17:00': false, '18:00': false, '19:00': false,'20:00': false, '21:00': false, '22:00': false, '23:00': false,
     },
     '수': {
-      '9:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
+      '09:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
       '16:00': false,'17:00': false, '18:00': false, '19:00': false,'20:00': false, '21:00': false, '22:00': false, '23:00': false,
     },
     '목': {
-      '9:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
+      '09:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
       '16:00': false,'17:00': false, '18:00': false, '19:00': false,'20:00': false, '21:00': false, '22:00': false, '23:00': false,
     },
     '금': {
-      '9:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
+      '09:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
       '16:00': false,'17:00': false, '18:00': false, '19:00': false,'20:00': false, '21:00': false, '22:00': false, '23:00': false,
     },
     '토': {
-      '9:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
+      '09:00': false, '10:00': false,'11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, 
       '16:00': false,'17:00': false, '18:00': false, '19:00': false,'20:00': false, '21:00': false, '22:00': false, '23:00': false,
     },
   });
+
+  useEffect(() => {
+    getDefaultTimes(korDayToEng(selectedDay));
+  },[selectedDay]);
+
+  const engDayToKor = (dayOfWeek) => {
+    switch(dayOfWeek){
+      case "SUNDAY": return '일';
+      case "MONDAY": return '월';
+      case "TUESDAY": return '화';
+      case "WEDNESDAY": return '수';
+      case "THURSDAY": return '목';
+      case "FRIDAY": return '금';
+      case "SATURDAY": return '토';
+    }
+  }
+
+  const korDayToEng = (dayOfWeek) => {
+    switch(dayOfWeek){
+      case "일": return "SUNDAY";
+      case "월": return "MONDAY";
+      case "화": return "TUESDAY";
+      case "수": return "WEDNESDAY";
+      case "목": return "THURSDAY";
+      case "금": return "FRIDAY";
+      case "토": return "SATURDAY";
+    }
+  }
+
+  const getDefaultTimes = (dayOfWeek) => {
+    sendGetRequest({
+      token: state.token,
+      endPoint: "/counselors/default-days",
+      requestParams: {
+        dayOfWeek: dayOfWeek,
+      },
+      onSuccess: (data) => {
+        console.log("initial data: ", data);
+        let newAvailability = availability;
+        let dayKey = engDayToKor(dayOfWeek);
+        
+        data.data.forEach(time => {
+          newAvailability[dayKey][time] = true;
+        });
+        console.log("newAvailability: ", newAvailability[engDayToKor(dayOfWeek)]);
+        setAvailability(newAvailability);
+        setIsLoading(false);
+      },
+      onFailure: () => Alert.alert("실패", "내 기본 상담 시간 조회 실패")
+    });
+  }
 
   const handleTimePress = (time) => {
     setAvailability((prevAvailability) => ({
@@ -57,6 +113,16 @@ function CounselorTimeSettingScreen() {
   
     // 여기에 POST 요청 코드를 추가할 수 있습니다.
     // 예: await axios.post('YOUR_API_ENDPOINT', dataToSend); 
+    sendPatchRequest({
+      token: state.token,
+      endPoint: "/counselors/default-days",
+      requestBody: {
+        dayOfWeek: korDayToEng(selectedDay),
+        times: availableTimes,
+      },
+      onSuccess: () => Alert.alert("성공", "기본 상담 시간 수정 완료"),
+      onFailure: () => Alert.alert("실패", "기본 상담 시간 수정 실패!")
+    })
   };
   
 
@@ -76,7 +142,7 @@ function CounselorTimeSettingScreen() {
         ))}
       </View>
       <View style={styles.timeGrid}>
-        {Object.keys(availability[selectedDay]).map((time) => (
+        {isLoading ? <View/> : Object.keys(availability[selectedDay]).map((time) => (
           <TouchableOpacity
             key={time}
             style={[styles.timeButton, availability[selectedDay][time] && styles.selectedButton]}

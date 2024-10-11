@@ -6,13 +6,13 @@ import CheckBox from '@react-native-community/checkbox'; // CheckBox import
 import sendGetRequest from '../../axios/SendGetRequest';
 import sendPostRequest from '../../axios/SendPostRequest';
 import { useNavigation } from '@react-navigation/native';
+import PassModal from '../../components/PassModal';
 
-function MemberSignUpScreen() {
+function CounselorSignUpScreen() {
   const navigation = useNavigation();
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [nickname, setNickname] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [gender, setGender] = useState('');
   const [genderLabel, setGenderLabel] = useState('성별 선택');
@@ -22,13 +22,11 @@ function MemberSignUpScreen() {
   const [birthDate, setBirthDate] = useState(new Date()); 
 
   const [userIdDuplChecked, setUserIdDuplChecked] = useState();
-  const [nicknameDuplChecked, setNicknameDuplChecked] = useState();
 
   // 유효성 검증. 빨간 줄 올라오기. 
   const [userIdError, setUserIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [nicknameError, setNicknameError] = useState('');
 
   // 본인인증 관련 상태. 
   const [name, setName] = useState('');
@@ -36,6 +34,10 @@ function MemberSignUpScreen() {
   const [residentNumber1, setResidentNumber1] = useState('');
   const [residentNumber2, setResidentNumber2] = useState('');
   const [carrier, setCarrier] = useState('');
+  //본인 인증 내용이 다 맞으면 패스 인증으로 넘어감.
+  const [modalVisible, setModalVisible] = useState(false);
+  //주민번호 앞자리 입력 후 뒷자리로 바로 넘어감. 
+  const residentNumber2InputRef = React.useRef(null);
 
   // 경력 인증 관련 상태.
   const [company, setCompany] = useState(''); // 소속
@@ -68,7 +70,6 @@ function MemberSignUpScreen() {
     }
     setPassword(input); // 비밀번호 상태 업데이트
 
-    console.log("password: ", input, " confirmPassword: ", confirmPassword);
     if(confirmPassword.length !== 0){
       setConfirmPasswordError(input !== confirmPassword ? '비밀번호가 일치하지 않습니다.' : '');
     }
@@ -81,17 +82,6 @@ function MemberSignUpScreen() {
       setConfirmPasswordError('');
     }
     setConfirmPassword(input);
-  };
-
-  const validateNickname = (input) => {
-    const nicknamePattern = /^[ㄱ-ㅎ가-힣a-zA-Z0-9]{2,10}$/
-    if (!nicknamePattern.test(input)) {
-      setNicknameError('닉네임은 영문 및 한글 또는 숫자로만 입력해야 합니다. (2~10자)');
-    } else {
-      setNicknameError('');
-    }
-    setNickname(input);
-    setNicknameDuplChecked(false);
   };
 
   const checkUsernameAvailability = () => {
@@ -112,39 +102,23 @@ function MemberSignUpScreen() {
         requestParams: {
           userId: userId
         },
-        onSuccess: () => {
-          setUserIdDuplChecked(true);
-          Alert.alert("사용 가능한 아이디입니다.")
+        onSuccess: (response) => {
+          console.log('response: ', response);
+          if(response.data){
+            setUserIdDuplChecked(true);
+            Alert.alert("사용 가능한 아이디입니다.")
+          }else{
+            setUserIdDuplChecked(false);
+            Alert.alert("이미 사용중인 아이디입니다.")
+          }
         },
-        onFailure: () => Alert.alert("이미 사용중인 아이디입니다.")
+        onFailure: () => Alert.alert("요청 실패")
       }
     );
   };
 
-  const checkNicknameAvailability = () => {
-    if(nickname.length === 0){
-      Alert.alert("닉네임을 입력해주세요");
-      return;
-    }
-    if(nicknameError){
-      Alert.alert("올바른 형식으로 입력해주세요");
-      return;
-    }
-    sendGetRequest({
-      endPoint: "/members/nickname-availabilities",
-      requestParams: {
-        nickname: nickname,
-      },
-      onSuccess: () => {
-        setNicknameDuplChecked(true);
-        Alert.alert("사용 가능한 닉네임입니다.");
-      },
-      onFailure: () => Alert.alert("이미 사용중인 닉네임입니다."),
-    })
-  };
-
   const handleSignUp = () => {
-    if (!userId || !password || !confirmPassword || !nickname) {
+    if (!userId || !password || !confirmPassword) {
       Alert.alert('오류', '모든 필드를 입력해주세요.');
       return;
     }
@@ -156,6 +130,11 @@ function MemberSignUpScreen() {
 
     if (!termsAccepted || !privacyAccepted) {
       Alert.alert('오류', '필수 약관에 동의해야 합니다.');
+      return;
+    }
+
+    if(!userIdDuplChecked) {
+      Alert.alert('오류', '아이디 중복 확인을 진행해주세요.');
       return;
     }
 
@@ -175,9 +154,11 @@ function MemberSignUpScreen() {
       },
       onSuccess: () => {
         Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!')
-        navigation.navigate("CounselorMain");
+        navigation.navigate("Tabs", {userType: "COUNSELOR"});
       },
-      onFailure: () => Alert.alert('회원가입 실패', '회원가입 실패~'),
+      onFailure: () => {
+        Alert.alert('회원가입 실패', '회원가입 실패~')
+      }
     });
   };
 
@@ -194,6 +175,7 @@ function MemberSignUpScreen() {
       Alert.alert('오류', '자격증은 최대 3개까지 등록할 수 있습니다.');
     }
   };
+
   const removeLicense = (index) => {
     if (licenses.length > 1) {
       const newLicenses = licenses.filter((_, i) => i !== index);
@@ -225,22 +207,50 @@ function MemberSignUpScreen() {
     setCareers(newCareers);
   };
 
-
+  //PASS 인증으로 넘어가는 로직. 
   const handleCertification = () => {
+
     // 모든 필드가 입력되었는지 확인
-    if (!name || !phoneNumber || !residentNumber1 || !residentNumber2 || !carrier) {
+    if (!name || !phoneNumber || !carrier ||!residentNumber1 || !residentNumber2) {
       Alert.alert('오류', '모든 본인 인증 필드를 입력해주세요.');
       return;
     }
-  
-    // 인증 로직 구현
-    Alert.alert('인증 진행', '인증 로직을 구현할 예정입니다.');
+
+    const fullResidentNumber = residentNumber1 + residentNumber2;
+
+    const queryParams = new URLSearchParams({
+      name: name,
+      phoneNo: phoneNumber,
+      identity: fullResidentNumber,
+      telecom: carrier
+    }).toString();
+
+    sendPostRequest({
+      endPoint: `/api/identity/verify?${queryParams}`, 
+      onSuccess: () => {
+        setModalVisible(true);
+
+      },
+      onFailure: () => {
+        Alert.alert("본인 인증 필드를 다시 확인해주세요.")
+      }
+    })
   };
   
   const toggleAllAccepted = () => {
     setAllAccepted(!allAccepted);
     setTermsAccepted(!allAccepted);
     setPrivacyAccepted(!allAccepted);
+  };
+
+  const handleResidentNumber1Change = (text) => {
+    const newValue = text.replace(/[^0-9]/g, ''); // 숫자만 입력 가능
+    setResidentNumber1(newValue);
+
+    // 6자 입력 시 자동으로 residentNumber2로 포커스 이동
+    if (newValue.length === 6) {
+        residentNumber2InputRef.current.focus(); // 포커스 이동
+    }
   };
 
 
@@ -291,21 +301,6 @@ function MemberSignUpScreen() {
           {confirmPasswordError ? <Text style={styles.errorText}>{confirmPasswordError}</Text> : null}
         </View>
         <View style={{ height : 65 }}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="닉네임을 입력해주세요"
-              value={nickname}
-              onChangeText={validateNickname}
-              keyboardType="default"
-            />
-            <TouchableOpacity style={styles.checkButton} onPress={checkNicknameAvailability}>
-              <Text style={styles.checkButtonText}>{nicknameDuplChecked ? "중복 확인  ✓" : "중복 확인"}</Text>
-            </TouchableOpacity>
-          </View>
-          {nicknameError ? <Text style={styles.errorText}>{nicknameError}</Text> : null}
-        </View>
-        <View style={{ height : 65 }}>
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={gender}
@@ -343,20 +338,22 @@ function MemberSignUpScreen() {
         </View>
         <View style={{ height : 65 }}>
           <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="전화번호를 입력해주세요"
-              value={phoneNumber}
-              onChangeText={setPhoneNumber}
-            />
-          </View>
+              <TextInput
+                  style={styles.input}
+                  placeholder="전화번호를 입력해주세요"
+                  value={phoneNumber}
+                  onChangeText={text => setPhoneNumber(text.replace(/[^0-9]/g, ''))} // 숫자만 입력 가능
+                  keyboardType="numeric" // 숫자 키패드 표시
+              />
+        </View>
+          <Text style={styles.note}>하이픈(-) 없이 입력해주세요.</Text>
         </View>
         <View style={styles.rnInputContainer}>
           <TextInput
             style={styles.rninput}
             placeholder="주민등록번호 앞자리"
             value={residentNumber1}
-            onChangeText={setResidentNumber1}
+            onChangeText={handleResidentNumber1Change}
             keyboardType="number-pad"
           />
         <View>
@@ -366,7 +363,8 @@ function MemberSignUpScreen() {
             style={styles.rninput}
             placeholder="주민등록번호 뒷자리"
             value={residentNumber2}
-            onChangeText={setResidentNumber2}
+            ref={residentNumber2InputRef}
+            onChangeText={text => setResidentNumber2(text.replace(/[^0-9]/g, ''))} 
             secureTextEntry // 뒷자리는 *****로 표시
             keyboardType="number-pad"
           />
@@ -524,6 +522,15 @@ function MemberSignUpScreen() {
       <TouchableOpacity style={styles.button} onPress={handleSignUp}>
         <Text style={styles.buttonText}>회원가입</Text>
       </TouchableOpacity>
+      <PassModal 
+        visible={modalVisible} 
+        onClose={() => setModalVisible(false)} 
+        name={name} 
+        phoneNumber={phoneNumber} 
+        carrier={carrier} 
+        residentNumber1={residentNumber1} 
+        residentNumber2={residentNumber2}
+      />
     </ScrollView>
   );
 }
@@ -539,6 +546,7 @@ const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 10,
     marginBottom: 20,
+    marginHorizontal:10
   },
   title: {
     backgroundColor: 'lightgray',
@@ -686,9 +694,15 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: 'red', // 오류 메시지 색상
-    fontSize: 12,
+    fontSize: 11,
     marginLeft:5,
+  },
+  note: {
+    marginTop:2,
+    marginLeft:5,
+    fontSize: 11, // 폰트 크기
+    color: 'gray', // 텍스트 색상
   },
 });
 
-export default MemberSignUpScreen;
+export default CounselorSignUpScreen;

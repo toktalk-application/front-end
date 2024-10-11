@@ -46,8 +46,9 @@ function MemberLoginScreen({ navigation }) {
         if (response.status === 200) {
           const token = response.headers.get('Authorization');
           const usertype = response.data.usertype;
+          const identifier = response.data.identifier;
           Alert.alert("로그인 성공", "환영합니다!");
-          login(token, usertype, navigation);
+          login(token, usertype, navigation, identifier);
         }
 
       } catch (error) {
@@ -108,7 +109,7 @@ function MemberLoginScreen({ navigation }) {
 
 // 상담자 로그인 화면
 function CounselorLoginScreen({ navigation }) {
-
+  const { login } = useAuth('');
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
 
@@ -142,10 +143,15 @@ function CounselorLoginScreen({ navigation }) {
         password: password,
         userType: 'COUNSELOR' // 사용자의 타입을 필요에 따라 설정
       });
-
+      
       // 로그인 성공 처리
-      Alert.alert("로그인 성공", "환영합니다!");
-      console.log(response.data); // 서버 응답 데이터 처리
+      if (response.status === 200) {
+        const token = response.headers.get('Authorization');
+        const usertype = response.data.usertype;
+        const identifier = response.data.identifier;
+        Alert.alert("로그인 성공", "환영합니다!");
+        login(token, usertype, navigation, identifier);
+      }
 
     } catch (error) {
       // 로그인 실패 처리
