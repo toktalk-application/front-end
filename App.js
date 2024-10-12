@@ -108,25 +108,76 @@ const CustomHeader = ({ routeName, navigation }) => {
 function Tabs({ route, navigation }) {
   const { userType } = route.params; 
 
+
+  const getTabIcon = (activeIcon, inactiveIcon) => {
+    return ({ focused }) => (
+      <Image
+        source={focused ? activeIcon : inactiveIcon}
+        style={{
+          width: 34,
+          height: 34,
+        }}
+      />
+    );
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         header: () => <CustomHeader routeName={route.name} navigation={navigation} />,
+        tabBarStyle: {
+          paddingBottom:20,
+          paddingTop:10,
+          paddingHorizontal: 10, // 좌우 여백 추가 (필요에 따라 조정)
+          height: 80, // 탭 바의 높이 조정
+        },
       })}
     >
       {userType === 'MEMBER' ? (
         <>
-          <Tab.Screen name="Main" component={MemberMainScreen} />
-          <Tab.Screen name="상담" component={MemberCounselScreen} />
-          <Tab.Screen name="채팅" component={MemberChattingScreen} />
-          <Tab.Screen name="내 정보" component={MemberMyScreen} />
+          <Tab.Screen name="Main" 
+                      component={MemberMainScreen} 
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), 
+                                  require('./assets/images/home.png')),
+                                  tabBarLabel: () => null  }} />
+          <Tab.Screen name="상담" 
+                      component={MemberCounselScreen} 
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), 
+                        require('./assets/images/counsel.png')),
+                        tabBarLabel: () => null }} />
+          <Tab.Screen name="채팅" 
+                      component={MemberChattingScreen} 
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), 
+                        require('./assets/images/chat.png')),
+                        tabBarLabel: () => null }} />
+          <Tab.Screen name="내 정보" 
+                      component={MemberMyScreen}
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), 
+                        require('./assets/images/my.png')),
+                        tabBarLabel: () => null }} />
         </>
       ) : userType === 'COUNSELOR' ? (
         <>
-          <Tab.Screen name="Main" component={CounselorMainScreen} />
-          <Tab.Screen name="상담" component={CounselorCounselScreen} />
-          <Tab.Screen name="채팅" component={CounselorChattingScreen} />
-          <Tab.Screen name="내 정보" component={CounselorMyScreen} />
+          <Tab.Screen name="Main" 
+                      component={CounselorMainScreen} 
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), 
+                        require('./assets/images/home.png')),
+                        tabBarLabel: () => null }} />
+          <Tab.Screen name="상담" 
+                      component={CounselorCounselScreen} 
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), 
+                        require('./assets/images/counsel.png')),
+                        tabBarLabel: () => null }} />
+          <Tab.Screen name="채팅" 
+                      component={CounselorChattingScreen} 
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), 
+                        require('./assets/images/chat.png')),
+                        tabBarLabel: () => null }} />
+          <Tab.Screen name="내 정보" 
+                      component={CounselorMyScreen} 
+                      options={{ tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), 
+                        require('./assets/images/my.png')),
+                        tabBarLabel: () => null }} />
         </>
       ) : null}
     </Tab.Navigator>
