@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { useRoute } from '@react-navigation/native';
 import ReservationModal from '../../components/ReservationModal';
+import sendGetRequest from '../../axios/SendGetRequest';
+import { useAuth } from '../../auth/AuthContext';
 
 // 상담사 데이터 배열
 const counselorDataArray = [
@@ -89,16 +91,34 @@ const counselorDataArray = [
   // 추가 상담사 데이터...
 ];
 
+
+
 const MemberCounselorDetailScreen = () => {
   const route = useRoute();
   const { counselorId } = route.params;
   const [modalVisible, setModalVisible] = useState(false);
+  const { state } = useAuth();
+  const [isLoading, setIsLoading] = useState(true);
+  const [counselorData, setCounselorData] = useState({});
+
+  useEffect(() => {
+    sendGetRequest({
+      token: state.token,
+      endPoint: `/counselors/${counselorId}`,
+      onSuccess: (data) => {
+        setCounselorData(data.data);
+        setIsLoading(false);
+      },
+      onFailure: () => Alert.alert("요청 실패", "단일 상담사 정보 조회 실패")
+    })
+  }, []);
 
   // counselorId에 해당하는 상담사 정보를 찾기
-  const counselorData = counselorDataArray.find(counselor => counselor.counselorId === counselorId);
+  /* const counselorData = counselorDataArray.find(counselor => counselor.counselorId === counselorId); */
+  console.log("counselorData: ", counselorData);
 
   // 정보가 없을 경우 처리
-  if (!counselorData) {
+  if (!isLoading && !counselorData) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>상담사 정보를 찾을 수 없습니다.</Text>
@@ -108,7 +128,7 @@ const MemberCounselorDetailScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.profileContainer}>
+      {isLoading ? <View/> : <View style={styles.profileContainer}>
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{counselorData.name} 상담사</Text>
           <Text style={styles.introduce}>{counselorData.introduction}</Text>
@@ -119,12 +139,12 @@ const MemberCounselorDetailScreen = () => {
             <Text style={styles.pricing}>{counselorData.callPrice.toLocaleString()} 원</Text>
           </View>
         </View>
-        
+
         <View style={styles.imageContainer}>
           <Image source={{ uri: counselorData.profileImage || 'https://via.placeholder.com/120' }} style={styles.image} />
         </View>
-      </View>
-      <View style={styles.descriptionContainer}>
+      </View>}
+      {isLoading ? <View/> : <View style={styles.descriptionContainer}>
         <Text style={styles.sectionTitle}>📍 심리상담사 소개</Text>
         <Text style={styles.description}>내담자를 위한 잃어버린 언어를 찾아주는 심리치료사</Text>
         <Text style={styles.detaiDescription}>안녕하세요, {counselorData.name} 상담사입니다. 상담을 통해 여러분의 감정, 생각, 행동을 이해할 수 있도록 돕겠습니다.</Text>
@@ -140,17 +160,18 @@ const MemberCounselorDetailScreen = () => {
             {career.classification === "CURRENT" ? "현재" : "이전"} ) {career.company} - {career.responsibility}
           </Text>
         ))}
-        
+
         <Text style={styles.sectionTitle}>📍 상담 진행 방법</Text>
-        <Text style={styles.detaiDescription}>상담을 통해 자신의 감정, 생각, 행동을 자유롭게 이야기할 수 있습니다.</Text>
-        <Text style={styles.detaiDescription}>내가 원하는 방향으로 상담 프로세스를 이끌어 갈 수 있도록 도와드립니다.</Text>
-      </View>
+        <Text style={styles.detaiDescription}>{counselorData.sessionDescription}</Text>
+        {/* <Text style={styles.detaiDescription}>상담을 통해 자신의 감정, 생각, 행동을 자유롭게 이야기할 수 있습니다.</Text>
+        <Text style={styles.detaiDescription}>내가 원하는 방향으로 상담 프로세스를 이끌어 갈 수 있도록 도와드립니다.</Text> */}
+      </View>}
       <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
         <Text style={styles.buttonText}>상담 신청 </Text>
       </TouchableOpacity>
       <ReservationModal visible={modalVisible} onClose={() => setModalVisible(false)} />
     </ScrollView>
-    
+
   );
 };
 

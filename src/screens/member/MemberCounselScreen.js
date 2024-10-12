@@ -1,8 +1,11 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import sendGetRequest from '../../axios/SendGetRequest';
+import { useAuth } from '../../auth/AuthContext';
 
 const MemberCounselScreen = () => {
+  const { state } = useAuth();
   const navigation = useNavigation();
   const dummyCounselors = [
     {
@@ -77,11 +80,27 @@ const MemberCounselScreen = () => {
     },
   ];
 
+  const [counselors, setCounselors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    sendGetRequest({
+      token: state.token,
+      endPoint: "/counselors",
+      onSuccess: (data) => {
+        console.log("data: ", data);
+        setCounselors(data.data);
+        setIsLoading(false);
+      },
+      onFailure: () => Alert.alert("요청 실패", "상담사 목록 로드 실패!")
+    });
+  }, []);
+
   const renderItem = ({ item }) => {
     return (
       <TouchableOpacity onPress={() => navigation.navigate('MemberCounselorDetail', { counselorId: item.counselorId })}>
         <View style={styles.card}>
-          <Image source={{ uri: item.profileImage }} style={styles.image} />
+          <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
           <View style={styles.infoContainer}>
             <Text style={styles.name}>{item.name} ⭐ {item.rating} ({item.reviews})</Text>
             <Text style={styles.introduction}>{item.introduction}</Text>
@@ -100,7 +119,7 @@ const MemberCounselScreen = () => {
   return (
     <View style={styles.container}>
       <FlatList
-        data={dummyCounselors}
+        data={counselors}
         renderItem={renderItem}
         keyExtractor={item => item.counselorId.toString()}
         contentContainerStyle={{
