@@ -74,6 +74,8 @@ const CustomDayComponent = ({ date, isDisabled, isToday, isSelected, isMarked, m
 };
 
 const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate }) => {
+  console.log("markedDates in MemberCalendar: ", markedDates);
+
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
   useEffect(() => {
@@ -100,7 +102,7 @@ const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate }) =>
         const isDisabled = new Date(date.dateString) < new Date(minDate) || new Date(date.dateString) > new Date(maxDate);
         const isToday = date.dateString === new Date().toISOString().split('T')[0]; // 오늘 날짜 확인
         const isSelected = date.dateString === selectedDate; // 선택된 날짜 확인
-        const isMarked = markedDates[date.dateString]?.marked; // 마킹된 날짜 확인
+        const isMarked = markedDates[date.dateString]; // 마킹된 날짜 확인
         const mood = moodDates[date.dateString];
 
         return (
