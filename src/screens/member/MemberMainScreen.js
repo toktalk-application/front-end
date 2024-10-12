@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
 import MemberCalendar from '../../components/Calendar/MemberCalendar'; // 경로를 상황에 맞게 수정하세요.
 import { useNavigation } from '@react-navigation/native';
+import sendGetRequest from '../../axios/SendGetRequest';
+import { useAuth } from '../../auth/AuthContext';
+import sendPostRequest from '../../axios/SendPostRequest';
 
 const moodOptions = [
     { key: 'HAPPY', label: '😃' },
@@ -13,13 +16,14 @@ const moodOptions = [
 
 
 function MemberMainScreen() {
+    const { state } = useAuth();
     const navigation = useNavigation();
     const [markedDates, setMarkedDates] = useState({});
-    const [moodDates, setMoodDates] = useState({}); 
+    const [moodDates, setMoodDates] = useState({});
     const [reservations, setReservations] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedEmotion, setSelectedEmotion] = useState(null); 
+    const [selectedEmotion, setSelectedEmotion] = useState(null);
     const today = new Date().toISOString().split('T')[0];
 
     const toggleModal = () => {
@@ -62,12 +66,12 @@ function MemberMainScreen() {
             const data = await response.json(); // API에서 받아온 데이터 사용
         };
         const dummyEmotionsData = {
-            "2024-10-01": "ANGRY", 
-            "2024-10-02": "HAPPY", 
-            "2024-10-03": "HAPPY", 
-            "2024-10-04": "NEUTRAL", 
-            "2024-10-05": "NEUTRAL", 
-            "2024-10-06": "HAPPY", 
+            "2024-10-01": "ANGRY",
+            "2024-10-02": "HAPPY",
+            "2024-10-03": "HAPPY",
+            "2024-10-04": "NEUTRAL",
+            "2024-10-05": "NEUTRAL",
+            "2024-10-06": "HAPPY",
             "2024-10-07": "HAPPY",
             "2024-10-08": "HAPPY"
         };
@@ -80,11 +84,54 @@ function MemberMainScreen() {
         }, {});
 
         setMoodDates(formattedMoodDates); // 이모지로 변환된 감정 데이터 설정
-        
+
 
 
         fetchMarkedDates();
         // fetchEmotions();
+    }, []);
+
+    const getFormattedMoodDates = (emotions) => Object.keys(emotions).reduce((acc, date) => {
+        const moodKey = emotions[date];
+        const moodOption = moodOptions.find(option => option.key === moodKey);
+        acc[date] = moodOption ? moodOption.label : ''; // 이모지로 변환
+        return acc;
+    }, {});
+
+    useEffect(() => {
+        const now = new Date();
+        const year = now.getFullYear(); // 연도
+        const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 월 (0부터 시작하므로 +1 필요)
+        const formattedMonth = `${year}-${month}`;
+        /* console.log("formattedMonth: ", formattedMonth); */
+
+        sendGetRequest({
+            token: state.token,
+            endPoint: "/reservations/monthly",
+            requestParams: {
+                month: formattedMonth
+            },
+            onSuccess: (data) => {
+                console.log("data: ", data);
+                setMarkedDates(data.data);
+            },
+            onFailure: () => Alert.alert("실패!")
+        })
+
+        sendGetRequest({
+            token: state.token,
+            endPoint: "/members/daily-moods",
+            requestParams: {
+                month: formattedMonth
+            },
+            onSuccess: (data) => {
+                console.log("data: ", data);
+                const formattedData = getFormattedMoodDates(data.data);
+                setMoodDates(formattedData);
+            },
+            onFailure: () => Alert.alert("실패", "실패!")
+        })
+
     }, []);
 
     const fetchReservations = async (date) => {
@@ -150,11 +197,11 @@ function MemberMainScreen() {
                         <TouchableOpacity style={styles.Button} onPress={toggleModal}>
                             <Text style={styles.buttonText}>오늘의 기분은?</Text>
                         </TouchableOpacity>
-                        <MemberCalendar 
-                            moodDates={moodDates} 
-                            markedDates={markedDates} 
-                            onDayPress={handleDayPress} 
-                            selectedDate={selectedDate} 
+                        <MemberCalendar
+                            moodDates={moodDates}
+                            markedDates={markedDates}
+                            onDayPress={handleDayPress}
+                            selectedDate={selectedDate}
                         />
                     </View>
                 )}
@@ -190,9 +237,9 @@ function MemberMainScreen() {
                         </View>
                         <View style={styles.emotionContainer}>
                             {moodOptions.map((emotion) => (
-                                <TouchableOpacity 
-                                    key={emotion.key} 
-                                    onPress={() => handleEmotionPress(emotion)} 
+                                <TouchableOpacity
+                                    key={emotion.key}
+                                    onPress={() => handleEmotionPress(emotion)}
                                     style={[
                                         styles.emotionButton,
                                         selectedEmotion === emotion.key && { backgroundColor: '#FFD700' } // 선택된 감정 배경색 변경
@@ -202,7 +249,23 @@ function MemberMainScreen() {
                                 </TouchableOpacity>
                             ))}
                         </View>
-                        <TouchableOpacity onPress={toggleModal} style={styles.closeButton}>
+                        <TouchableOpacity onPress={() => {
+                            console.log("selectedEmotion: ", selectedEmotion);
+                            console.log("today: ", new Date().toISOString().slice(0,10));
+
+                            if(!selectedEmotion) toggleModal();
+
+                            sendPostRequest({
+                                token: state.token,
+                                endPoint: "/members/daily-moods",
+                                requestBody: {
+                                    date: new Date().toISOString().slice(0,10),
+                                    mood: selectedEmotion
+                                },
+                                onSuccess: () => toggleModal(),
+                                onFailure: () => Alert.alert("실패", "실패!")
+                            })
+                        }} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}> 저장 </Text>
                         </TouchableOpacity>
                     </View>
