@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button, Alert,TouchableOpacity, Modal, TextInput} from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useRoute, useNavigation } from '@react-navigation/native';
+import sendGetRequest from '../axios/SendGetRequest';
+import { useAuth } from '../auth/AuthContext';
 
 const CounselDetailScreen = () => {
+    const { state } = useAuth();
     const route = useRoute();
     const navigation = useNavigation();
     const { reservationId } = route.params;
@@ -11,6 +14,18 @@ const CounselDetailScreen = () => {
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false); 
     const [selectedValue, setSelectedValue] = useState("");
+
+    useEffect(() => {
+        sendGetRequest({
+            token: state.token,
+            endPoint: `/reservations/${reservationId}`,
+            onSuccess: (data) => {
+                console.log("data: ", data);
+                setReservation(data.data);
+            },
+            onFailure: () => Alert.alert("실패", "예약 정보 조회 실패")
+        })
+    },[]);
 
     useEffect(() => {
         const fetchReservationDetails = async () => {
