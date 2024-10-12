@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import { View, Text, StyleSheet, Modal, TouchableOpacity, TextInput, Animated, ScrollView, Image, PanResponder } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import ReservationCalendar from '../components/Calendar/ReservationCalendar.js'
 import TimeSelection from '../components/TimeSelection'; 
+import { PaymentWidgetProvider } from '@tosspayments/widget-sdk-react-native';
+import ExPaymentWidget from './exPaymentWidget';
+import { REACT_APP_TOSS_CLIENT_KEY } from '@env';
 
 const ReservationModal = ({ visible, onClose }) => {
   const [slideAnim] = useState(new Animated.Value(800));
@@ -12,6 +14,8 @@ const ReservationModal = ({ visible, onClose }) => {
   const [details, setDetails] = useState('');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
+  const [showWebView, setShowWebView] = useState(false);
+  const webViewRef = useRef(null);
 
   // 아코디언 상태 관리
   const [isTypeOpen, setIsTypeOpen] = useState(false);
@@ -23,6 +27,7 @@ const ReservationModal = ({ visible, onClose }) => {
     '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false,
     '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false,
   });
+  
 
   useEffect(() => {
     if (visible) {
@@ -61,6 +66,15 @@ const ReservationModal = ({ visible, onClose }) => {
     setIsCommentOpen(false);
   };
 
+  const handlePaymentRequest = () => {
+    setShowWebView(true);
+  };
+
+  const onClosee = () => {
+    onClose();
+    setShowWebView(false);
+  }
+
   const handleDayPress = (day) => {
     if (selectedDate === day.dateString) {
       // 이미 선택된 날짜를 다시 선택하면 선택 취소
@@ -72,18 +86,6 @@ const ReservationModal = ({ visible, onClose }) => {
       const dayOfWeek = date.toLocaleString('ko-KR', { weekday: 'long' }); // 요일 가져오기
       setSelectedDay(dayOfWeek); // 선택된 요일 상태 업데이트
       console.log('선택된 요일:', dayOfWeek); // 요일 출력
-
-      // 기본 시간 설정
-    //   if (defaultTimes[dayOfWeek]) {
-    //     const updatedAvailability = { ...availability[dayOfWeek] };
-    //     defaultTimes[dayOfWeek].forEach(time => {
-    //       updatedAvailability[time] = true; // 해당 시간의 상태를 true로 설정
-    //     });
-    //     setAvailability((prev) => ({
-    //       ...prev,
-    //       [dayOfWeek]: updatedAvailability,
-    //     }));
-    //   }
     }
   };
 
@@ -177,13 +179,20 @@ const ReservationModal = ({ visible, onClose }) => {
     return `${startTime} - ${endHour.toString().padStart(2, '0')}:${endMinute}`;
 };
 
-  return (
-    <Modal
-      animationType="slide"
-      transparent={true}
-      visible={visible}
-      onRequestClose={onClose}
-    >
+return (
+  <Modal
+    animationType="slide"
+    transparent={true}
+    visible={visible}
+    onRequestClose={onClose}
+  >
+    {showWebView ? (
+      <PaymentWidgetProvider
+      clientKey={REACT_APP_TOSS_CLIENT_KEY}
+      customerKey={`sbd0Tg2oe-tJS4xNk1krs`}>
+      <ExPaymentWidget onClose={onClosee}/>
+    </PaymentWidgetProvider>
+    ) : (
       <View style={styles.modalContainer}>
         <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -191,11 +200,11 @@ const ReservationModal = ({ visible, onClose }) => {
           <ScrollView contentContainerStyle={styles.scrollContainer}>
             {/* 상담 종류 선택 섹션 */}
             <TouchableOpacity onPress={() => setIsTypeOpen(!isTypeOpen)} style={styles.accordionHeader}>
-                <Text style={styles.label}>📞  상담 종류 선택 </Text>
-                <Image 
-                    source={isTypeOpen ? require('../../assets/images/up.png') : require('../../assets/images/down.png')} 
-                    style={styles.icon} 
-                />
+              <Text style={styles.label}>📞  상담 종류 선택 </Text>
+              <Image 
+                source={isTypeOpen ? require('../../assets/images/up.png') : require('../../assets/images/down.png')} 
+                style={styles.icon} 
+              />
             </TouchableOpacity>
             {isTypeOpen && (
               <View style={styles.accordionContent}>
@@ -210,84 +219,85 @@ const ReservationModal = ({ visible, onClose }) => {
               </View>
             )}
             <TouchableOpacity onPress={() => setIsDateOpen(!isDateOpen)} style={styles.accordionHeader}>
-                <Text style={styles.label}>📅  날짜와 시간 선택 </Text>
-                <Image 
-                    source={selectedType ? (isDateOpen ? require('../../assets/images/up.png') : require('../../assets/images/down.png')) : require('../../assets/images/down.png')} 
-                    style={styles.icon} 
-                />
+              <Text style={styles.label}>📅  날짜와 시간 선택 </Text>
+              <Image 
+                source={selectedType ? (isDateOpen ? require('../../assets/images/up.png') : require('../../assets/images/down.png')) : require('../../assets/images/down.png')} 
+                style={styles.icon} 
+              />
             </TouchableOpacity>
             {/* 날짜와 시간 선택 섹션 */}
             {selectedType && (
-                <>
-                    {isDateOpen && (
-                        <>
-                            <ReservationCalendar onDayPress={handleDayPress} selectedDate={selectedDate} />
-                            {/* 시간 선택 섹션 */}
-                            {selectedDate && (
-                                <TimeSelection 
-                                    availability={availability} 
-                                    selectedDay={new Date(selectedDate).toLocaleString('ko-KR', { weekday: 'long' })} 
-                                    onTimePress={handleTimePress} 
-                                />
-                            )}
-                        </>
+              <>
+                {isDateOpen && (
+                  <>
+                    <ReservationCalendar onDayPress={handleDayPress} selectedDate={selectedDate} />
+                    {/* 시간 선택 섹션 */}
+                    {selectedDate && (
+                      <TimeSelection 
+                        availability={availability} 
+                        selectedDay={new Date(selectedDate).toLocaleString('ko-KR', { weekday: 'long' })} 
+                        onTimePress={handleTimePress} 
+                      />
                     )}
-                </>
+                  </>
+                )}
+              </>
             )}
             <TouchableOpacity onPress={() => setIsCommentOpen(!isCommentOpen)} style={styles.accordionHeader}>
-                <Text style={styles.label}>📖  상담 내용 </Text>
-                <Image 
-                    source={selectedDate? (isCommentOpen ? require('../../assets/images/up.png') : require('../../assets/images/down.png')) : require('../../assets/images/down.png')} 
-                    style={styles.icon} 
-                />
+              <Text style={styles.label}>📖  상담 내용 </Text>
+              <Image 
+                source={selectedDate? (isCommentOpen ? require('../../assets/images/up.png') : require('../../assets/images/down.png')) : require('../../assets/images/down.png')} 
+                style={styles.icon} 
+              />
             </TouchableOpacity>
             {/* 상담 내용 입력 섹션 */}
             {selectedDate && (
-                <>
-                    {isCommentOpen && (
-                        <View style={styles.accordionContent}>
-                            <TextInput
-                                style={[styles.textInput, { textAlignVertical: 'top' }]} 
-                                placeholder="상담하고 싶은 내용을 적어주세요."
-                                multiline
-                                value={details}
-                                onChangeText={setDetails}
-                            />
-                        </View>
-                    )}
-                </>
+              <>
+                {isCommentOpen && (
+                  <View style={styles.accordionContent}>
+                    <TextInput
+                      style={[styles.textInput, { textAlignVertical: 'top' }]} 
+                      placeholder="상담하고 싶은 내용을 적어주세요."
+                      multiline
+                      value={details}
+                      onChangeText={setDetails}
+                    />
+                  </View>
+                )}
+              </>
             )}
           </ScrollView>
-    {/* 선택한 상담 종류 표시 */}
-            <View style={styles.container}>
-                <View style={styles.row}>
-                    <View style={styles.column}>
-                        <Text style={styles.selectedLabel}>상담 종류</Text>
-                        <Text style={styles.value}>{selectedType}</Text>
-                    </View>
-                    <View style={styles.column}>
-                        <Text style={styles.selectedLabel}>선택 날짜</Text>
-                        <Text style={styles.dateValue}>{formatDate(selectedDate)}</Text>
-                    </View>
-                    <View style={styles.column}>
-                        <Text style={styles.selectedLabel}>선택 시간</Text>
-                        <Text style={styles.timeValue}>
-                            {formatSelectedTime(time)}
-                        </Text>
-                    </View>
-                </View>
-                <View style={styles.footer}>
-                    <Text style={styles.cost}>총 결제금액</Text>
-                    <Text style={styles.costValue}>50,000원</Text>
-                        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-                    <Text style={styles.buttonText}>결제하기</Text>
-                    </TouchableOpacity>
-                </View>
+          {/* 선택한 상담 종류 표시 */}
+          <View style={styles.container}>
+            <View style={styles.row}>
+              <View style={styles.column}>
+                <Text style={styles.selectedLabel}>상담 종류</Text>
+                <Text style={styles.value}>{selectedType}</Text>
+              </View>
+              <View style={styles.column}>
+                <Text style={styles.selectedLabel}>선택 날짜</Text>
+                <Text style={styles.dateValue}>{formatDate(selectedDate)}</Text>
+              </View>
+              <View style={styles.column}>
+                <Text style={styles.selectedLabel}>선택 시간</Text>
+                <Text style={styles.timeValue}>
+                  {formatSelectedTime(time)}
+                </Text>
+              </View>
             </View>
+            <View style={styles.footer}>
+              <Text style={styles.cost}>총 결제금액</Text>
+              <Text style={styles.costValue}>50,000원</Text>
+              <TouchableOpacity style={styles.submitButton} onPress={handlePaymentRequest} >
+                <Text style={styles.buttonText}>결제하기</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </Animated.View>
       </View>
-    </Modal>
-  );
+    )}
+  </Modal>
+);
 };
 
 const styles = StyleSheet.create({

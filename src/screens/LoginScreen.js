@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { memo, useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet,Alert } from 'react-native';
 import axios from 'axios';
 import {REACT_APP_API_URL} from '@env';

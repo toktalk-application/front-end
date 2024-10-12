@@ -75,7 +75,7 @@ const setupNotificationsOnFirstLogin = async (memberId) => {
         // FCM 토큰 얻기 및 서버로 전송
         const token = await messaging().getToken();
         console.log('FCM Token:', token);
-        await sendFcmTokenToServer(memberId, token);
+        // await sendFcmTokenToServer(memberId, token);
         
         // 설정 완료 표시
         await AsyncStorage.setItem('hasSetupNotifications', 'true');
@@ -89,31 +89,6 @@ const setupNotificationsOnFirstLogin = async (memberId) => {
     console.log('Error in notification setup:', error);
   }
 };
-
-// const sendFcmTokenToServer = async (memberId, fcmToken) => {
-//   try {
-//     const userToken = await AsyncStorage.getItem('userToken'); // 저장된 인증 토큰
-//     const response = await fetch(`http://10.0.2.2:8080/members/${memberId}/fcm-token`, {
-//       method: 'PUT',
-//       headers: {
-//         'Content-Type': 'application/json',
-//         'Authorization': `Bearer ${userToken}`
-//       },
-//       body: JSON.stringify({ fcmToken })
-//     });
-//     console.log(memberId);
-//     console.log(userToken);
-//     console.log(fcmToken);
-//     if (response.ok) {
-//       console.log('FCM token successfully sent to server');
-//     } else {
-//       console.error('Failed to send FCM token to server');
-//     }
-//   } catch (error) {
-//     console.error('Error sending FCM token to server:', error);
-//   }
-// };
-
 
 const CustomHeader = ({ routeName, navigation }) => {
   return (
