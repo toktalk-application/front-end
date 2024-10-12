@@ -131,7 +131,30 @@ function MemberMainScreen() {
             },
             onFailure: () => Alert.alert("실패", "실패!")
         })
-
+        
+        sendGetRequest({
+            token: state.token,
+            endPoint: `/members/${state.identifier}`,
+            onSuccess: (data) => {
+              console.log("data: ", data);
+                      // lastTestResult가 비어있는 경우
+                      if (!data.data.lastTestResult || Object.keys(data.data.lastTestResult).length === 0) {
+                        Alert.alert(
+                            "우울 검사 필요",
+                            "우울 검사를 진행해야 합니다.",
+                            [
+                                {
+                                    text: "확인",
+                                    onPress: () => navigation.navigate("우울 검사"), // TestScreen으로 이동
+                                },
+                            ],
+                            { cancelable: false }
+                        );
+                      }
+            },
+            onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
+          });
+        
     }, []);
 
     const fetchReservations = async (date) => {

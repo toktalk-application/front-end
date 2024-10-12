@@ -11,16 +11,20 @@ export const AuthProvider = ({ children }) => {
         token: null,
         usertype: null,
         identifier: null,
+        nickname: null,
+        name:null,
     };
 
     const [state, setState] = useState(initialState);
 
-    const login = async (token, usertype, navigation, identifier) => {
+    const login = async (token, usertype, navigation, identifier, nickname, name) => {
         const newState = {
             isAuthenticated: true,
             token,
             usertype,
             identifier,
+            nickname,
+            name
         };
         setState(newState);
         await AsyncStorage.setItem('authState', JSON.stringify(newState));

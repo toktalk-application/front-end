@@ -5,7 +5,6 @@ const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFail
     /* console.log("token: ", token);
     console.log("endPoint: ", endPoint);
     console.log("requestParams: ", requestParams); */
-    console.log('REACT_APP_API_URL:', REACT_APP_API_URL);
     
     try{
         const response = await axios.get(
