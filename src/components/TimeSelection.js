@@ -1,14 +1,26 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
-const TimeSelection = ({ availability, onTimePress }) => {
+const TimeSelection = ({ availability, availableTimes, onTimePress }) => {
+
+  const getStyle = (time) => {
+    if(availableTimes[time]){
+      return availability[time] && styles.selectedButton;
+    }else{
+      return styles.unavailableButton;
+    }
+  }
+  const isDisabled = (time) => {
+    return !availableTimes[time];
+  }
   return (
     <View style={styles.timeGrid}>
       {Object.keys(availability).map((time) => (
         <TouchableOpacity
           key={time}
-          style={[styles.timeButton, availability[time] && styles.selectedButton]}
+          style={[styles.timeButton, getStyle(time)]}
           onPress={() => onTimePress(time)} // 선택된 시간 전달
+          disabled = {isDisabled(time)}
         >
           <Text style={styles.timeButtonText}>{time}</Text>
         </TouchableOpacity>
@@ -39,6 +51,9 @@ const styles = StyleSheet.create({
   },
   selectedButton: {
     backgroundColor: '#00bcd4',
+  },
+  unavailableButton: {
+    backgroundColor: '#bbbbbb',
   },
 });
 

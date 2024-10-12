@@ -169,7 +169,7 @@ const MemberCounselorDetailScreen = () => {
       <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
         <Text style={styles.buttonText}>상담 신청 </Text>
       </TouchableOpacity>
-      <ReservationModal visible={modalVisible} onClose={() => setModalVisible(false)} />
+      <ReservationModal visible={modalVisible} onClose={() => setModalVisible(false)} counselorId={counselorId} chatPrice={counselorData.chatPrice} callPrice={counselorData.callPrice} />
     </ScrollView>
 
   );
