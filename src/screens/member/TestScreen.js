@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, Animated, ScrollView }
 import { useNavigation } from '@react-navigation/native';
 import sendPostRequest from '../../axios/SendPostRequest';
 import { useAuth } from '../../auth/AuthContext';
+import TestResultModal from './TestResultModal';
 
 
 const questions = [
@@ -24,6 +25,14 @@ const TestScreen = () => {
   const progressAnim = useRef(new Animated.Value(0)).current; // 애니메이션 값 초기화
   const [selectedValues, setSelectedValues] = useState(Array(questions.length).fill(null));
   const scrollViewRef = useRef(); 
+  const [modalVisible, setModalVisible] = useState(false); // 모달 가시성 상태
+  const [resultData, setResultData] = useState(null); // 결과 데이터 상태
+
+    // 모달을 여는 함수
+  const openModal = (data) => {
+    setResultData(data); // 결과 데이터 설정
+    setModalVisible(true); // 모달 열기
+  };
 
   const handleButtonPress = (questionIndex, value) => {
     const updatedValues = [...selectedValues];
@@ -73,25 +82,21 @@ const TestScreen = () => {
       requestBody: {
         score: totalScore
       },
-      onSuccess: () => {
+      onSuccess: (data) => {
+        console.log('성공적으로 응답을 받았습니다:', data);
+        console.log(data.score);
         // TestResultScreen으로 이동.  점수에 따라 보여지는 내용이 다름. 
-        navigation.navigate('',)
-        navigation.navigate('TestResult', { score: totalScore });
+        openModal({
+          score: data.score,
+          comment: data.comment,
+          description: data.description,
+          createdAt: data.createdAt
+        });
       },
       onFailure: () => {
           Alert.alert("오류", "테스트에 실패했습니다. 다시 시도해주세요.")
       }
   });
-
-    Alert.alert("설문이 완료되었습니다!", `응답: ${responses.join(', ')}\n총 점수: ${totalScore}`, [
-      {
-        text: "확인",
-        onPress: () => {
-          navigation.goBack();
-          setResponses(Array(questions.length).fill(null)); // 다시 초기화
-        },
-      },
-    ]);
   };
 
   const totalAnswered = responses.filter(response => response !== null).length;
@@ -149,6 +154,12 @@ const TestScreen = () => {
           </TouchableOpacity>
         </ScrollView>
       </View>
+      <TestResultModal 
+        route={{ params: resultData }} // 결과 데이터를 모달에 전달
+        visible={modalVisible} 
+        onClose={() => setModalVisible(false)} // 모달 닫기 함수
+        navigation={navigation}
+      />
     </View>
   );
 };

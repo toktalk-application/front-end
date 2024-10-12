@@ -45,9 +45,9 @@ function MemberLoginScreen({ navigation }) {
         if (response.status === 200) {
           const token = response.headers.get('Authorization');
           const usertype = response.data.usertype;
+          const nickname = response.data.nickname;
           const identifier = response.data.identifier;
-          Alert.alert("로그인 성공", "환영합니다!");
-          login(token, usertype, navigation, identifier);
+          login(token, usertype, navigation, identifier, nickname);
         }
 
       } catch (error) {
@@ -157,8 +157,10 @@ function CounselorLoginScreen({ navigation }) {
         const token = response.headers.get('Authorization');
         const usertype = response.data.usertype;
         const identifier = response.data.identifier;
+        const name = response.data.name;
+        const nickname= response.data.nickname;
         Alert.alert("로그인 성공", "환영합니다!");
-        login(token, usertype, navigation, identifier);
+        login(token, usertype, navigation, identifier, nickname, name);
       }
 
     } catch (error) {
