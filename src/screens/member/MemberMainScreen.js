@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendPostRequest from '../../axios/SendPostRequest';
+import { all } from 'axios';
 
 const moodOptions = [
     { key: 'HAPPY', label: '😃' },
@@ -25,6 +26,7 @@ function MemberMainScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedEmotion, setSelectedEmotion] = useState(null);
     const today = new Date().toISOString().split('T')[0];
+    const [isLoading, setIsLoading] = useState(true);
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -112,8 +114,9 @@ function MemberMainScreen() {
                 month: formattedMonth
             },
             onSuccess: (data) => {
-                console.log("data: ", data);
+                console.log("monthlyData: ", data);
                 setMarkedDates(data.data);
+                setIsLoading(false);
             },
             onFailure: () => Alert.alert("실패!")
         })
@@ -190,12 +193,27 @@ function MemberMainScreen() {
     };
 
     const handleDayPress = (day) => {
+        // 두 번 누르면 해제
         if (selectedDate === day.dateString) {
+            console.log("날짜 클릭");
             setSelectedDate('');
             setReservations([]);
-        } else {
+        } else { // 일반적인 경우
+            console.log("날짜 클릭");
+            sendGetRequest({
+                token: state.token,
+                endPoint: "/reservations/daily",
+                requestParams: {
+                    date: day.dateString
+                },
+                onSuccess: (data) => {
+                    console.log("data: ", data);
+                    setReservations(data.data);
+                },
+                onFailure: () => Alert.alert("실패", "내 특정일 예약 목록 조회 실패")
+            });
             setSelectedDate(day.dateString);
-            fetchReservations(day.dateString);
+            /* fetchReservations(day.dateString); */
         }
     };
 
@@ -220,12 +238,12 @@ function MemberMainScreen() {
                         <TouchableOpacity style={styles.Button} onPress={toggleModal}>
                             <Text style={styles.buttonText}>오늘의 기분은?</Text>
                         </TouchableOpacity>
-                        <MemberCalendar
+                        {isLoading ? <View/> : <MemberCalendar
                             moodDates={moodDates}
                             markedDates={markedDates}
                             onDayPress={handleDayPress}
                             selectedDate={selectedDate}
-                        />
+                        />}
                     </View>
                 )}
                 renderItem={({ item }) => (
