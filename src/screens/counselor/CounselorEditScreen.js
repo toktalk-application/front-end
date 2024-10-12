@@ -4,9 +4,11 @@ import { launchImageLibrary } from 'react-native-image-picker';
 import sendPatchRequest from '../../axios/PatchRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendGetRequest from '../../axios/SendGetRequest';
+import { useNavigation } from '@react-navigation/native';
 
 function CounselorEditScreen() {
     const { state } = useAuth();
+    const navigation = useNavigation();
     const [profileImage, setProfileImage] = useState(null);
     const [introduction, setIntroduction] = useState(''); // 자기 소개
     const [expertise, setExpertise] = useState(''); // 전문 분야
@@ -65,7 +67,7 @@ function CounselorEditScreen() {
             endPoint: "/counselors",
             requestBody: data,
             onSuccess: () => {
-                Alert.alert("수정 성공", "성공!");
+                navigation.navigate("프로필 관리");
             },
             onFailure: () => Alert.alert("수정 실패", "실패!")
         });

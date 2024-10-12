@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+
 
 
 function CounselorProfileScreen() {
@@ -11,21 +12,31 @@ function CounselorProfileScreen() {
   const [counselorData, setCounselorData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   
-  useEffect(() => {
-    /* console.log("state: ", state); */
-    sendGetRequest(
-      {
-        token: state.token,
-        endPoint: `/counselors/${state.identifier}`,
-        onSuccess: (data) => {
-          console.log("data2: ",  data);
-          setCounselorData(data.data);
-          setIsLoading(false);
-        },
-        onFailure: () => Alert.alert("내 정보 GET요청 실패!")
-      }
-    )
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+        const fetchData = () => {
+            sendGetRequest({
+                token: state.token,
+                endPoint: `/counselors/${state.identifier}`,
+                onSuccess: (data) => {
+                    console.log("data2: ", data);
+                    setCounselorData(data.data);
+                    setIsLoading(false);
+                },
+                onFailure: () => {
+                    Alert.alert("내 정보 GET요청 실패!");
+                    setIsLoading(false);
+                },
+            });
+        };
+
+        fetchData(); // 데이터 요청
+
+        return () => {
+            // 컴포넌트 언마운트 시 필요한 정리 작업을 여기에 추가
+        };
+    }, [state.token, state.identifier]) // 의존성 배열에 추가
+);
   
   return (
     <>
@@ -51,24 +62,25 @@ function CounselorProfileScreen() {
           </View>
           <View style={styles.descriptionContainer}>
             {/* 상담사 소개 */}
-            <Text style={styles.sectionTitle}>📍 심리상담사 소개</Text>
+            <Text style={styles.sectionTitle}>📍 전문 분야 소개</Text>
             <Text style={styles.detaiDescription}>안녕하세요, {counselorData.name} 상담사입니다. </Text>
             <Text style={styles.detaiDescription}>{counselorData.expertise}</Text>
     
             {/* 경력 및 자격 */}
-            <Text style={styles.sectionTitle}>👩‍🎓 공인 자격 및 경력</Text>
+            <Text style={styles.sectionTitle}>👩‍🎓 공인 자격</Text>
             {counselorData.licenses.map((license) => (
               <Text key={license.licenseDto} style={styles.license}>
                 🏅 {license.licenseName} ({license.organization})
               </Text>
             ))}
+            <Text style={styles.sectionTitle}>💼 경력</Text>
             {counselorData.careers.map((career) => (
               <Text key={career.careerId} style={styles.career}>
                 {career.classification === "CURRENT" ? "현재" : "이전"} ) {career.company} - {career.responsibility}
               </Text>
             ))}
             {/* 상담 진행 방법 */}
-            <Text style={styles.sectionTitle}>📍 상담 진행 방법</Text>
+            <Text style={styles.sectionTitle}>📑 상담 세션 소개</Text>
             <Text style={styles.detaiDescription}>{counselorData.sessionDescription}</Text>
           
           </View>
