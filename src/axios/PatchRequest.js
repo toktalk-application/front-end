@@ -3,6 +3,8 @@ import {REACT_APP_API_URL} from '@env';
 
 const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFailure }) => {
     try{
+        console.log('REACT_APP_API_URL:', REACT_APP_API_URL);
+        
         if(requestBody) console.log("requestBody:", requestBody);
 
         const response = await axios.patch(
