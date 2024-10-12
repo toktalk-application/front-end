@@ -185,6 +185,11 @@ const CounselDetailScreen = () => {
     // 후에 UserInfo 받아서 처리 할 예정. 
     const userType = 'counselor'; 
 
+    const getKorGender = (gender) => {
+        if(gender === 'MALE') return "남";
+        if(gender === "FEMALE") return "여";
+        return "기타";
+    }
     
     return (
         <ScrollView style={styles.container}>
@@ -205,13 +210,13 @@ const CounselDetailScreen = () => {
                             <Text style={styles.memberDetailTitleNickname}>닉네임</Text>   
                             <Text style={styles.memberDetailContent}>{reservation.memberNickname}</Text>
                             <Text style={styles.memberDetailTitle}>성별</Text>
-                            <Text style={styles.memberDetailContent}>여</Text>
+                            <Text style={styles.memberDetailContent}>{getKorGender(reservation.memberGender)}</Text>
                         </View>
                         <View style={styles.memberDetail}>
                             <Text style={styles.memberDetailTitle}>출생년도</Text>
-                            <Text style={styles.memberDetailContent}>20대</Text>
+                            <Text style={styles.memberDetailContent}>{reservation.memberBirthYear}</Text>
                             <Text style={styles.memberDetailTitle}>점수</Text>
-                            <Text style={styles.memberDetailContent}>42점</Text>
+                            <Text style={styles.memberDetailContent}>{reservation.memberDepressionScore + '점'}</Text>
                         </View>
                     </View>
                 </>
