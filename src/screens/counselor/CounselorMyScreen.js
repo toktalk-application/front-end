@@ -4,7 +4,7 @@ import MenuItem from '../../components/MenuItem.js';
 import calendarIcon from '../../../assets/images/calendar.png'
 import chargeIcon from '../../../assets/images/charge.png'
 import profileIcon from '../../../assets/images/profile.png'
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest.js';
 import { useAuth } from '../../auth/AuthContext.js';
 
@@ -23,27 +23,31 @@ const CounselorMyScreen = () => {
   };
   const [myData, setMyData] = useState({data:{}});
 
-  useEffect(() => {
-    sendGetRequest({
-      token: state.token,
-      endPoint: `/counselors/${state.identifier}`,
-      onSuccess: (data) => {
-        console.log("data: ", data);
-        setMyData(data.data);
-      },
-      onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
-    });
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      sendGetRequest({
+        token: state.token,
+        endPoint: `/counselors/${state.identifier}`,
+        onSuccess: (data) => {
+          console.log("data: ", data);
+          setMyData(data.data);
+        },
+        onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
+      });
+  
+      // Optional cleanup if needed (none in your case)
+      return () => {
+        // Cleanup logic if any
+      };
+    }, [state.token, state.identifier])  // Dependencies: these values trigger re-fetch when changed
+  );
 
 
   return (
     <View style={styles.containder}>
       <View style={styles.infoContainer}>
         <View style={styles.nameBingContainer}>
-          <Image
-            source={{ uri: myData.profileImage || "https://via.placeholder.com/80" }}
-            style={styles.image}
-          />
+        <Image source={{ uri: myData.profileImage || 'https://via.placeholder.com/120' }} style={styles.image} />
           <View style={styles.nameContainer}>
             <Text style={styles.name}>{myData.name}</Text>
             <Text style={styles.counselor}> 상담사님 </Text>

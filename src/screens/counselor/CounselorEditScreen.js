@@ -5,6 +5,8 @@ import sendPatchRequest from '../../axios/PatchRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useNavigation } from '@react-navigation/native';
+import sendPostRequest from '../../axios/SendPostRequest';
+
 
 function CounselorEditScreen() {
     const { state } = useAuth();
@@ -14,6 +16,7 @@ function CounselorEditScreen() {
     const [expertise, setExpertise] = useState(''); // 전문 분야
     const [sessionDescription, setSessionDescription] = useState(''); // 상담 세션 설명
     const [isLoading, setIsLoading] = useState(true);
+    const [selectedImage, setSelectedImage] = useState(null);
 
     useEffect(() => {
         sendGetRequest({
@@ -21,6 +24,7 @@ function CounselorEditScreen() {
             endPoint: `/counselors/${state.identifier}`,
             onSuccess: (data) => {
                 /* console.log("data: ", data); */
+                setProfileImage(data.data.profileImage);
                 setIntroduction(data.data.introduction);
                 setExpertise(data.data.expertise);
                 setSessionDescription(data.data.sessionDescription);
@@ -29,31 +33,67 @@ function CounselorEditScreen() {
         });
     }, []);
 
-    const selectImage = async () => {
+
+    // 이미지 선택 및 S3에 업로드하는 함수
+    const selectImage = () => {
         const options = {
             mediaType: 'photo',
-            includeBase64: false,
+            maxWidth: 600,
+            maxHeight: 600,
+            quality: 1,
         };
 
-        try {
-            const response = await launchImageLibrary(options);
-
+        launchImageLibrary(options, async (response) => {
             if (response.didCancel) {
-                console.log('사용자가 이미지를 선택하지 않았습니다.');
-            } else if (response.errorCode) {
-                console.log('이미지 선택 오류:', response.errorMessage);
-            } else if (response.assets) {
-                const source = { uri: response.assets[0].uri };
-                setProfileImage(source);
+                Alert.alert('알림', '이미지 선택이 취소되었습니다.');
+            } else if (response.errorMessage) {
+                Alert.alert('에러', '이미지를 선택하는 중 오류가 발생했습니다.');
+            } else {
+                const uri = response.assets[0].uri;
+
+                // 이미지 업로드 (S3로 업로드)
+                const formData = new FormData();
+                formData.append('file', {
+                    uri: uri,
+                    type: 'image/jpeg',
+                    name: `image_${state.identifier}.jpg`,
+                });
+                console.log(uri);
+                setProfileImage(uri);
+
+                const uploadResponse = await fetch('http://10.0.2.2:8080/counselors/upload-image', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                    },
+                });
+                
+                const responseText = await uploadResponse.text(); // 응답 내용을 텍스트로 가져옵니다
+                console.log("서버 응답:", responseText); // 응답 내용을 로그로 출력합니다
+                
+                    let result;
+                
+                    // 응답 상태가 2xx일 경우에만 JSON으로 파싱 시도
+                    if (uploadResponse.ok) {
+                            result = JSON.parse(responseText); // JSON으로 파싱
+                            const uploadedImageUrl = typeof result === 'string' ? result : result.imageUrl;
+                            Alert.alert('성공', '이미지가 성공적으로 업로드되었습니다.');
+                            console.log('이미지 URL:', uploadedImageUrl);
+                    } else {
+                        // 에러 상태일 경우
+                        Alert.alert('실패', '이미지 업로드에 실패했습니다.');
+                        console.error('서버에서 반환한 오류:', responseText);
+                    }
             }
-        } catch (error) {
-            console.error('이미지 선택 중 오류 발생:', error);
-        }
+        });
     };
+    
+
 
     const handleSubmit = async () => {
         const data = {
-            profileImage: profileImage ? profileImage.uri : null,
+            profileImage: profileImage ? profileImage : null,
         };
 
         if (introduction) data.introduction = introduction;
@@ -61,16 +101,19 @@ function CounselorEditScreen() {
         if (sessionDescription) data.sessionDescription = sessionDescription;
 
         /* console.log(data); */
-
-        sendPatchRequest({
-            token: state.token,
-            endPoint: "/counselors",
-            requestBody: data,
-            onSuccess: () => {
-                navigation.navigate("프로필 관리");
-            },
-            onFailure: () => Alert.alert("수정 실패", "실패!")
-        });
+        try {
+            await sendPatchRequest({
+                token: state.token,
+                endPoint: "/counselors",
+                requestBody: data,
+                onSuccess: () => {
+                    navigation.navigate("프로필 관리");
+                },
+                onFailure: () => Alert.alert("수정 실패", "실패!")
+            });
+        } catch (error) {
+            Alert.alert("업로드 실패", "이미지 업로드에 실패했습니다.");
+        }
     };
 
     return (
@@ -78,7 +121,7 @@ function CounselorEditScreen() {
             {/* 프로필 이미지 표시 */}
             <View style={styles.imageContainer}>
                 {profileImage ? (
-                    <Image source={profileImage} style={styles.image} />
+                    <Image source={{ uri: profileImage }} style={styles.image} />
                 ) : (
                     <Image source={{ uri: 'https://via.placeholder.com/120' }} style={styles.image} />
                 )}
