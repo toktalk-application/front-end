@@ -177,7 +177,7 @@ function MemberSignUpScreen() {
       },
       onSuccess: () => {
         Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!')
-        navigation.navigate('Tabs', { userType: 'MEMBER' });
+        navigation.navigate('로그인');
       },
       onFailure: () => Alert.alert('회원가입 실패', '회원가입 실패~'),
     });
