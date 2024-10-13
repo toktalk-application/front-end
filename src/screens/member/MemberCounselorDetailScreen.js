@@ -81,7 +81,14 @@ const MemberCounselorDetailScreen = () => {
       <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
         <Text style={styles.buttonText}>상담 신청 </Text>
       </TouchableOpacity>
-      <ReservationModal visible={modalVisible} onClose={() => setModalVisible(false)} counselorId={counselorId} chatPrice={counselorData.chatPrice} callPrice={counselorData.callPrice} />
+      <ReservationModal 
+        visible={modalVisible} 
+        onClose={() => setModalVisible(false)} 
+        counselorId={counselorId} 
+        counselorData={counselorData}  // 전체 counselorData 객체를 전달
+        chatPrice={counselorData?.chatPrice}  // 옵셔널 체이닝 사용
+        callPrice={counselorData?.callPrice}  // 옵셔널 체이닝 사용
+      />
     </ScrollView>
 
   );
