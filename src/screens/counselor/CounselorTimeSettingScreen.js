@@ -152,11 +152,15 @@ function CounselorTimeSettingScreen() {
           </TouchableOpacity>
         ))}
       </View>
-      <Text style={styles.notice}>변경 시,</Text>
-      <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>
-        <View style={styles.buttonContainer}>
-            <Button title="변경 완료" onPress={handleComplete} color="#001932" />
+      <View style={styles.buttonContainer}>
+        <View style={{marginBottom: 10}}>
+          <Text style={styles.notice}>변경 시,</Text>
+          <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>
         </View>
+          <TouchableOpacity style={styles.submitButton} onPress={handleComplete}>
+                <Text style={styles.submitButtonText}>변경 완료 </Text>
+          </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -205,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#00bcd4', // 선택된 버튼 색상
   },
   buttonContainer: {
-    marginTop: 10, // 원하는 여백 추가
+    marginTop: 30, // 원하는 여백 추가
     marginBottom: 20, // 필요한 경우 아래쪽 여백 추가
   },
   buttonText: {
@@ -216,6 +220,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     color: 'gray',
+  },
+  submitButton: {
+    marginTop: 10,
+    marginBottom: 40,
+    padding: 10,
+    backgroundColor: '#001326',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      textAlign: 'center',
   },
 });
 

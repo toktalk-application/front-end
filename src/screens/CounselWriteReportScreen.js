@@ -1,25 +1,46 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert,TouchableOpacity } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useAuth } from '../auth/AuthContext';
+import sendPostRequest from '../axios/SendPostRequest';
 
 const CounselWriteReportScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { reservationId } = route.params;
+    const { state } = useAuth();
 
     const [reportContent, setReportContent] = useState('');
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         // 리포트를 제출하는 로직을 여기에 추가
         if (reportContent.trim() === '') {
-            Alert.alert("경고", "모든 필드를 입력해주세요.");
+            Alert.alert("경고", "리포트 내용을 입력해주세요.");
             return;
         }
-        
-        // 예: API 호출 등
-        console.log("리포트 작성 완료:", { reservationId, reportContent });
-        Alert.alert("리포트 제출", "리포트가 성공적으로 제출되었습니다.");
-        navigation.goBack(); // 이전 화면으로 돌아가기
+        const requestBody = {
+            content: reportContent
+        }
+        const token = state.token;
+        try {
+            await sendPostRequest({
+                token,
+                endPoint: `/reservations/${reservationId}/reports`,
+                requestBody,
+                onSuccess: (data) => {
+                    Alert.alert("성공", "리포트가 성공적으로 작성되었습니다.");
+                    navigation.goBack(); // 이전 화면으로 돌아가기
+                },
+                onFailure: () => {
+                    Alert.alert("실패", "리포트 작성에 실패했습니다.");
+                }
+
+            })
+        } catch (error) {
+            console.error("리포트 작성 중 오류 발생:", error);
+            Alert.alert("오류", "리포트 작성 중 오류가 발생했습니다.");
+        }
+
     };
 
     return (

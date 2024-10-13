@@ -183,7 +183,7 @@ const CounselDetailScreen = () => {
     };
 
     // 후에 UserInfo 받아서 처리 할 예정. 
-    const userType = 'counselor'; 
+    const userType = state.usertype; 
 
     const getKorGender = (gender) => {
         if(gender === 'MALE') return "남";
@@ -202,7 +202,7 @@ const CounselDetailScreen = () => {
                     <Text style={styles.type}>  {reservation.type}  </Text>
                 </View>
                 <View style={styles.memberContainer}>
-                {userType === 'counselor' ? (
+                {userType === 'COUNSELOR' ? (
                 <>
                     <Text style={styles.subtitle}>내담자 정보</Text>
                     <View style={styles.memberDetailContainer}>
@@ -220,7 +220,7 @@ const CounselDetailScreen = () => {
                         </View>
                     </View>
                 </>
-            ) : userType === 'member' ? (
+            ) : userType === 'MEMBER' ? (
                 <View style= {styles.dateDetailContainer}>
                     <Text style={styles.subtitle}>상담사 </Text>
                     <Text style={styles.dateText}> {reservation.counselorName}</Text>
@@ -232,7 +232,7 @@ const CounselDetailScreen = () => {
                     <Text>{reservation.comment}</Text>
                 </View>
             </View>
-                {userType === 'counselor' && reservation.status === 'PENDING' ? (
+                {userType === 'COUNSELOR' && reservation.status === 'PENDING' ? (
                     <View style={styles.pendingButtonContainer}>
                         <TouchableOpacity style={styles.pendingButton}>
                             <Text style={styles.buttonText}>채팅방 열기</Text>
@@ -241,7 +241,7 @@ const CounselDetailScreen = () => {
                             <Text style={styles.buttonText}>상담 취소</Text>
                         </TouchableOpacity>
                     </View>
-                ) : userType === 'member' && reservation.status === 'PENDING' ? (
+                ) : userType === 'MEMBER' && reservation.status === 'PENDING' ? (
                     <View style={styles.memberPendingButtonContainer}>
                         <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
                             <Text style={styles.buttonText}>상담 취소</Text>
@@ -265,7 +265,7 @@ const CounselDetailScreen = () => {
                                 <Text style={styles.reviewContent}>{reservation.review.content}</Text>
                             </View>
                         ) : (
-                            userType === 'member' && (
+                            userType === 'MEMBER' && (
                                 <View>
                                     <Text style={styles.reviewContent}>후기가 없습니다.</Text>
                                     <TouchableOpacity 
@@ -285,7 +285,7 @@ const CounselDetailScreen = () => {
                         {reservation.report && Object.keys(reservation.report).length > 0 ? (
                             <Text>{reservation.report.content}</Text>
                         ) : (
-                            userType === 'counselor' && (
+                            userType === 'COUNSELOR' && (
                                 <View>
                                     <Text>리포트가 없습니다.</Text>
                                     <TouchableOpacity 
