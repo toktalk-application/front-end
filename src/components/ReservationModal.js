@@ -8,7 +8,7 @@ import { REACT_APP_TOSS_CLIENT_KEY } from '@env';
 import sendGetRequest from '../axios/SendGetRequest.js';
 import { useAuth } from '../auth/AuthContext.js';
 
-const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice }) => {
+const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice, counselorData }) => {
   const { state } = useAuth();
   const [slideAnim] = useState(new Animated.Value(800));
   const [selectedType, setSelectedType] = useState('');
@@ -19,6 +19,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice 
   const [selectedDay, setSelectedDay] = useState('');
   const [showWebView, setShowWebView] = useState(false);
   const webViewRef = useRef(null);
+  const [orderInfo, setOrderInfo] = useState(null);
 
   // 아코디언 상태 관리
   const [isTypeOpen, setIsTypeOpen] = useState(false);
@@ -70,7 +71,17 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice 
     setIsCommentOpen(false);
   };
 
+  // 수정
   const handlePaymentRequest = () => {
+    const orderInfo = {
+      counselingType: selectedType,
+      totalAmount: getTotalFee(),
+      selectedDate: selectedDate,
+      selectedTime: formatSelectedTime(time),
+      counselorId: counselorId,
+      counselorName: counselorData?.name || '알 수 없음',  // 기본값 제공
+    };
+    setOrderInfo(orderInfo);
     setShowWebView(true);
   };
 
@@ -251,7 +262,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice 
         <PaymentWidgetProvider
           clientKey={REACT_APP_TOSS_CLIENT_KEY}
           customerKey={`sbd0Tg2oe-tJS4xNk1krs`}>
-          <ExPaymentWidget onClose={onClosee} />
+          <ExPaymentWidget onClose={onClosee} orderInfo={orderInfo} />
         </PaymentWidgetProvider>
       ) : (
         <View style={styles.modalContainer}>
