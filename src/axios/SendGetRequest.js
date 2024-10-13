@@ -21,9 +21,10 @@ const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFail
             if(onSuccess) onSuccess(response.data);
         }
     }catch(error){
-        console.log('요청 실패: ', error);
-        console.log('response: ', error.response);
-        console.log('message: ', error.message);
+        console.error('요청 실패: ', error);
+        /* console.error('error data: ', error.response.data); */
+        console.error('message: ', error.message);
+        console.error('server message: ', error.response.data.message);
 
         if(onFailure) onFailure();
     }

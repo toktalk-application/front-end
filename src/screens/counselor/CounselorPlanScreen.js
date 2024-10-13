@@ -12,6 +12,7 @@ function CounselorPlanScreen() {
   const [selectedDay, setSelectedDay] = useState('일요일'); // 현재 선택된 요일
   const initialTimeslots = { '09:00': false, '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false, '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false, '20:00': false, '21:00': false, '22:00': false, '23:00': false };
   const [timeslots, setTimeslots] = useState(initialTimeslots);
+  const [defaultDayInitialized, setDefaultDayInitialized] = useState(false);
 
   const navigation = useNavigation();
 
@@ -23,7 +24,22 @@ function CounselorPlanScreen() {
   };
 
   useEffect(() => {
+    sendGetRequest({
+      token: state.token,
+      endPoint: "/counselors/default-days-initializations",
+      onSuccess: (data) => {
+        console.log("기본 상담 시간 등록 여부: ", data);
+        setDefaultDayInitialized(data.data);
+      },
+      onFailure: () => Alert.alert("실패", "내 기본 시간 등록 여부 조회 실패"),
+    })
+  },[]);
+
+  useEffect(() => {
+    // 페이지 처음 들어왔을 땐 실행 안함
     if(!selectedDate) return;
+    // 기본 시간이 등록되지 않았다면 실행 안함
+    if(!defaultDayInitialized) return;
 
     sendGetRequest({
       token: state.token,
@@ -45,6 +61,10 @@ function CounselorPlanScreen() {
   }, [selectedDate]);
 
   const handleDayPress = (day) => {
+    if(!defaultDayInitialized){
+      Alert.alert("요청 거부", "기본 상담 시간을 먼저 등록해주세요");
+      return;
+    }
     if (selectedDate === day.dateString) {
       // 이미 선택된 날짜를 다시 선택하면 선택 취소
       setSelectedDate('');
@@ -105,7 +125,7 @@ function CounselorPlanScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('기본 시간 설정')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('기본 시간 설정', {defaultDayInitialized: defaultDayInitialized})}>
           <Text style={styles.buttonText}>기본 시간 설정</Text>
         </TouchableOpacity>
       </View>
