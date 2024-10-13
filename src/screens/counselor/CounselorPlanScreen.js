@@ -122,11 +122,20 @@ function CounselorPlanScreen() {
             </TouchableOpacity>
           ))}
         </View>}
-        {!selectedDate ? <View /> : <Text style={styles.notice}>변경 시,</Text>}
-        {!selectedDate ? <View /> : <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>}
-        {!selectedDate ? <View /> : <View style={styles.buttonContainer}>
-          <Button title="변경 완료" onPress={handleComplete} color="#001932" />
-        </View>}
+        <View style={styles.buttonContainer}>
+          {selectedDate ? (
+              <View style={{ marginBottom: 10 }}>
+                  <Text style={styles.notice}>변경 시,</Text>
+                  <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>
+              </View>
+          ) : null}
+
+          {selectedDate ? (
+                  <TouchableOpacity style={styles.submitButton} onPress={handleComplete}>
+                      <Text style={styles.submitButtonText}>변경 완료</Text>
+                  </TouchableOpacity>
+              ) : null}
+          </View>
       </View>
     </ScrollView>
   );
@@ -184,6 +193,22 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     color: 'gray',
+  },
+  buttonContainer: {
+    marginTop: 10, // 원하는 여백 추가
+    marginBottom: 20, // 필요한 경우 아래쪽 여백 추가
+  },
+  submitButton: {
+    marginBottom: 40,
+    padding: 10,
+    backgroundColor: '#001326',
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  submitButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+      textAlign: 'center',
   },
 });
 
