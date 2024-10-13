@@ -23,16 +23,26 @@ function CounselorPlanScreen() {
     // 다른 요일의 기본 시간 추가 가능
   };
 
+  const getDefaultDayInitialized = () => {
+    return new Promise((resolve, reject) => {
+      sendGetRequest({
+        token: state.token,
+        endPoint: "/counselors/default-days-initializations",
+        onSuccess: (data) => {
+          console.log("기본 상담 시간 등록 여부: ", data);
+          setDefaultDayInitialized(data.data);
+          resolve(data.data);
+        },
+        onFailure: (error) => {
+          Alert.alert("실패", "내 기본 시간 등록 여부 조회 실패");
+          reject(error);
+        },
+      });
+    });
+  };
+
   useEffect(() => {
-    sendGetRequest({
-      token: state.token,
-      endPoint: "/counselors/default-days-initializations",
-      onSuccess: (data) => {
-        console.log("기본 상담 시간 등록 여부: ", data);
-        setDefaultDayInitialized(data.data);
-      },
-      onFailure: () => Alert.alert("실패", "내 기본 시간 등록 여부 조회 실패"),
-    })
+    getDefaultDayInitialized();
   },[]);
 
   useEffect(() => {
@@ -60,10 +70,15 @@ function CounselorPlanScreen() {
     });
   }, [selectedDate]);
 
-  const handleDayPress = (day) => {
+  const handleDayPress = async(day) => {
     if(!defaultDayInitialized){
-      Alert.alert("요청 거부", "기본 상담 시간을 먼저 등록해주세요");
-      return;
+      const initialized = await getDefaultDayInitialized();
+      if(initialized) {
+        setDefaultDayInitialized(true);
+      }else{
+        Alert.alert("요청 거부", "기본 상담 시간을 먼저 등록해주세요");
+        return;
+      };
     }
     if (selectedDate === day.dateString) {
       // 이미 선택된 날짜를 다시 선택하면 선택 취소

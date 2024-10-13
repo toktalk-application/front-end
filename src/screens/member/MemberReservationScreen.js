@@ -181,7 +181,7 @@ const MemberReservationScreen = () => {
                 </Picker>
             </View>
             <ScrollView>
-                {isLoading ? <View><Text>상담 예약 내역이 없습니다</Text></View> : reservations.map(reservation => (
+                {isLoading ? <View></View> : reservations.length === 0 ? <View><Text>상담 예약 내역이 없습니다</Text></View> : reservations.map(reservation => (
                     <TouchableOpacity
                         key={reservation.reservationId}
                         onPress={() => handleReservationPress(reservation.reservationId)}
