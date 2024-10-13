@@ -1,6 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useAuth } from '../../auth/AuthContext';
+import sendGetRequest from '../../axios/SendGetRequest';
 
 // 더미 데이터
 const chatRooms = [
@@ -29,7 +31,11 @@ const chatRooms = [
   },
 ];
 
+
 function MemberChattingScreen() {
+  const { state } = useAuth();
+  const [chatrooms, setChatrooms] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const userType = 'member';
 
   const navigation = useNavigation();
@@ -38,6 +44,18 @@ function MemberChattingScreen() {
     navigation.navigate('ChatRoom', { roomId, memberNickname, counselorName});
   };
 
+  useEffect(() => {
+    sendGetRequest({
+      token: state.token,
+      endPoint: "/chat_rooms",
+      onSuccess: (data) => {
+        console.log("data: ", data);
+        setChatrooms(data);
+        setIsLoading(false);
+      },
+      onFailure: () => Alert.alert("실패", "채팅방 목록 조회 실패!")
+    });
+  },[]);
 
   const renderItem = ({ item }) => {
     const createdDate = new Date(item.createdAt);
@@ -72,12 +90,13 @@ function MemberChattingScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={chatRooms}
+
+      {!isLoading && chatrooms.length === 0 ? <View><Text>채팅방이 없습니다</Text></View> : <FlatList
+        data={chatrooms}
         keyExtractor={(item) => item.roomId.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
-      />
+      />}
     </View>
   );
 }

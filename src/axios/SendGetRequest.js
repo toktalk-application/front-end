@@ -22,7 +22,6 @@ const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFail
         }
     }catch(error){
         console.error('요청 실패: ', error);
-        /* console.error('error data: ', error.response.data); */
         console.error('message: ', error.message);
         console.error('server message: ', error.response.data.message);
 
