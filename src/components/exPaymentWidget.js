@@ -42,58 +42,59 @@ export default function ExPaymentWidget({ onClose, orderInfo }) {
     }
 
     // handlePayment 함수 내부
-    paymentWidgetControl.requestPayment?.({
-      orderId: generateOrderId(),
-      orderName: `${orderInfo.counselingType} - ${orderInfo.selectedDate} ${orderInfo.selectedTime}`,
-      amount: parseInt(orderInfo.totalAmount.replace(/[^0-9]/g, '')),
-    }).then(async (result) => {
-      if (result?.success) {
-        console.log("Toss Payments 결제 성공:", result.success);
-        try {
-          const response = await axios.post('http://10.0.2.2:8080/toss', {
-            orderId: result.success.orderId,
-            paymentKey: result.success.paymentKey,
-            paymentType: result.success.paymentType,
-            amount: result.success.amount,
-            counselorId: orderInfo.counselorId,
-            counselingType: orderInfo.counselingType,
-            selectedDate: orderInfo.selectedDate,
-            selectedTime: orderInfo.selectedTime,
-          }, {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': state.token
-            },
-          });
-          
-          console.log('서버 응답:', response.data);
-          
-          const paymentData = result.success || {};
-          console.log(paymentData);
-          const reservationNumber = result.success.orderId;
+  paymentWidgetControl.requestPayment?.({
+    orderId: generateOrderId(),  // 고유한 주문 ID 생성
+    orderName: `${orderInfo.counselingType} - ${orderInfo.selectedDate} ${orderInfo.selectedTime}`,  // 주문명 설정
+    amount: parseInt(orderInfo.totalAmount.replace(/[^0-9]/g, '')),  // 결제 금액 (숫자만 추출)
+  }).then(async (result) => {
+    if (result?.success) {
+      console.log("Toss Payments 결제 성공:", result.success);
+      try {
+        // 결제 성공 후 서버에 결제 정보 전송
+        const response = await axios.post('http://10.0.2.2:8080/toss', {
+          orderId: result.success.orderId,
+          paymentKey: result.success.paymentKey,
+          paymentType: result.success.paymentType,
+          amount: result.success.amount,
+          counselorId: orderInfo.counselorId,
+          counselingType: orderInfo.counselingType,
+          selectedDate: orderInfo.selectedDate,
+          selectedTime: orderInfo.selectedTime,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': state.token  // 인증 토큰
+          },
+        });
+        
+        console.log('서버 응답:', response.data);
+        
+        const paymentData = result.success || {};
+        console.log(paymentData);
+        const reservationNumber = result.success.orderId;  // 예약 번호로 주문 ID 사용
 
-          setPaymentInfo({
-            reservationNumber: reservationNumber,
-            counselorName: paymentData.counselorName || orderInfo.counselorName || '정보 없음',
-            counselingType: paymentData.counselingType || orderInfo.counselingType,
-            selectedDate: paymentData.selectedDate || orderInfo.selectedDate,
-            selectedTime: paymentData.selectedTime || orderInfo.selectedTime,
-            amount: paymentData.amount || orderInfo.totalAmount,
-            paymentMethod: paymentData.paymentMethod || '카드',
-          });
-          
-          setIsModalVisible(true);
-        } catch (error) {
-          console.error('POST 요청 실패:', error.response?.data || error.message);
-          Alert.alert('결제 확인 실패', '서버와의 통신 중 오류가 발생했습니다.');
-        }
-      } else if (result?.fail) {
-        console.log("Toss Payments 결제 실패:", result.fail);
-        Alert.alert("결제 실패");
+        // 결제 완료 모달에 표시할 정보 설정
+        setPaymentInfo({
+          reservationNumber: reservationNumber,
+          counselorName: paymentData.counselorName || orderInfo.counselorName || '정보 없음',
+          counselingType: paymentData.counselingType || orderInfo.counselingType,
+          selectedDate: paymentData.selectedDate || orderInfo.selectedDate,
+          selectedTime: paymentData.selectedTime || orderInfo.selectedTime,
+          amount: paymentData.amount || orderInfo.totalAmount,
+          paymentMethod: paymentData.paymentMethod || '카드',
+        });
+        
+        setIsModalVisible(true);  // 결제 완료 모달 표시
+      } catch (error) {
+        console.error('POST 요청 실패:', error.response?.data || error.message);
+        Alert.alert('결제 확인 실패', '서버와의 통신 중 오류가 발생했습니다.');
       }
-    });
-    };
-
+    } else if (result?.fail) {
+      console.log("Toss Payments 결제 실패:", result.fail);
+      Alert.alert("결제 실패");
+    }
+  });
+};
 
 const handleModalClose = () => {
 setIsModalVisible(false);
