@@ -1,63 +1,74 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
-// 더미 데이터
-const chatRooms = [
-  {
-    roomId: 1,
-    counselorId: 1,
-    memberNickname: "남나미",
-    createdAt: "2024-10-06T20:00:00+09:00", // KST
-  },
-  {
-    roomId: 2,
-    counselorId: 1,
-    memberNickname: "슈파노바",
-    createdAt: "2024-10-05T14:00:00+09:00", // KST
-  },
-  {
-    roomId: 3,
-    counselorId: 1,
-    memberNickname: "눈누난나",
-    createdAt: "2024-10-04T17:00:00+09:00", // KST
-  },
-];
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
+import sendGetRequest from '../../axios/SendGetRequest';
+import { useAuth } from '../../auth/AuthContext';
+import { useCallback } from 'react';
 
 function CounselorChattingScreen() {
-
   const navigation = useNavigation();
-  const handleChatRoomPress = (roomId, memberNickname) => {
-    console.log(`Entering chat room with ID: ${roomId}`);
-    navigation.navigate('ChatRoom', { roomId, memberNickname });
+  const { state } = useAuth(); // 인증 상태 가져오기
+  const [chatRooms, setChatRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const fetchChatRooms = async () => {
+    setLoading(true);
+    setError(null);
+
+    // 서버로부터 채팅방 목록 요청
+    sendGetRequest({
+      token: state.token,
+      endPoint: '/chat_rooms', // 채팅방 목록을 가져오는 API 엔드포인트
+      onSuccess: (data) => {
+        setChatRooms(data); // 가져온 데이터로 상태 업데이트
+      },
+      onFailure: () => {
+        setError('채팅방 목록을 가져오는 데 실패했습니다.');
+      },
+    });
+
+    setLoading(false);
   };
 
+  // 화면이 포커스될 때마다 데이터를 다시 로드
+  useFocusEffect(
+    useCallback(() => {
+      fetchChatRooms();
+    }, [])
+  );
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>오류: {error}</Text>
+      </View>
+    );
+  }
+
+  const handleChatRoomPress = (roomId, nickname) => {
+    navigation.navigate('ChatRoom', { roomId, nickname });
+  };
 
   const renderItem = ({ item }) => {
     const createdDate = new Date(item.createdAt);
     const today = new Date();
-
-    // 현재 날짜와 생성 날짜 비교
     const isToday = createdDate.toDateString() === today.toDateString();
-    
-    let displayText;
-    if (isToday) {
-      // 오늘이면 시간만 표시
-      const options = { hour: 'numeric', minute: 'numeric', hour12: true };
-      displayText = createdDate.toLocaleString('ko-KR', options); // 오늘이면 시간 포맷
-    } else {
-      // 오늘이 아니면 날짜만 표시
-      const options = { month: 'long', day: 'numeric' };
-      displayText = createdDate.toLocaleDateString('ko-KR', options).replace(/월/g, '월 ').replace(/일/g, '일'); // 날짜 포맷
-    }
+    const displayText = isToday
+      ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
 
     return (
-      <TouchableOpacity 
-        style={styles.chatRoom} 
-        onPress={() => handleChatRoomPress(item.roomId, item.memberNickname)}
+      <TouchableOpacity
+        style={styles.chatRoom}
+        onPress={() => handleChatRoomPress(item.roomId, item.nickname)}
       >
         <View style={styles.row}>
-          <Text style={styles.memberName}>{item.memberNickname} 내담자</Text>
+          <Text style={styles.memberName}>{item.nickname}</Text>
           <Text style={styles.createdAt}>{displayText}</Text>
         </View>
       </TouchableOpacity>
@@ -78,8 +89,8 @@ function CounselorChattingScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // 화면 전체를 차지하도록 설정
-    backgroundColor: 'white', // 배경색을 하얗게 설정
+    flex: 1,
+    backgroundColor: 'white',
   },
   listContainer: {
     padding: 10,
@@ -88,7 +99,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    marginBottom:5
+    marginBottom: 5,
   },
   row: {
     flexDirection: 'row',
@@ -97,10 +108,15 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontWeight: 'bold',
-    fontSize:16
+    fontSize: 16,
   },
   createdAt: {
     color: '#666',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
