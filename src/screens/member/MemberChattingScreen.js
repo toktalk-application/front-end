@@ -1,84 +1,71 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useAuth } from '../../auth/AuthContext';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
-
-// 더미 데이터
-const chatRooms = [
-  // counselor 이미지까지 있으면 좋을 듯. 
-  // get/chatRooms 인데 authentication 전달해서 지금 로그인 한 사람의 채팅방 목록 데리고 오기. 
-  {
-    roomId: 1,
-    counselorId: 1,
-    memberNickname: "냠냐미",
-    counselorName: "김철수",
-    createdAt: "2024-10-06T20:00:00+09:00", // KST
-  },
-  {
-    roomId: 2,
-    counselorId: 2,
-    memberNickname: "냠냐미",
-    counselorName: "안성진",
-    createdAt: "2024-10-05T14:00:00+09:00", // KST
-  },
-  {
-    roomId: 3,
-    counselorId: 3,
-    memberNickname: "냠냐미",
-    counselorName: "백종원",
-    createdAt: "2024-10-04T17:00:00+09:00", // KST
-  },
-];
-
+import { useAuth } from '../../auth/AuthContext';
+import { useCallback } from 'react';
 
 function MemberChattingScreen() {
-  const { state } = useAuth();
-  const [chatrooms, setChatrooms] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const userType = 'member';
-
   const navigation = useNavigation();
-  const handleChatRoomPress = (roomId, memberNickname, counselorName) => {
-    console.log(`Entering chat room with ID: ${roomId}`);
-    navigation.navigate('ChatRoom', { roomId, memberNickname, counselorName});
-  };
+  const { state } = useAuth(); // 인증 상태 가져오기
+  const [chatRooms, setChatRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
+  const fetchChatRooms = async () => {
+    setLoading(true);
+    setError(null);
+
+    // 서버로부터 채팅방 목록 요청
     sendGetRequest({
       token: state.token,
-      endPoint: "/chat_rooms",
+      endPoint: '/chat_rooms', // 채팅방 목록을 가져오는 API 엔드포인트
       onSuccess: (data) => {
-        console.log("data: ", data);
-        setChatrooms(data);
-        setIsLoading(false);
+        setChatRooms(data); // 가져온 데이터로 상태 업데이트
       },
-      onFailure: () => Alert.alert("실패", "채팅방 목록 조회 실패!")
+      onFailure: () => {
+        setError('채팅방 목록을 가져오는 데 실패했습니다.');
+      },
     });
-  },[]);
+
+    setLoading(false);
+  };
+
+  // 화면이 포커스될 때마다 데이터를 다시 로드
+  useFocusEffect(
+    useCallback(() => {
+      fetchChatRooms();
+    }, [])
+  );
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#0000ff" />;
+  }
+
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>오류: {error}</Text>
+      </View>
+    );
+  }
+
+  const handleChatRoomPress = (roomId, memberNickname, counselorName) => {
+    navigation.navigate('ChatRoom', { roomId, memberNickname, counselorName });
+  };
 
   const renderItem = ({ item }) => {
     const createdDate = new Date(item.createdAt);
     const today = new Date();
-
-    // 현재 날짜와 생성 날짜 비교
     const isToday = createdDate.toDateString() === today.toDateString();
-    
-    let displayText;
-    if (isToday) {
-      // 오늘이면 시간만 표시
-      const options = { hour: 'numeric', minute: 'numeric', hour12: true };
-      displayText = createdDate.toLocaleString('ko-KR', options); // 오늘이면 시간 포맷
-    } else {
-      // 오늘이 아니면 날짜만 표시
-      const options = { month: 'long', day: 'numeric' };
-      displayText = createdDate.toLocaleDateString('ko-KR', options).replace(/월/g, '월 ').replace(/일/g, '일'); // 날짜 포맷
-    }
+    const displayText = isToday
+      ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
 
     return (
-      <TouchableOpacity 
-        style={styles.chatRoom} 
-        onPress={() => handleChatRoomPress(item.roomId, item.memberNickname, item.counselorName )}
+      <TouchableOpacity
+        style={styles.chatRoom}
+        onPress={() => handleChatRoomPress(item.roomId, item.memberNickname, item.counselorName)}
       >
         <View style={styles.row}>
           <Text style={styles.memberName}>{item.counselorName} 상담사</Text>
@@ -90,21 +77,20 @@ function MemberChattingScreen() {
 
   return (
     <View style={styles.container}>
-
-      {!isLoading && chatrooms.length === 0 ? <View><Text>채팅방이 없습니다</Text></View> : <FlatList
-        data={chatrooms}
+      <FlatList
+        data={chatRooms}
         keyExtractor={(item) => item.roomId.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
-      />}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // 화면 전체를 차지하도록 설정
-    backgroundColor: 'white', // 배경색을 하얗게 설정
+    flex: 1,
+    backgroundColor: 'white',
   },
   listContainer: {
     padding: 10,
@@ -113,7 +99,7 @@ const styles = StyleSheet.create({
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
-    marginBottom:5
+    marginBottom: 5,
   },
   row: {
     flexDirection: 'row',
@@ -122,10 +108,15 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontWeight: 'bold',
-    fontSize:16
+    fontSize: 16,
   },
   createdAt: {
     color: '#666',
+  },
+  errorText: {
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
 
