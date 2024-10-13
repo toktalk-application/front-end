@@ -23,8 +23,8 @@ const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFail
         }
     }catch(error){
         console.error('요청 실패: ', error);
-        console.error('status: ', error.status);
         console.error('message: ', error.message);
+        console.error('server message: ', error.response.data.message);
 
         if(onFailure) onFailure();
     }

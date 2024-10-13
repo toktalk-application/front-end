@@ -3,9 +3,11 @@ import { Alert, View, Text, Button, StyleSheet, TouchableOpacity } from 'react-n
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendPatchRequest from '../../axios/PatchRequest';
+import sendPostRequest from '../../axios/SendPostRequest';
 
-function CounselorTimeSettingScreen() {
+function CounselorTimeSettingScreen({ route, navigation }) {
   const { state } = useAuth();
+  const { defaultDayInitialized } = route.params;
   const [selectedDay, setSelectedDay] = useState('일'); // 현재 선택된 요일
   const [isLoading, setIsLoading] = useState(true);
   const [availability, setAvailability] = useState({
@@ -111,18 +113,31 @@ function CounselorTimeSettingScreen() {
     // 각 요일에 해당하는 배열을 콘솔에 출력
     console.log('예약 가능 시간:', dataToSend);
   
-    // 여기에 POST 요청 코드를 추가할 수 있습니다.
-    // 예: await axios.post('YOUR_API_ENDPOINT', dataToSend); 
-    sendPatchRequest({
-      token: state.token,
-      endPoint: "/counselors/default-days",
-      requestBody: {
-        dayOfWeek: korDayToEng(selectedDay),
-        times: availableTimes,
-      },
-      onSuccess: () => Alert.alert("성공", "기본 상담 시간 수정 완료"),
-      onFailure: () => Alert.alert("실패", "기본 상담 시간 수정 실패!")
-    })
+    if(defaultDayInitialized){
+      // 기본 상담 시간 수정
+      sendPatchRequest({
+        token: state.token,
+        endPoint: "/counselors/default-days",
+        requestBody: {
+          dayOfWeek: korDayToEng(selectedDay),
+          times: availableTimes,
+        },
+        onSuccess: () => Alert.alert("성공", "기본 상담 시간 수정 완료"),
+        onFailure: () => Alert.alert("실패", "기본 상담 시간 수정 실패!")
+      });
+    }else{ // 기본 상담 시간 최초 등록
+      console.log("기본 상담 시간 최초 등록");
+      sendPostRequest({
+        token: state.token,
+        endPoint: "/counselors/default-days",
+        requestBody: {
+          dayOfWeek: korDayToEng(selectedDay),
+          times: availableTimes,
+        },
+        onSuccess: () => Alert.alert("성공", "기본 상담 시간 등록 완료"),
+        onFailure: () => Alert.alert("실패", "기본 상담 시간 등록 실패!")
+      });
+    }
   };
   
 
