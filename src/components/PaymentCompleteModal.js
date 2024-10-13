@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
+// 결제 성공 모달창
 const PaymentCompleteModal = ({ visible, onClose, paymentInfo }) => {
   return (
     <Modal
