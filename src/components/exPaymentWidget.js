@@ -3,12 +3,15 @@ import { usePaymentWidget, AgreementWidget, PaymentMethodWidget } from '@tosspay
 import { Alert, Button } from 'react-native'
 import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
+import PaymentCompleteModal from './PaymentCompleteModal';
 
-export default function ExPaymentWidget({ onClose }) {
+export default function ExPaymentWidget({ onClose, orderInfo }) {
   const paymentWidgetControl = usePaymentWidget();
   const [paymentMethodWidgetControl, setPaymentMethodWidgetControl] = useState(null);
   const [agreementWidgetControl, setAgreementWidgetControl] = useState(null);
   const { state } = useAuth();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [paymentInfo, setPaymentInfo] = useState({});
 
   const generateOrderId = () => {
     // 앞 6자리: 오늘 날짜를 "yyMMdd" 형식으로 생성
@@ -28,83 +31,113 @@ export default function ExPaymentWidget({ onClose }) {
   };
 
   const handlePayment = async () => {
-    if (paymentWidgetControl == null || agreementWidgetControl == null) {
-      Alert.alert('주문 정보가 초기화되지 않았습니다.');
+    if (!orderInfo) {
+      Alert.alert('주문 정보가 없습니다.');
       return;
     }
-
     const agreement = await agreementWidgetControl.getAgreementStatus();
     if (!agreement.agreedRequiredTerms) {
       Alert.alert('약관에 동의하지 않았습니다.');
       return;
     }
 
+    // handlePayment 함수 내부
     paymentWidgetControl.requestPayment?.({
       orderId: generateOrderId(),
-      orderName: '토스 티셔츠 외 2건',
+      orderName: `${orderInfo.counselingType} - ${orderInfo.selectedDate} ${orderInfo.selectedTime}`,
+      amount: parseInt(orderInfo.totalAmount.replace(/[^0-9]/g, '')),
     }).then(async (result) => {
       if (result?.success) {
-        Alert.alert(result.success.orderId)
-        Alert.alert("성공 가즈아ㅏㅏ");
+        console.log("Toss Payments 결제 성공:", result.success);
         try {
-          // POST 요청 보내기
           const response = await axios.post('http://10.0.2.2:8080/toss', {
             orderId: result.success.orderId,
             paymentKey: result.success.paymentKey,
             paymentType: result.success.paymentType,
             amount: result.success.amount,
+            counselorId: orderInfo.counselorId,
+            counselingType: orderInfo.counselingType,
+            selectedDate: orderInfo.selectedDate,
+            selectedTime: orderInfo.selectedTime,
           }, {
             headers: {
               'Content-Type': 'application/json',
               'Authorization': state.token
             },
           });
+          
+          console.log('서버 응답:', response.data);
+          
+          const paymentData = result.success || {};
+          console.log(paymentData);
+          const reservationNumber = result.success.orderId;
+
+          setPaymentInfo({
+            reservationNumber: reservationNumber,
+            counselorName: paymentData.counselorName || orderInfo.counselorName || '정보 없음',
+            counselingType: paymentData.counselingType || orderInfo.counselingType,
+            selectedDate: paymentData.selectedDate || orderInfo.selectedDate,
+            selectedTime: paymentData.selectedTime || orderInfo.selectedTime,
+            amount: paymentData.amount || orderInfo.totalAmount,
+            paymentMethod: paymentData.paymentMethod || '카드',
+          });
+          
+          setIsModalVisible(true);
         } catch (error) {
-          // 에러 처리
-          Alert.alert(error)
-          console.error('POST 요청 실패:', error);
+          console.error('POST 요청 실패:', error.response?.data || error.message);
+          Alert.alert('결제 확인 실패', '서버와의 통신 중 오류가 발생했습니다.');
         }
-        onClose(); // 모달 닫기
       } else if (result?.fail) {
-        Alert.alert("실패 가즈아ㅏㅏ");
-        onClose(); // 모달 닫기
+        console.log("Toss Payments 결제 실패:", result.fail);
+        Alert.alert("결제 실패");
       }
     });
-  };
+    };
 
-  return (
-    <>
-      <PaymentMethodWidget
-        selector="payment-methods"
-        onLoadEnd={() => {
-          paymentWidgetControl.renderPaymentMethods('payment-methods', { value: 5000 }, {
-            variantKey: 'DEFAULT', // 토스 어드민 > UI 설정값
-          }).then((control) => {
-            setPaymentMethodWidgetControl(control);
-          });
-        }}
-      />
-      <AgreementWidget
-        selector="agreement"
-        onLoadEnd={() => {
-          paymentWidgetControl.renderAgreement('agreement', {
-            variantKey: 'DEFAULT',
-          }).then((control) => {
-            setAgreementWidgetControl(control);
-          });
-        }}
-      />
-      <Button title="결제요청" onPress={handlePayment} />
-      <Button
-        title="선택된 결제수단"
-        onPress={async () => {
-          if (paymentMethodWidgetControl == null) {
-            Alert.alert('주문 정보가 초기화되지 않았습니다.');
-            return;
-          }
-          Alert.alert(`선택된 결제수단: ${JSON.stringify(await paymentMethodWidgetControl.getSelectedPaymentMethod())}`);
-        }}
-      />
-    </>
-  );
+
+const handleModalClose = () => {
+setIsModalVisible(false);
+onClose();
+};
+
+return (
+  <>
+    <PaymentMethodWidget
+      selector="payment-methods"
+      onLoadEnd={() => {
+        paymentWidgetControl.renderPaymentMethods('payment-methods', { value: parseInt(orderInfo.totalAmount.replace(/[^0-9]/g, '')) }, {
+          variantKey: 'DEFAULT',
+        }).then((control) => {
+          setPaymentMethodWidgetControl(control);
+        });
+      }}
+    />
+    <AgreementWidget
+      selector="agreement"
+      onLoadEnd={() => {
+        paymentWidgetControl.renderAgreement('agreement', {
+          variantKey: 'DEFAULT',
+        }).then((control) => {
+          setAgreementWidgetControl(control);
+        });
+      }}
+    />
+    <Button title="결제요청" onPress={handlePayment} />
+    <Button
+      title="선택된 결제수단"
+      onPress={async () => {
+        if (paymentMethodWidgetControl == null) {
+          Alert.alert('주문 정보가 초기화되지 않았습니다.');
+          return;
+        }
+        Alert.alert(`선택된 결제수단: ${JSON.stringify(await paymentMethodWidgetControl.getSelectedPaymentMethod())}`);
+      }}
+    />
+    <PaymentCompleteModal 
+      visible={isModalVisible}
+      onClose={handleModalClose}
+      paymentInfo={paymentInfo}
+    />
+  </>
+);
 }
