@@ -70,25 +70,12 @@ const CustomDayComponent = ({ date, isDisabled, isToday, isSelected, isMarked, o
   );
 };
 
-const CounselorCalendar = ({ markedDates, onDayPress, selectedDate }) => {
-  const [minDate, setMinDate] = useState('');
-  const [maxDate, setMaxDate] = useState('');
+const CounselorCalendar = ({ markedDates, onDayPress, selectedDate, minDate, maxDate }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   console.log("markedDates in CounselorCalendar: ", markedDates);
 
   useEffect(() => {
-    const today = new Date();
-    setMinDate(today.toISOString().split('T')[0]);
-
-    const currentYear = today.getFullYear();
-    const nextMonth = today.getMonth() + 1;
-
-    // 다음 달의 마지막 날 계산
-    const lastDayOfNextMonth = new Date(currentYear, nextMonth + 1, 0).getDate();
-    
-    // 최대 날짜 설정
-    setMaxDate(`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
     setIsLoading(false);
   }, []);
 

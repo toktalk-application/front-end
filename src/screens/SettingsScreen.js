@@ -38,8 +38,6 @@ const SettingsScreen = () => {
         },
     ]);
 };
-
-
   const handleDeleteAccount = () => {
     // 회원 탈퇴 로직 추가
     Alert.alert("회원 탈퇴", "정말 회원 탈퇴 하시겠습니까?", [

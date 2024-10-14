@@ -72,7 +72,7 @@ function MemberMainScreen() {
                     setMarkedDates(data.data);
                     setIsReservationLoading(false);
                 },
-                /* onFailure: () => Alert.alert("실패!", "내 한 달간 날짜별 예약 존재 여부 확인 실패") */
+                onFailure: () => Alert.alert("실패!", "내 한 달간 날짜별 예약 존재 여부 확인 실패")
             });
 
             sendGetRequest({
@@ -87,7 +87,7 @@ function MemberMainScreen() {
                     setMoodDates(formattedData);
                     setIsMoodLoading(false);
                 },
-                /* onFailure: () => Alert.alert("실패", "실패!") */
+                onFailure: () => Alert.alert("실패", "실패!")
             });
 
             sendGetRequest({
@@ -109,7 +109,7 @@ function MemberMainScreen() {
                         );
                     }
                 },
-                /* onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"), */
+                onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
             });
         }, [])
     );
@@ -133,7 +133,7 @@ function MemberMainScreen() {
                     console.log("data: ", data);
                     setReservations(data.data);
                 },
-                /* onFailure: () => Alert.alert("실패", "내 특정일 예약 목록 조회 실패") */
+                onFailure: () => Alert.alert("실패", "내 특정일 예약 목록 조회 실패")
             });
             setSelectedDate(day.dateString);
             /* fetchReservations(day.dateString); */
@@ -151,6 +151,23 @@ function MemberMainScreen() {
         return `${period} ${formattedHour}:${minute}`;
     };
 
+    const getMinDate = () => {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    const getMaxDate = () => {
+        const today = new Date();
+
+        const currentYear = today.getFullYear();
+        const nextMonth = today.getMonth() + 1;
+
+        // 다음 달의 마지막 날 계산
+        const lastDayOfNextMonth = new Date(currentYear, nextMonth + 1, 0).getDate();
+
+        // 최대 날짜 설정
+        return(`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
+    }
+
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
             {isReservationLoading || isMoodLoading ? <View /> : <FlatList
@@ -166,12 +183,14 @@ function MemberMainScreen() {
                             markedDates={markedDates}
                             onDayPress={handleDayPress}
                             selectedDate={selectedDate}
+                            minDate={getMinDate()}
+                            maxDate={getMaxDate()}
                         />
                     </View>
                 )}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
-                        {selectedDate === '' ? <View/> : <View style={styles.row}>
+                        {selectedDate === '' ? <View /> : <View style={styles.row}>
                             <View style={styles.timeContainer}>
                                 <Text style={styles.timeText}> {formatTime(item.startTime)} </Text>
                                 <Text style={styles.timeText}> | </Text>
@@ -227,7 +246,7 @@ function MemberMainScreen() {
                                     mood: selectedEmotion
                                 },
                                 onSuccess: () => toggleModal(),
-                                /* onFailure: () => Alert.alert("실패", "실패!") */
+                                onFailure: () => Alert.alert("실패", "실패!")
                             })
                         }} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}> 저장 </Text>
