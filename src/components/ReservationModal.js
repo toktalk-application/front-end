@@ -80,6 +80,8 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
       selectedTime: formatSelectedTime(time),
       counselorId: counselorId,
       counselorName: counselorData?.name || '알 수 없음',  // 기본값 제공
+      comment: details,
+      startTimes: time
     };
     setOrderInfo(orderInfo);
     setShowWebView(true);
