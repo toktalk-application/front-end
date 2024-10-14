@@ -21,6 +21,7 @@
     "@react-navigation/native": "^6.1.18",
     "@react-navigation/native-stack": "^6.11.0",
     "@react-navigation/stack": "^6.4.1",
+    "@stomp/stompjs": "^7.0.0",
     "@tosspayments/payment-sdk": "^1.9.0",
     "@tosspayments/widget-sdk-react-native": "^1.3.5",
     "axios": "^1.7.7",
@@ -36,6 +37,10 @@
     "react-native-screens": "^3.34.0",
     "react-native-vector-icons": "^10.2.0",
     "react-native-webview": "^13.12.3",
+    "socket.io-client": "^4.8.0",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3",
+    "text-encoding": "^0.7.0",
     "tosspayments-react-native-webview": "^1.0.0"
   },
   "devDependencies": {
