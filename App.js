@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import messaging from '@react-native-firebase/messaging';
+import notifee, { AndroidImportance, EventType } from '@notifee/react-native'; // notifee 관련 import 추가
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthProvider } from './src/auth/AuthContext.js'; 
 import { Platform, PermissionsAndroid } from 'react-native';
@@ -45,6 +46,28 @@ import SettingsScreen from './src/screens/SettingsScreen.js'
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
+// 알림 권한 요청 함수 추가
+const requestNotificationPermission = async () => {
+  try {
+    const alreadyRequested = await AsyncStorage.getItem('notification_permission_requested');
+    if (!alreadyRequested) {
+      if (Platform.OS === 'android' && Platform.Version >= 33) {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+        );
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('Notification permission granted');
+        } else {
+          console.log('Notification permission denied');
+        }
+        await AsyncStorage.setItem('notification_permission_requested', 'true');
+      }
+    }
+  } catch (error) {
+    console.log('Error requesting notification permission:', error);
+  }
+};
+
 const setupNotificationsOnFirstLogin = async (memberId) => {
   try {
     const hasSetupNotifications = await AsyncStorage.getItem('hasSetupNotifications');
@@ -52,33 +75,24 @@ const setupNotificationsOnFirstLogin = async (memberId) => {
     if (hasSetupNotifications !== 'true') {
       let permissionGranted = false;
 
-      // iOS에서 권한 요청
       if (Platform.OS === 'ios') {
         const authStatus = await messaging().requestPermission();
         permissionGranted = 
           authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
           authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-      } 
-      // Android에서 권한 요청 (Android 13 이상)
-      else if (Platform.OS === 'android' && Platform.Version >= 33) {
+      } else if (Platform.OS === 'android' && Platform.Version >= 33) {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
         );
         permissionGranted = granted === PermissionsAndroid.RESULTS.GRANTED;
-      } 
-      // Android 13 미만에서는 별도의 권한 요청 불필요
-      else {
+      } else {
         permissionGranted = true;
       }
 
       if (permissionGranted) {
         console.log('Notification permission granted');
-        // FCM 토큰 얻기 및 서버로 전송
         const token = await messaging().getToken();
         console.log('FCM Token:', token);
-        // await sendFcmTokenToServer(memberId, token);
-        
-        // 설정 완료 표시
         await AsyncStorage.setItem('hasSetupNotifications', 'true');
       } else {
         console.log('Notification permission denied');
@@ -89,6 +103,46 @@ const setupNotificationsOnFirstLogin = async (memberId) => {
   } catch (error) {
     console.log('Error in notification setup:', error);
   }
+};
+
+// 알림 채널 생성 및 알림 관련 로직 추가
+const configureNotifications = () => {
+  useEffect(() => {
+    const createChannel = async () => {
+      await notifee.createChannel({
+        id: '1',
+        name: 'Default Channel',
+        importance: AndroidImportance.HIGH,
+      });
+    };
+    createChannel();
+
+    const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
+      console.log('[Foreground Remote Message]', remoteMessage);
+      await notifee.displayNotification({
+        title: remoteMessage.notification.title,
+        body: remoteMessage.notification.body,
+        android: {
+          channelId: '1',
+          pressAction: { id: 'default' },
+        },
+      });
+    });
+
+    messaging().setBackgroundMessageHandler(async remoteMessage => {
+      console.log('[Background Remote Message]', remoteMessage);
+      await notifee.displayNotification({
+        title: remoteMessage.notification.title,
+        body: remoteMessage.notification.body,
+        android: {
+          channelId: '1',
+          pressAction: { id: 'default' },
+        },
+      });
+    });
+
+    return () => unsubscribeForeground();
+  }, []);
 };
 
 const CustomHeader = ({ routeName, navigation }) => {
@@ -105,19 +159,16 @@ const CustomHeader = ({ routeName, navigation }) => {
     </View>
   );
 };
-// userType 이 Member, Counselor 이느냐에 따라 보이는 screen 이 다름. 
+
+// userType 이 Member, Counselor 이느냐에 따라 보이는 screen 이 다름.
 function Tabs({ route, navigation }) {
   const { userType } = route.params; 
-
 
   const getTabIcon = (activeIcon, inactiveIcon) => {
     return ({ focused }) => (
       <Image
         source={focused ? activeIcon : inactiveIcon}
-        style={{
-          width: 34,
-          height: 34,
-        }}
+        style={{ width: 34, height: 34 }}
       />
     );
   };
@@ -127,58 +178,50 @@ function Tabs({ route, navigation }) {
       screenOptions={({ route }) => ({
         header: () => <CustomHeader routeName={route.name} navigation={navigation} />,
         tabBarStyle: {
-          paddingBottom:20,
-          paddingTop:10,
-          paddingHorizontal: 10, // 좌우 여백 추가 (필요에 따라 조정)
-          height: 80, // 탭 바의 높이 조정
+          paddingBottom: 20,
+          paddingTop: 10,
+          paddingHorizontal: 10,
+          height: 80,
         },
       })}
     >
       {userType === 'MEMBER' ? (
         <>
-          <Tab.Screen name="Main" 
-                      component={MemberMainScreen} 
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), 
-                                  require('./assets/images/home.png')),
-                                  tabBarLabel: () => null  }} />
-          <Tab.Screen name="상담" 
-                      component={MemberCounselScreen} 
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), 
-                        require('./assets/images/counsel.png')),
-                        tabBarLabel: () => null }} />
-          <Tab.Screen name="채팅" 
-                      component={MemberChattingScreen} 
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), 
-                        require('./assets/images/chat.png')),
-                        tabBarLabel: () => null }} />
-          <Tab.Screen name="내 정보" 
-                      component={MemberMyScreen}
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), 
-                        require('./assets/images/my.png')),
-                        tabBarLabel: () => null }} />
+          <Tab.Screen name="Main" component={MemberMainScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), require('./assets/images/home.png')),
+            tabBarLabel: () => null,
+          }} />
+          <Tab.Screen name="상담" component={MemberCounselScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), require('./assets/images/counsel.png')),
+            tabBarLabel: () => null,
+          }} />
+          <Tab.Screen name="채팅" component={MemberChattingScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), require('./assets/images/chat.png')),
+            tabBarLabel: () => null,
+          }} />
+          <Tab.Screen name="내 정보" component={MemberMyScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), require('./assets/images/my.png')),
+            tabBarLabel: () => null,
+          }} />
         </>
       ) : userType === 'COUNSELOR' ? (
         <>
-          <Tab.Screen name="Main" 
-                      component={CounselorMainScreen} 
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), 
-                        require('./assets/images/home.png')),
-                        tabBarLabel: () => null }} />
-          <Tab.Screen name="상담" 
-                      component={CounselorCounselScreen} 
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), 
-                        require('./assets/images/counsel.png')),
-                        tabBarLabel: () => null }} />
-          <Tab.Screen name="채팅" 
-                      component={CounselorChattingScreen} 
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), 
-                        require('./assets/images/chat.png')),
-                        tabBarLabel: () => null }} />
-          <Tab.Screen name="내 정보" 
-                      component={CounselorMyScreen} 
-                      options={{ tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), 
-                        require('./assets/images/my.png')),
-                        tabBarLabel: () => null }} />
+          <Tab.Screen name="Main" component={CounselorMainScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), require('./assets/images/home.png')),
+            tabBarLabel: () => null,
+          }} />
+          <Tab.Screen name="상담" component={CounselorCounselScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), require('./assets/images/counsel.png')),
+            tabBarLabel: () => null,
+          }} />
+          <Tab.Screen name="채팅" component={CounselorChattingScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), require('./assets/images/chat.png')),
+            tabBarLabel: () => null,
+          }} />
+          <Tab.Screen name="내 정보" component={CounselorMyScreen} options={{
+            tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), require('./assets/images/my.png')),
+            tabBarLabel: () => null,
+          }} />
         </>
       ) : null}
     </Tab.Navigator>
@@ -186,7 +229,9 @@ function Tabs({ route, navigation }) {
 }
 
 function App() {
+  configureNotifications();
   setupNotificationsOnFirstLogin();
+  
   return (
     <AuthProvider>
       <NavigationContainer>
@@ -197,21 +242,7 @@ function App() {
           <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
           <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
           <Stack.Screen name="알림" component={AlarmScreen} />
-          <Stack.Screen name="프로필 관리" component={CounselorProfileScreen} />
-          <Stack.Screen name="프로필 수정" component={CounselorEditScreen} />
-          <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
-          <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
-          <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
-          <Stack.Screen name="내 상담 내역" component={MemberReservationScreen} />
-          <Stack.Screen name="우울 검사" component={TestScreen}/>
-          <Stack.Screen name="우울 검사 내역" component={TestResultScreen}/>
-          <Stack.Screen name="TestResult" component={TestResultModal} options={{ title: '' }} />
-          <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
-          <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
-          <Stack.Screen name="MemberWriteReview" component={MemberWriteReviewScreen} options={{ title: '' }} />
-          <Stack.Screen name="MemberCounselorDetail" component={MemberCounselorDetailScreen} options={{ title: '' }} />
-          <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ headerShown: false }}/>
-          <Stack.Screen name="설정" component={SettingsScreen}/>
+          <Stack.Screen name="설정" component={SettingsScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>
@@ -225,7 +256,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'white',
     padding: 20,
-    height: 80,  
+    height: 80,
   },
   logo: {
     width: 100,

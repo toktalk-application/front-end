@@ -5,7 +5,6 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import sendPostRequest from '../axios/SendPostRequest';
 
-
 const SettingsScreen = () => {
   const { state } = useAuth();
   const { logout } = useAuth('');

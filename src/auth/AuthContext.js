@@ -72,4 +72,19 @@ export const AuthProvider = ({ children }) => {
             {children}
         </AuthContext.Provider>
     );
+
+    const getToken = async () => {
+        const savedState = await AsyncStorage.getItem('authState');
+        if (savedState) {
+            const { token } = JSON.parse(savedState);
+            return token;
+        }
+        return null;
+    };
+
+    return (
+        <AuthContext.Provider value={{ state, login, logout, getToken }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };
