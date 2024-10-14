@@ -38,6 +38,14 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
     if(type.includes('채팅')) return 'CHAT';
   }
 
+  const formatAmount = (amount) => {
+  
+    // 천 단위마다 쉼표를 추가하여 문자열로 변환
+    const formattedAmount = amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  
+    return formattedAmount; // " 원"을 추가하여 반환
+  };
+
   const handlePayment = async () => {
     if (!orderInfo) {
       Alert.alert('주문 정보가 없습니다.');
@@ -97,7 +105,7 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
             counselingType: paymentData.counselingType || orderInfo.counselingType,
             selectedDate: paymentData.selectedDate || orderInfo.selectedDate,
             selectedTime: paymentData.selectedTime || orderInfo.selectedTime,
-            amount: paymentData.amount || orderInfo.totalAmount,
+            amount: formatAmount(paymentData.amount) || formatAmount(orderInfo.totalAmount),
             paymentMethod: paymentData.paymentMethod || '카드',
           });
           console.log('orderId:', orderInfo);
@@ -124,6 +132,7 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
   const handleModalClose = () => {
     setIsModalVisible(false);
     onClose();
+    navigation.navigate('내 상담 내역')
   };
 
   return (
@@ -226,12 +235,12 @@ const styles = StyleSheet.create({
   infoTitle:{
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 10,
     marginLeft:23,
     color:'#333D4B'
   },
   infoContainer: {
-    marginBottom: 10,
+    marginBottom: 15,
     marginHorizontal:20,
     padding: 10,
     borderWidth: 1,
