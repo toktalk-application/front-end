@@ -26,7 +26,8 @@ function MemberMainScreen() {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedEmotion, setSelectedEmotion] = useState(null);
     const today = new Date().toISOString().split('T')[0];
-    const [isLoading, setIsLoading] = useState(true);
+    const [isReservationLoading, setIsReservationLoading] = useState(true);
+    const [isMoodLoading, setIsMoodLoading] = useState(true);
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -42,56 +43,6 @@ function MemberMainScreen() {
         // 후에 post/emotions 해서 오늘 입력한 기분값을 전달해야 함. 
     };
 
-    useEffect(() => {
-        const fetchMarkedDates = async () => {
-            const dummyData = {
-                "2024-10-04": true,
-                "2024-10-05": true,
-                "2024-10-06": true,
-                "2024-10-18": true,
-                "2024-10-19": true,
-                "2024-10-31": true,
-            };
-
-            const formattedData = Object.keys(dummyData).reduce((acc, date) => {
-                acc[date] = { marked: dummyData[date] === true };
-                return acc;
-            }, {});
-
-            setMarkedDates(formattedData);
-        };
-
-
-        const fetchEmotions = async () => {
-            // API 요청 예시 (여기서는 더미 데이터 사용)
-            // const response = await fetch('https://api.example.com/get/emotions'); // 실제 API URL로 변경
-            const data = await response.json(); // API에서 받아온 데이터 사용
-        };
-        const dummyEmotionsData = {
-            "2024-10-01": "ANGRY",
-            "2024-10-02": "HAPPY",
-            "2024-10-03": "HAPPY",
-            "2024-10-04": "NEUTRAL",
-            "2024-10-05": "NEUTRAL",
-            "2024-10-06": "HAPPY",
-            "2024-10-07": "HAPPY",
-            "2024-10-08": "HAPPY"
-        };
-        // enum 으로 받은 감정을 이모지로 바꿔주는 작업.
-        const formattedMoodDates = Object.keys(dummyEmotionsData).reduce((acc, date) => {
-            const moodKey = dummyEmotionsData[date];
-            const moodOption = moodOptions.find(option => option.key === moodKey);
-            acc[date] = moodOption ? moodOption.label : ''; // 이모지로 변환
-            return acc;
-        }, {});
-
-        setMoodDates(formattedMoodDates); // 이모지로 변환된 감정 데이터 설정
-
-
-
-        fetchMarkedDates();
-        // fetchEmotions();
-    }, []);
 
     const getFormattedMoodDates = (emotions) => Object.keys(emotions).reduce((acc, date) => {
         const moodKey = emotions[date];
@@ -116,7 +67,7 @@ function MemberMainScreen() {
             onSuccess: (data) => {
                 console.log("monthlyData: ", data);
                 setMarkedDates(data.data);
-                setIsLoading(false);
+                setIsReservationLoading(false);
             },
             onFailure: () => Alert.alert("실패!")
         })
@@ -131,6 +82,7 @@ function MemberMainScreen() {
                 console.log("data: ", data);
                 const formattedData = getFormattedMoodDates(data.data);
                 setMoodDates(formattedData);
+                setIsMoodLoading(false);
             },
             onFailure: () => Alert.alert("실패", "실패!")
         })
@@ -159,38 +111,6 @@ function MemberMainScreen() {
           });
         
     }, []);
-
-    const fetchReservations = async (date) => {
-        const dummyReservations = [
-            {
-                reservationId: 5,
-                counselorId: 1,
-                nickName: "눈누난나",
-                counselorName: "김철수",
-                comment: "지친다 정말루다가",
-                type: "CHAT",
-                status: "PENDING",
-                date: "2024-10-18",
-                startTime: "09:00",
-                endTime: "10:50",
-            },
-            {
-                reservationId: 6,
-                counselorId: 1,
-                nickName: "뉴뉴",
-                counselorName: "홍길동",
-                comment: "우울해요",
-                type: "CALL",
-                status: "PENDING",
-                date: "2024-10-18",
-                startTime: "11:00",
-                endTime: "11:50",
-            },
-        ];
-
-        const filteredReservations = dummyReservations.filter(reservation => reservation.date === date);
-        setReservations(filteredReservations);
-    };
 
     const handleDayPress = (day) => {
         // 두 번 누르면 해제
@@ -230,7 +150,7 @@ function MemberMainScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
-            <FlatList
+            {isReservationLoading || isMoodLoading ? <View/> : <FlatList
                 data={reservations}
                 keyExtractor={(item) => item.reservationId.toString()}
                 ListHeaderComponent={() => (
@@ -238,12 +158,12 @@ function MemberMainScreen() {
                         <TouchableOpacity style={styles.Button} onPress={toggleModal}>
                             <Text style={styles.buttonText}>오늘의 기분은?</Text>
                         </TouchableOpacity>
-                        {isLoading ? <View/> : <MemberCalendar
+                        <MemberCalendar
                             moodDates={moodDates}
                             markedDates={markedDates}
                             onDayPress={handleDayPress}
                             selectedDate={selectedDate}
-                        />}
+                        />
                     </View>
                 )}
                 renderItem={({ item }) => (
@@ -264,7 +184,7 @@ function MemberMainScreen() {
                         </View>
                     </TouchableOpacity>
                 )}
-            />
+            />}
             <Modal
                 transparent
                 visible={modalVisible}

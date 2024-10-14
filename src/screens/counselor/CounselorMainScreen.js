@@ -47,41 +47,28 @@ function CounselorMainScreen() {
           }
           return acc;
         }, {});
-        /* console.log(filteredData); */
+        console.log(filteredData);
         setMarkedDates(filteredData);
       },
       onFailure: () => Alert.alert("실패", "월별 일정 조회 실패")
-    })
+    });
+
   }, []);
 
   const fetchReservations = async (date) => {
-    const dummyReservations = [
-      {
-        reservationId: 5,
-        counselorId: 1,
-        nickName: "눈누난나",
-        comment: "지친다 정말루다가",
-        type: "CHAT",
-        status: "PENDING",
-        date: "2024-10-18",
-        startTime: "09:00",
-        endTime: "10:50",
+    sendGetRequest({
+      token: state.token,
+      endPoint: "/reservations",
+      requestParams: {
+        counselorId: state.identifier,
+        date: date,
       },
-      {
-        reservationId: 6,
-        counselorId: 1,
-        nickName: "김철수",
-        comment: "우울해요",
-        type: "CALL",
-        status: "PENDING",
-        date: "2024-10-18",
-        startTime: "11:00",
-        endTime: "11:50",
+      onSuccess: (data) => {
+        console.log("data: ", data);
+        setReservations(data.data);
       },
-    ];
-
-    const filteredReservations = dummyReservations.filter(reservation => reservation.date === date);
-    setReservations(filteredReservations);
+      onFailure: () => Alert.alert("실패", "내 특정일 상담 목록 조회 실패"),
+    });
   };
 
   const handleDayPress = (day) => {
@@ -123,10 +110,10 @@ function CounselorMainScreen() {
             </View>
             <View style={styles.detailsContainer}>
               <View style={styles.detailsRow}>
-                <Text style={styles.nickNameText}>내담자 {item.nickName}</Text>
+                <Text style={styles.nickNameText}>내담자 {item.memberNickname}</Text>
                 <Text style={styles.typeText}> {item.type} </Text>
               </View>
-              <Text style={styles.commentText}>상담 내용: {item.comment}</Text>
+              <Text style={styles.commentText}>상담 내용: {item.comment || '없음'}</Text>
             </View>
           </View>
         </TouchableOpacity>
