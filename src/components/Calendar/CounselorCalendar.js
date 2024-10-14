@@ -75,6 +75,8 @@ const CounselorCalendar = ({ markedDates, onDayPress, selectedDate }) => {
   const [maxDate, setMaxDate] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
+  console.log("markedDates in CounselorCalendar: ", markedDates);
+
   useEffect(() => {
     const today = new Date();
     setMinDate(today.toISOString().split('T')[0]);
@@ -99,7 +101,7 @@ const CounselorCalendar = ({ markedDates, onDayPress, selectedDate }) => {
         const isDisabled = new Date(date.dateString) < new Date(minDate) || new Date(date.dateString) > new Date(maxDate);
         const isToday = date.dateString === new Date().toISOString().split('T')[0]; // 오늘 날짜 확인
         const isSelected = date.dateString === selectedDate; // 선택된 날짜 확인
-        const isMarked = markedDates[date.dateString]?.marked; // 마킹된 날짜 확인
+        const isMarked = markedDates[date.dateString]; // 마킹된 날짜 확인
 
         return (
           <CustomDayComponent
