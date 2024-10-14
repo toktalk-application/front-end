@@ -45,11 +45,11 @@ const MemberReservationScreen = () => {
                 month: selectedYear + '-' + String(selectedMonth).padStart(2, '0') // 월 형식을 9 -> 09 와 같이 변환
             },
             onSuccess: (data) => {
-                console.log("data: ", data);
-                const completedReservations = data.data.filter(reservation => reservation.status === "COMPLETED");
+                console.log("reservations: ", data);
+                const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED");
                 const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
                 setReservations(data.data);
-                setCompletedCount(total.length || 0);
+                setCompletedCount(completedReservations.length || 0);
                 setTotalAmount(total);
                 setIsLoading(false);
             },
