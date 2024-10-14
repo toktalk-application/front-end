@@ -73,6 +73,8 @@ const CustomDayComponent = ({ date, isDisabled, isToday, isSelected, isMarked, o
 const CounselorCalendar = ({ markedDates, onDayPress, selectedDate }) => {
   const [minDate, setMinDate] = useState('');
   const [maxDate, setMaxDate] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const today = new Date();
     setMinDate(today.toISOString().split('T')[0]);
@@ -85,11 +87,11 @@ const CounselorCalendar = ({ markedDates, onDayPress, selectedDate }) => {
     
     // 최대 날짜 설정
     setMaxDate(`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
-    
+    setIsLoading(false);
   }, []);
 
   return (
-    <Calendar
+    isLoading ? <View/> : <Calendar
       current={new Date().toISOString().split('T')[0]}
       minDate={minDate}
       maxDate={maxDate}
