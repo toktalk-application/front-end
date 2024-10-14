@@ -7,9 +7,11 @@ import ExPaymentWidget from './exPaymentWidget';
 import { REACT_APP_TOSS_CLIENT_KEY } from '@env';
 import sendGetRequest from '../axios/SendGetRequest.js';
 import { useAuth } from '../auth/AuthContext.js';
+import { useNavigation } from '@react-navigation/native';
 
 const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice, counselorData }) => {
   const { state } = useAuth();
+  const navigation = useNavigation();
   const [slideAnim] = useState(new Animated.Value(800));
   const [selectedType, setSelectedType] = useState('');
   const [date, setDate] = useState(new Date());
@@ -74,18 +76,23 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
 
   // 수정
   const handlePaymentRequest = () => {
-    const orderInfo = {
-      counselingType: selectedType,
-      totalAmount: getTotalFee(),
-      selectedDate: selectedDate,
-      selectedTime: formatSelectedTime(time),
-      counselorId: counselorId,
-      counselorName: counselorData?.name || '알 수 없음',  // 기본값 제공
-      comment: details,
-      startTimes: time
-    };
-    setOrderInfo(orderInfo);
-    setShowWebView(true);
+    if (!details) {
+      Alert.alert('상담 내용을 입력해주세요.')
+    }
+    else {
+      const orderInfo = {
+        counselingType: selectedType,
+        totalAmount: getTotalFee(),
+        selectedDate: selectedDate,
+        selectedTime: formatSelectedTime(time),
+        counselorId: counselorId,
+        counselorName: counselorData?.name || '알 수 없음',  // 기본값 제공
+        comment: details,
+        startTimes: time
+      };
+      setOrderInfo(orderInfo);
+      setShowWebView(true);
+    }
   };
 
   const onClosee = () => {
@@ -199,16 +206,6 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
       }
     }
     setIsCommentOpen(true);
-  };
-
-
-  const handleSubmit = () => {
-    if (!selectedType) {
-      alert('상담 종류를 선택해주세요.');
-      return;
-    }
-    alert(`예약 완료!\n상담 종류: ${selectedType}\n날짜: ${date.toLocaleDateString()}\n시간: ${time}\n상담 내용: ${details}`);
-    onClose();
   };
 
   const formatDate = (date) => {

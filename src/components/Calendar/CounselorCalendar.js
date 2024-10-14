@@ -91,7 +91,7 @@ const CounselorCalendar = ({ markedDates, onDayPress, selectedDate }) => {
   }, []);
 
   return (
-    isLoading ? <View/> : <Calendar
+    <Calendar
       current={new Date().toISOString().split('T')[0]}
       minDate={minDate}
       maxDate={maxDate}

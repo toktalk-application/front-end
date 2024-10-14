@@ -76,10 +76,6 @@ function CounselorEditScreen() {
                 
                     // 응답 상태가 2xx일 경우에만 JSON으로 파싱 시도
                     if (uploadResponse.ok) {
-                            result = JSON.parse(responseText); // JSON으로 파싱
-                            const uploadedImageUrl = typeof result === 'string' ? result : result.imageUrl;
-                            Alert.alert('성공', '이미지가 성공적으로 업로드되었습니다.');
-                            console.log('이미지 URL:', uploadedImageUrl);
                     } else {
                         // 에러 상태일 경우
                         Alert.alert('실패', '이미지 업로드에 실패했습니다.');

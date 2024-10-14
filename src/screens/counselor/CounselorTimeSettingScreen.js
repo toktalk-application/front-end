@@ -69,6 +69,18 @@ function CounselorTimeSettingScreen({ route, navigation }) {
     }
   }
 
+  const korDayAdd = (dayOfWeek) => {
+    switch(dayOfWeek){
+      case "일": return "일요일";
+      case "월": return "월요일";
+      case "화": return "화요일";
+      case "수": return "수요일";
+      case "목": return "목요일";
+      case "금": return "금요일";
+      case "토": return "토요일";
+    }
+  }
+
   const getDefaultTimes = (dayOfWeek) => {
     sendGetRequest({
       token: state.token,
@@ -122,7 +134,7 @@ function CounselorTimeSettingScreen({ route, navigation }) {
           dayOfWeek: korDayToEng(selectedDay),
           times: availableTimes,
         },
-        onSuccess: () => Alert.alert("성공", "기본 상담 시간 수정 완료"),
+        onSuccess: () => Alert.alert("성공", `${korDayAdd(selectedDay)} 기본 상담 시간 수정 완료`),
         onFailure: () => Alert.alert("실패", "기본 상담 시간 수정 실패!")
       });
     }else{ // 기본 상담 시간 최초 등록
@@ -134,7 +146,7 @@ function CounselorTimeSettingScreen({ route, navigation }) {
           dayOfWeek: korDayToEng(selectedDay),
           times: availableTimes,
         },
-        onSuccess: () => Alert.alert("성공", "기본 상담 시간 등록 완료"),
+        onSuccess: () => Alert.alert("성공", `${korDayAdd(selectedDay)} 기본 상담 시간 등록 완료`),
         onFailure: () => Alert.alert("실패", "기본 상담 시간 등록 실패!")
       });
     }
@@ -173,7 +185,7 @@ function CounselorTimeSettingScreen({ route, navigation }) {
           <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>
         </View>
           <TouchableOpacity style={styles.submitButton} onPress={handleComplete}>
-                <Text style={styles.submitButtonText}>변경 완료 </Text>
+                <Text style={styles.submitButtonText}>{korDayAdd(selectedDay)} 변경 </Text>
           </TouchableOpacity>
       </View>
     </View>
@@ -245,6 +257,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonText: {
+      fontSize: 17,
       color: '#fff',
       fontWeight: 'bold',
       textAlign: 'center',
