@@ -4,6 +4,7 @@ import { Picker } from '@react-native-picker/picker';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../axios/SendGetRequest';
 import { useAuth } from '../auth/AuthContext';
+import sendDeleteRequest from '../axios/DeleteRequest';
 
 const CounselDetailScreen = () => {
     const { state } = useAuth();
@@ -169,17 +170,54 @@ const CounselDetailScreen = () => {
     
         return `${month}.${day}`; // "YY.MM.DD" 형식으로 반환
     };
+
+    const sendDeleteReservationRequest = (onSuccess) => {
+        sendDeleteRequest({
+            token: state.token,
+            endPoint: `/reservations/${reservationId}`,
+            onSuccess: () => {
+                if(onSuccess){
+                    onSuccess();
+                }else{
+                    Alert.alert("성공", "예약 취소 성공!");
+                }
+                navigation.goBack();
+            },
+            onFailure: () => Alert.alert("실패", "예약 취소 실패!")
+        });
+    };
     
     // 상담 취소 시 사유 받기 
     const handleCancelPress = () => {
+        console.log("userType: ", state.usertype);
+        // 회원은 취소 사유 필요 없음
+        if(state.usertype === "MEMBER") {
+            Alert.alert(
+                "취소 확인", // 제목
+                "예약을 취소하시겠습니까?", // 메시지
+                [
+                  {
+                    text: "아니요",
+                    onPress: () => console.log("예약 취소 취소"),
+                    style: "cancel"
+                  },
+                  { text: "예", onPress: () => sendDeleteReservationRequest() }
+                ],
+                { cancelable: false } // 백 버튼으로 취소할 수 없게 설정 (Android)
+              );
+            return;
+        }
         setModalVisible(true); // 모달 열기
     };
 
+    // 취소 사유 선택한 후 실행
     const handleConfirmCancellation = () => {
-        // 취소 사유를 처리하는 로직 추가
-        Alert.alert("상담 취소", `상담이 취소되었습니다.\n사유: ${selectedValue}`);
-        setModalVisible(false);
-        setSelectedValue(''); // 입력 필드 초기화
+        sendDeleteReservationRequest(() => {
+            // 취소 사유를 처리하는 로직 추가
+            Alert.alert("상담 취소", `상담이 취소되었습니다.\n사유: ${selectedValue}`);
+            setModalVisible(false);
+            setSelectedValue(''); // 입력 필드 초기화
+        });
     };
 
     // 후에 UserInfo 받아서 처리 할 예정. 

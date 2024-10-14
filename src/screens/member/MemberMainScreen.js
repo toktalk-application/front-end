@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import MemberCalendar from '../../components/Calendar/MemberCalendar'; // 경로를 상황에 맞게 수정하세요.
 import { useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
@@ -51,66 +52,65 @@ function MemberMainScreen() {
         return acc;
     }, {});
 
-    useEffect(() => {
-        const now = new Date();
-        const year = now.getFullYear(); // 연도
-        const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 월 (0부터 시작하므로 +1 필요)
-        const formattedMonth = `${year}-${month}`;
-        /* console.log("formattedMonth: ", formattedMonth); */
-
-        sendGetRequest({
+    useFocusEffect(
+        useCallback(() => {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = (now.getMonth() + 1).toString().padStart(2, '0');
+          const formattedMonth = `${year}-${month}`;
+      
+          sendGetRequest({
             token: state.token,
             endPoint: "/reservations/monthly",
             requestParams: {
-                month: formattedMonth
+              month: formattedMonth
             },
             onSuccess: (data) => {
-                console.log("monthlyData: ", data);
-                setMarkedDates(data.data);
-                setIsReservationLoading(false);
+              console.log("monthlyData: ", data);
+              setMarkedDates(data.data);
+              setIsReservationLoading(false);
             },
-            onFailure: () => Alert.alert("실패!")
-        })
-
-        sendGetRequest({
+            onFailure: () => Alert.alert("실패!", "내 한 달간 날짜별 예약 존재 여부 확인 실패")
+          });
+      
+          sendGetRequest({
             token: state.token,
             endPoint: "/members/daily-moods",
             requestParams: {
-                month: formattedMonth
+              month: formattedMonth
             },
             onSuccess: (data) => {
-                console.log("data: ", data);
-                const formattedData = getFormattedMoodDates(data.data);
-                setMoodDates(formattedData);
-                setIsMoodLoading(false);
+              console.log("data: ", data);
+              const formattedData = getFormattedMoodDates(data.data);
+              setMoodDates(formattedData);
+              setIsMoodLoading(false);
             },
             onFailure: () => Alert.alert("실패", "실패!")
-        })
-        
-        sendGetRequest({
+          });
+      
+          sendGetRequest({
             token: state.token,
             endPoint: `/members/${state.identifier}`,
             onSuccess: (data) => {
               console.log("data: ", data);
-                      // lastTestResult가 비어있는 경우
-                      if (!data.data.lastTestResult || Object.keys(data.data.lastTestResult).length === 0) {
-                        Alert.alert(
-                            "우울 검사 필요",
-                            "우울 검사를 진행해야 합니다.",
-                            [
-                                {
-                                    text: "확인",
-                                    onPress: () => navigation.navigate("우울 검사"), // TestScreen으로 이동
-                                },
-                            ],
-                            { cancelable: false }
-                        );
-                      }
+              if (!data.data.lastTestResult || Object.keys(data.data.lastTestResult).length === 0) {
+                Alert.alert(
+                  "우울 검사 필요",
+                  "우울 검사를 진행해야 합니다.",
+                  [
+                    {
+                      text: "확인",
+                      onPress: () => navigation.navigate("우울 검사"),
+                    },
+                  ],
+                  { cancelable: false }
+                );
+              }
             },
             onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
           });
-        
-    }, []);
+        }, [])
+      );
 
     const handleDayPress = (day) => {
         // 두 번 누르면 해제
@@ -124,7 +124,8 @@ function MemberMainScreen() {
                 token: state.token,
                 endPoint: "/reservations/daily",
                 requestParams: {
-                    date: day.dateString
+                    date: day.dateString,
+                    exceptCancelledReservation: true,
                 },
                 onSuccess: (data) => {
                     console.log("data: ", data);
