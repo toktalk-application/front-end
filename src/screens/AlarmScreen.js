@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { getNotifications, markNotificationAsRead } from './notificationService';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { getNotifications, markNotificationAsRead, deleteNotification } from './notificationService';
 
 const AlarmScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     loadNotifications();
@@ -17,30 +19,28 @@ const AlarmScreen = () => {
       setNotifications(fetchedNotifications);
     } catch (error) {
       console.error('알림 로드 실패:', error);
-      Alert.alert('오류', '알림을 불러오는 데 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleMarkAsRead = async (notificationId) => {
+  const handleNotificationPress = async (notification) => {
     try {
-      await markNotificationAsRead(notificationId);
-      setNotifications(notifications.map(notification => 
-        notification.notificationId === notificationId 
-          ? { ...notification, isRead: true } 
-          : notification
-      ));
+      await markNotificationAsRead(notification.notificationId);
+      await deleteNotification(notification.notificationId);
+      // 알림 목록에서 해당 알림 제거
+      setNotifications(notifications.filter(n => n.notificationId !== notification.notificationId));
+      // CounselDetailScreen으로 네비게이트
+      navigation.navigate('CounselDetailScreen', { reservationId: notification.reservationId });
     } catch (error) {
-      console.error('알림 읽음 처리 실패:', error);
-      Alert.alert('오류', '알림 읽음 처리에 실패했습니다.');
+      console.error('알림 처리 실패:', error);
     }
   };
 
   const renderNotificationItem = ({ item }) => (
     <TouchableOpacity 
-      style={[styles.notificationItem, item.isRead && styles.readNotification]}
-      onPress={() => handleMarkAsRead(item.notificationId)}
+      style={styles.notificationItem}
+      onPress={() => handleNotificationPress(item)}
     >
       <Text style={styles.notificationTitle}>{item.title}</Text>
       <Text style={styles.notificationBody}>{item.body}</Text>
@@ -50,25 +50,13 @@ const AlarmScreen = () => {
     </TouchableOpacity>
   );
 
-  if (isLoading) {
-    return (
-      <View style={styles.centerContainer}>
-        <Text>알림을 불러오는 중...</Text>
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       <FlatList
         data={notifications}
         renderItem={renderNotificationItem}
         keyExtractor={(item) => item.notificationId}
-        ListEmptyComponent={
-          <View style={styles.centerContainer}>
-            <Text>알림이 없습니다.</Text>
-          </View>
-        }
+        ListEmptyComponent={<Text>알림이 없습니다.</Text>}
         refreshing={isLoading}
         onRefresh={loadNotifications}
       />
