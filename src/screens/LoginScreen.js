@@ -237,8 +237,6 @@ function CounselorLoginScreen({ navigation }) {
         
         // 상태 업데이트 후 FCM 토큰 업데이트
         await updateFcmToken(token);
-
-        Alert.alert("로그인 성공", "환영합니다!");
       }
 
     } catch (error) {
