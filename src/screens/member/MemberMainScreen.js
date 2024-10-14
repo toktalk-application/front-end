@@ -72,7 +72,7 @@ function MemberMainScreen() {
                     setMarkedDates(data.data);
                     setIsReservationLoading(false);
                 },
-                onFailure: () => Alert.alert("실패!", "내 한 달간 날짜별 예약 존재 여부 확인 실패")
+                /* onFailure: () => Alert.alert("실패!", "내 한 달간 날짜별 예약 존재 여부 확인 실패") */
             });
 
             sendGetRequest({
@@ -87,7 +87,7 @@ function MemberMainScreen() {
                     setMoodDates(formattedData);
                     setIsMoodLoading(false);
                 },
-                onFailure: () => Alert.alert("실패", "실패!")
+                /* onFailure: () => Alert.alert("실패", "실패!") */
             });
 
             sendGetRequest({
@@ -109,7 +109,7 @@ function MemberMainScreen() {
                         );
                     }
                 },
-                onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
+                /* onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"), */
             });
         }, [])
     );
@@ -133,7 +133,7 @@ function MemberMainScreen() {
                     console.log("data: ", data);
                     setReservations(data.data);
                 },
-                onFailure: () => Alert.alert("실패", "내 특정일 예약 목록 조회 실패")
+                /* onFailure: () => Alert.alert("실패", "내 특정일 예약 목록 조회 실패") */
             });
             setSelectedDate(day.dateString);
             /* fetchReservations(day.dateString); */
@@ -227,7 +227,7 @@ function MemberMainScreen() {
                                     mood: selectedEmotion
                                 },
                                 onSuccess: () => toggleModal(),
-                                onFailure: () => Alert.alert("실패", "실패!")
+                                /* onFailure: () => Alert.alert("실패", "실패!") */
                             })
                         }} style={styles.closeButton}>
                             <Text style={styles.closeButtonText}> 저장 </Text>

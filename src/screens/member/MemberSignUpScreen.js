@@ -109,7 +109,7 @@ function MemberSignUpScreen() {
             Alert.alert("이미 사용중인 아이디입니다.")
           }
         },
-        onFailure: () => Alert.alert("이미 사용중인 아이디입니다.")
+        /* onFailure: () => Alert.alert("이미 사용중인 아이디입니다.") */
       }
     );
   };
@@ -179,7 +179,7 @@ function MemberSignUpScreen() {
         Alert.alert('회원가입 완료', '회원가입이 성공적으로 완료되었습니다!')
         navigation.navigate('로그인');
       },
-      onFailure: () => Alert.alert('회원가입 실패', '회원가입 실패~'),
+      /* onFailure: () => Alert.alert('회원가입 실패', '회원가입 실패~'), */
     });
   };
 
@@ -207,9 +207,9 @@ function MemberSignUpScreen() {
         setModalVisible(true);
 
       },
-      onFailure: () => {
+      /* onFailure: () => {
         Alert.alert("본인 인증 필드를 다시 확인해주세요.")
-      }
+      } */
     })
   };
   

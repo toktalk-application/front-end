@@ -34,9 +34,9 @@ const MemberWriteReviewScreen = () => {
                     Alert.alert("성공", "후기가 성공적으로 작성되었습니다.");
                     navigation.goBack(); // 이전 화면으로 돌아가기
                 },
-                onFailure: () => {
+                /* onFailure: () => {
                     Alert.alert("실패", "후기 작성에 실패했습니다.");
-                }
+                } */
             });
         } catch (error) {
             console.error("후기 작성 중 오류 발생:", error);
