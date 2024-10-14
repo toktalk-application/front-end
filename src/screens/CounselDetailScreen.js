@@ -172,12 +172,13 @@ const CounselDetailScreen = () => {
     };
 
     const sendDeleteReservationRequest = ({ cancelReason, onSuccess }) => {
+        const requestParams = {};
+        if(cancelReason !== null) requestParams.cancelReason = cancelReason;
+
         sendDeleteRequest({
             token: state.token,
             endPoint: `/reservations/${reservationId}`,
-            requestParams: {
-                cancelReason: cancelReason,
-            },
+            requestParams: requestParams,
             onSuccess: () => {
                 if(onSuccess){
                     onSuccess();
@@ -204,7 +205,7 @@ const CounselDetailScreen = () => {
                     onPress: () => console.log("예약 취소 취소"),
                     style: "cancel"
                   },
-                  { text: "예", onPress: () => sendDeleteReservationRequest() }
+                  { text: "예", onPress: () => sendDeleteReservationRequest({ cancelReason: null }) }
                 ],
                 { cancelable: false } // 백 버튼으로 취소할 수 없게 설정 (Android)
               );
