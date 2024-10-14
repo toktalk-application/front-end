@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import MemberCalendar from '../../components/Calendar/MemberCalendar'; // 경로를 상황에 맞게 수정하세요.
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendPostRequest from '../../axios/SendPostRequest';
@@ -54,63 +53,66 @@ function MemberMainScreen() {
 
     useFocusEffect(
         useCallback(() => {
-          const now = new Date();
-          const year = now.getFullYear();
-          const month = (now.getMonth() + 1).toString().padStart(2, '0');
-          const formattedMonth = `${year}-${month}`;
-      
-          sendGetRequest({
-            token: state.token,
-            endPoint: "/reservations/monthly",
-            requestParams: {
-              month: formattedMonth
-            },
-            onSuccess: (data) => {
-              console.log("monthlyData: ", data);
-              setMarkedDates(data.data);
-              setIsReservationLoading(false);
-            },
-            onFailure: () => Alert.alert("실패!", "내 한 달간 날짜별 예약 존재 여부 확인 실패")
-          });
-      
-          sendGetRequest({
-            token: state.token,
-            endPoint: "/members/daily-moods",
-            requestParams: {
-              month: formattedMonth
-            },
-            onSuccess: (data) => {
-              console.log("data: ", data);
-              const formattedData = getFormattedMoodDates(data.data);
-              setMoodDates(formattedData);
-              setIsMoodLoading(false);
-            },
-            onFailure: () => Alert.alert("실패", "실패!")
-          });
-      
-          sendGetRequest({
-            token: state.token,
-            endPoint: `/members/${state.identifier}`,
-            onSuccess: (data) => {
-              console.log("data: ", data);
-              if (!data.data.lastTestResult || Object.keys(data.data.lastTestResult).length === 0) {
-                Alert.alert(
-                  "우울 검사 필요",
-                  "우울 검사를 진행해야 합니다.",
-                  [
-                    {
-                      text: "확인",
-                      onPress: () => navigation.navigate("우울 검사"),
-                    },
-                  ],
-                  { cancelable: false }
-                );
-              }
-            },
-            onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
-          });
+            setSelectedDate("");
+            /* handleDayPress(selectedDate); */
+
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const formattedMonth = `${year}-${month}`;
+
+            sendGetRequest({
+                token: state.token,
+                endPoint: "/reservations/monthly",
+                requestParams: {
+                    month: formattedMonth
+                },
+                onSuccess: (data) => {
+                    console.log("monthlyData: ", data);
+                    setMarkedDates(data.data);
+                    setIsReservationLoading(false);
+                },
+                onFailure: () => Alert.alert("실패!", "내 한 달간 날짜별 예약 존재 여부 확인 실패")
+            });
+
+            sendGetRequest({
+                token: state.token,
+                endPoint: "/members/daily-moods",
+                requestParams: {
+                    month: formattedMonth
+                },
+                onSuccess: (data) => {
+                    console.log("data: ", data);
+                    const formattedData = getFormattedMoodDates(data.data);
+                    setMoodDates(formattedData);
+                    setIsMoodLoading(false);
+                },
+                onFailure: () => Alert.alert("실패", "실패!")
+            });
+
+            sendGetRequest({
+                token: state.token,
+                endPoint: `/members/${state.identifier}`,
+                onSuccess: (data) => {
+                    console.log("data: ", data);
+                    if (!data.data.lastTestResult || Object.keys(data.data.lastTestResult).length === 0) {
+                        Alert.alert(
+                            "우울 검사 필요",
+                            "우울 검사를 진행해야 합니다.",
+                            [
+                                {
+                                    text: "확인",
+                                    onPress: () => navigation.navigate("우울 검사"),
+                                },
+                            ],
+                            { cancelable: false }
+                        );
+                    }
+                },
+                onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
+            });
         }, [])
-      );
+    );
 
     const handleDayPress = (day) => {
         // 두 번 누르면 해제
@@ -151,7 +153,7 @@ function MemberMainScreen() {
 
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
-            {isReservationLoading || isMoodLoading ? <View/> : <FlatList
+            {isReservationLoading || isMoodLoading ? <View /> : <FlatList
                 data={reservations}
                 keyExtractor={(item) => item.reservationId.toString()}
                 ListHeaderComponent={() => (
@@ -169,7 +171,7 @@ function MemberMainScreen() {
                 )}
                 renderItem={({ item }) => (
                     <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
-                        <View style={styles.row}>
+                        {selectedDate === '' ? <View/> : <View style={styles.row}>
                             <View style={styles.timeContainer}>
                                 <Text style={styles.timeText}> {formatTime(item.startTime)} </Text>
                                 <Text style={styles.timeText}> | </Text>
@@ -182,7 +184,7 @@ function MemberMainScreen() {
                                 </View>
                                 <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
                             </View>
-                        </View>
+                        </View>}
                     </TouchableOpacity>
                 )}
             />}
@@ -213,15 +215,15 @@ function MemberMainScreen() {
                         </View>
                         <TouchableOpacity onPress={() => {
                             console.log("selectedEmotion: ", selectedEmotion);
-                            console.log("today: ", new Date().toISOString().slice(0,10));
+                            console.log("today: ", new Date().toISOString().slice(0, 10));
 
-                            if(!selectedEmotion) toggleModal();
+                            if (!selectedEmotion) toggleModal();
 
                             sendPostRequest({
                                 token: state.token,
                                 endPoint: "/members/daily-moods",
                                 requestBody: {
-                                    date: new Date().toISOString().slice(0,10),
+                                    date: new Date().toISOString().slice(0, 10),
                                     mood: selectedEmotion
                                 },
                                 onSuccess: () => toggleModal(),
