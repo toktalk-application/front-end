@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import CounselorCalendar from '../../components/Calendar/CounselorCalendar';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 
@@ -25,35 +25,37 @@ function CounselorMainScreen() {
     navigation.navigate('CounselDetail', { reservationId });
   };
 
-  useEffect(() => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0'); // 두 자리로 맞추기 위해 padStart 사용
+  useFocusEffect(
+    useCallback(() => {
+      setSelectedDate('');
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0'); // 두 자리로 맞추기 위해 padStart 사용
 
-    const formattedMonth = `${year}-${month}`;
+      const formattedMonth = `${year}-${month}`;
 
-    sendGetRequest({
-      token: state.token,
-      endPoint: "/reservations",
-      requestParams: {
-        counselorId: state.identifier,
-        month: formattedMonth,
-      },
-      onSuccess: (data) => {
-        /* console.log(data); */
-        const filteredData = Object.keys(data.data).reduce((acc, key) => {
-          if (data.data[key] === true) {  // 값이 true인 경우만
-            acc[key] = data.data[key];    // 결과 객체에 추가
-          }
-          return acc;
-        }, {});
-        console.log(filteredData);
-        setMarkedDates(filteredData);
-      },
-      onFailure: () => Alert.alert("실패", "월별 일정 조회 실패")
-    });
-
-  }, []);
+      sendGetRequest({
+        token: state.token,
+        endPoint: "/reservations",
+        requestParams: {
+          counselorId: state.identifier,
+          month: formattedMonth,
+        },
+        onSuccess: (data) => {
+          /* console.log("marked data: ", data); */
+          const filteredData = Object.keys(data.data).reduce((acc, key) => {
+            if (data.data[key] === true) {  // 값이 true인 경우만
+              acc[key] = data.data[key];    // 결과 객체에 추가
+            }
+            return acc;
+          }, {});
+          console.log("filtered data: ", filteredData);
+          setMarkedDates(filteredData);
+        },
+        onFailure: () => Alert.alert("실패", "월별 일정 조회 실패")
+      });
+    }, [])
+  );
 
   const fetchReservations = async (date) => {
     sendGetRequest({
@@ -102,7 +104,7 @@ function CounselorMainScreen() {
       )}
       renderItem={({ item }) => (
         <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
-          <View style={styles.row}>
+          {selectedDate === '' ? <View/> : <View style={styles.row}>
             <View style={styles.timeContainer}>
               <Text style={styles.timeText}> {formatTime(item.startTime)} </Text>
               <Text style={styles.timeText}> | </Text>
@@ -115,7 +117,7 @@ function CounselorMainScreen() {
               </View>
               <Text style={styles.commentText}>상담 내용: {item.comment || '없음'}</Text>
             </View>
-          </View>
+          </View>}
         </TouchableOpacity>
       )}
     />

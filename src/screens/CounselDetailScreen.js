@@ -171,10 +171,13 @@ const CounselDetailScreen = () => {
         return `${month}.${day}`; // "YY.MM.DD" 형식으로 반환
     };
 
-    const sendDeleteReservationRequest = (onSuccess) => {
+    const sendDeleteReservationRequest = ({ cancelReason, onSuccess }) => {
         sendDeleteRequest({
             token: state.token,
             endPoint: `/reservations/${reservationId}`,
+            requestParams: {
+                cancelReason: cancelReason,
+            },
             onSuccess: () => {
                 if(onSuccess){
                     onSuccess();
@@ -212,11 +215,14 @@ const CounselDetailScreen = () => {
 
     // 취소 사유 선택한 후 실행
     const handleConfirmCancellation = () => {
-        sendDeleteReservationRequest(() => {
-            // 취소 사유를 처리하는 로직 추가
-            Alert.alert("상담 취소", `상담이 취소되었습니다.\n사유: ${selectedValue}`);
-            setModalVisible(false);
-            setSelectedValue(''); // 입력 필드 초기화
+        sendDeleteReservationRequest({
+            cancelReason: selectedValue,
+            onSuccess: () => {
+                // 취소 사유를 처리하는 로직 추가
+                Alert.alert("상담 취소", `상담이 취소되었습니다.\n사유: ${selectedValue}`);
+                setModalVisible(false);
+                setSelectedValue(''); // 입력 필드 초기화
+            }
         });
     };
 
