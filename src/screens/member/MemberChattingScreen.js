@@ -77,12 +77,12 @@ function MemberChattingScreen() {
 
   return (
     <View style={styles.container}>
-      <FlatList
+      {chatRooms.length === 0 ? <View><Text>채팅이 없습니다.</Text></View> : <FlatList
         data={chatRooms}
         keyExtractor={(item) => item.roomId.toString()}
         renderItem={renderItem}
         contentContainerStyle={styles.listContainer}
-      />
+      />}
     </View>
   );
 }
