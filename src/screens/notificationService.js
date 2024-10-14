@@ -68,3 +68,25 @@ export const markNotificationAsRead = async (notificationId) => {
       throw error;
     }
   };
+
+  export const deleteNotification = async (notificationId) => {
+    try {
+      const authToken = await getAuthToken();
+      if (!authToken) {
+        throw new Error('인증 토큰이 없습니다.');
+      }
+      const cleanToken = authToken.replace('Bearer ', ''); // 접두사 제거
+  
+      await axios.delete(`${REACT_APP_API_URL}/fcm/${notificationId}`, {
+        headers: {
+          'Authorization': `Bearer ${cleanToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      console.log('알림 삭제 성공');
+    } catch (error) {
+      console.error('알림 삭제 실패:', error);
+      throw error;
+    }
+  };

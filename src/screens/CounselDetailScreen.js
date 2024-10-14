@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button, Alert,To
 import { Picker } from '@react-native-picker/picker';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../axios/SendGetRequest';
+import sendPostRequest from '../axios/SendPostRequest';  // 추가
 import { useAuth } from '../auth/AuthContext';
 import sendDeleteRequest from '../axios/DeleteRequest';
 
@@ -10,7 +11,7 @@ const CounselDetailScreen = () => {
     const { state } = useAuth();
     const route = useRoute();
     const navigation = useNavigation();
-    const { reservationId } = route.params;
+    const { reservationId, notificationId } = route.params;  // notificationId 추가
     const [reservation, setReservation] = useState(null);
     const [loading, setLoading] = useState(true);
     const [modalVisible, setModalVisible] = useState(false); 
@@ -23,10 +24,33 @@ const CounselDetailScreen = () => {
             onSuccess: (data) => {
                 console.log("data: ", data);
                 setReservation(data.data);
+                setLoading(false);
+                
+                // 알림 읽음 처리
+                if (notificationId) {
+                    markNotificationAsRead(notificationId);
+                }
             },
-            onFailure: () => Alert.alert("실패", "예약 정보 조회 실패")
-        })
-    },[]);
+            onFailure: () => {
+                Alert.alert("실패", "예약 정보 조회 실패");
+                setLoading(false);
+            }
+        });
+    }, [reservationId, notificationId]);
+
+    // 알림 읽음 처리 함수
+    const markNotificationAsRead = (notificationId) => {
+        sendPostRequest({
+            token: state.token,
+            endPoint: `/fcm/${notificationId}/read`,
+            onSuccess: () => {
+                console.log("알림 읽음 처리 성공");
+            },
+            onFailure: (error) => {
+                console.error("알림 읽음 처리 실패:", error);
+            }
+        });
+    };
 
     useEffect(() => {
         const fetchReservationDetails = async () => {
