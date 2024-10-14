@@ -1,5 +1,6 @@
 import axios from "axios";
 import {REACT_APP_API_URL} from '@env';
+import handleErrorMessage from "./ErrorMessageHandler";
 
 const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFailure }) => {
     /* console.log("token: ", token);
@@ -25,6 +26,7 @@ const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFail
         console.error('message: ', error.message);
         console.error('server message: ', error.response.data.message);
 
+        handleErrorMessage(error.response.status, error.response.data.message);
         if(onFailure) onFailure();
     }
 }

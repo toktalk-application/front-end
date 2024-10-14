@@ -1,5 +1,6 @@
 import axios from "axios";
 import {REACT_APP_API_URL} from '@env';
+import handleErrorMessage from "./ErrorMessageHandler";
 
 const sendPostRequest = async({ token, endPoint, requestBody, onSuccess, onFailure }) => {
     try{
@@ -19,6 +20,7 @@ const sendPostRequest = async({ token, endPoint, requestBody, onSuccess, onFailu
         )
         /* console.log("response: ", response); */
         if (response.status === 200 || response.status === 201) {
+            /* handleErrorMessage(response.status, response.) */
             if (onSuccess) onSuccess(response.data.data);
         }
     }catch(error){
@@ -26,6 +28,7 @@ const sendPostRequest = async({ token, endPoint, requestBody, onSuccess, onFailu
         console.error('message: ', error.message);
         console.error('server message: ', error.response.data.message);
 
+        handleErrorMessage(error.response.status, error.response.data.message);
         if(onFailure) onFailure();
     }
 }
