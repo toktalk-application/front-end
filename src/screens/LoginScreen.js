@@ -189,12 +189,36 @@ function CounselorLoginScreen({ navigation }) {
     setPassword(input);
   };
 
+  // COUNSELOR FCM 토큰을 업데이트하는 함수 추가
+  const updateFcmToken = async (token) => {
+    try {
+      const fcmToken = await messaging().getToken();
+      console.log('FCM Token:', fcmToken);
+
+      const cleanToken = token.replace('Bearer ', '');
+
+      const response = await axios.post(
+        `${REACT_APP_API_URL}/counselors/fcm-token`,
+        { fcmToken: fcmToken },
+        {
+          headers: {
+            'Authorization': `Bearer ${cleanToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      console.log('FCM 토큰 업데이트 응답:', response.data);
+    } catch (error) {
+      console.error('FCM 토큰 업데이트 실패:', error.response ? error.response.data : error.message);
+    }
+  };
+
   const onLogin = async () => {
     try {
       const response = await axios.post(`${REACT_APP_API_URL}/auth/login`, {
         userId: userId,
         password: password,
-        userType: 'COUNSELOR' // 사용자의 타입을 필요에 따라 설정
+        userType: 'COUNSELOR'
       });
 
       // 로그인 성공 처리
@@ -204,8 +228,17 @@ function CounselorLoginScreen({ navigation }) {
         const identifier = response.data.identifier;
         const name = response.data.name;
         const nickname = response.data.nickname;
+
+        // 토큰을 Keychain에 안전하게 저장
+        await Keychain.setGenericPassword('token', token);
+        
+        // login 함수를 먼저 호출하여 상태를 업데이트
+        await login(token, usertype, navigation, identifier, nickname, name);
+        
+        // 상태 업데이트 후 FCM 토큰 업데이트
+        await updateFcmToken(token);
+
         Alert.alert("로그인 성공", "환영합니다!");
-        login(token, usertype, navigation, identifier, nickname, name);
       }
 
     } catch (error) {
