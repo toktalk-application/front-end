@@ -242,7 +242,21 @@ function App() {
           <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
           <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
           <Stack.Screen name="알림" component={AlarmScreen} />
-          <Stack.Screen name="설정" component={SettingsScreen} />
+          <Stack.Screen name="프로필 관리" component={CounselorProfileScreen} />
+          <Stack.Screen name="프로필 수정" component={CounselorEditScreen} />
+          <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
+          <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
+          <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
+          <Stack.Screen name="내 상담 내역" component={MemberReservationScreen} />
+          <Stack.Screen name="우울 검사" component={TestScreen}/>
+          <Stack.Screen name="우울 검사 내역" component={TestResultScreen}/>
+          <Stack.Screen name="TestResult" component={TestResultModal} options={{ title: '' }} />
+          <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
+          <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
+          <Stack.Screen name="MemberWriteReview" component={MemberWriteReviewScreen} options={{ title: '' }} />
+          <Stack.Screen name="MemberCounselorDetail" component={MemberCounselorDetailScreen} options={{ title: '' }} />
+          <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ headerShown: false }}/>
+          <Stack.Screen name="설정" component={SettingsScreen}/>
         </Stack.Navigator>
       </NavigationContainer>
     </AuthProvider>
