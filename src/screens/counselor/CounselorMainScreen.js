@@ -92,6 +92,23 @@ function CounselorMainScreen() {
     return `${period} ${formattedHour}:${minute}`;
   };
 
+  const getMinDate = () => {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  const getMaxDate = () => {
+    const today = new Date();
+
+    const currentYear = today.getFullYear();
+    const nextMonth = today.getMonth() + 1;
+
+    // 다음 달의 마지막 날 계산
+    const lastDayOfNextMonth = new Date(currentYear, nextMonth + 1, 0).getDate();
+
+    // 최대 날짜 설정
+    return (`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
+  }
+
   return (
     <FlatList
       data={reservations}
@@ -99,12 +116,12 @@ function CounselorMainScreen() {
       style={{ backgroundColor: 'white' }} // 여기에서 배경색을 흰색으로 설정
       ListHeaderComponent={() => (
         <View>
-          <CounselorCalendar markedDates={markedDates} onDayPress={handleDayPress} selectedDate={selectedDate} />
+          <CounselorCalendar markedDates={markedDates} onDayPress={handleDayPress} selectedDate={selectedDate} minDate={getMinDate()} maxDate={getMaxDate()} />
         </View>
       )}
       renderItem={({ item }) => (
         <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
-          {selectedDate === '' ? <View/> : <View style={styles.row}>
+          {selectedDate === '' ? <View /> : <View style={styles.row}>
             <View style={styles.timeContainer}>
               <Text style={styles.timeText}> {formatTime(item.startTime)} </Text>
               <Text style={styles.timeText}> | </Text>

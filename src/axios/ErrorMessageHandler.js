@@ -16,6 +16,7 @@ const getPrettyMessage = (status, message) => {
             if(message.includes('licenses')) return '자격증은 총 1~3개로만 등록할 수 있습니다.'
             if(message.includes('careers')) return '경력사항은 총 1~3개로만 등록할 수 있습니다.'
             if(message.includes('month')) return '달은 1월~12월이어야 합니다.'
+            break;
         case 403:
             if(message.includes('denied')) return '요청이 거부되었습니다.'
             if(message.includes('usertype')) return '잘못된 유저 타입입니다.'
@@ -25,6 +26,7 @@ const getPrettyMessage = (status, message) => {
             if(message.includes('Cancellation')) return '예약은 24시간 전까지만 취소할 수 있습니다.'
             if(message.includes('Occupied')) return '예약이 있는 시간대를 삭제할 수 없습니다.'
             if(message.includes('timeslots')) return '예약을 위해 최소 하나의 시간대를 선택해야 합니다.'
+            break;
         case 404:
             if(message.includes('score')) return '잘못된 우울증 점수입니다.'
             if(message.includes('finished')) return '완료되지 않은 상담입니다.'
@@ -42,6 +44,7 @@ const getPrettyMessage = (status, message) => {
             if(message.includes('Payment_Amount')) return '잘못된 결제액입니다.'
             if(message.includes('Payment_Not')) return '존재하지 않는 결제정보입니다.'
             if(message.includes('Payment_Failed')) return '결제에 실패하였습니다.'
+            break;
         case 409:
             if(message.includes('userid')) return '이미 사용중인 아이디입니다.'
             if(message.includes('nickname')) return '이미 사용중인 닉네임입니다.'
@@ -49,9 +52,11 @@ const getPrettyMessage = (status, message) => {
             if(message.includes('occupied')) return '이미 예약된 시간입니다.'
             if(message.includes('Review')) return '리뷰가 이미 등록되었습니다.'
             if(message.includes('Report')) return '진단이 이미 등록되었습니다.'
+            break;
         case 500:
             if(message.includes('credential')) return '서버 오류: 회원 정보에 오류가 있습니다.'
             if(message.includes('Month parameter')) return '서버 오류: 달 파라미터는 양수여야 합니다.'
+            break;
         default:
             return "처리되지 않은 예외가 발생하였습니다."
 

@@ -73,26 +73,12 @@ const CustomDayComponent = ({ date, isDisabled, isToday, isSelected, isMarked, m
   );
 };
 
-const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate }) => {
+const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate, minDate, maxDate }) => {
   console.log("markedDates in MemberCalendar: ", markedDates);
-
-  const [minDate, setMinDate] = useState('');
-  const [maxDate, setMaxDate] = useState('');
 
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const today = new Date();
-    setMinDate(today.toISOString().split('T')[0]);
-
-    const currentYear = today.getFullYear();
-    const nextMonth = today.getMonth() + 1;
-
-    // 다음 달의 마지막 날 계산
-    const lastDayOfNextMonth = new Date(currentYear, nextMonth + 1, 0).getDate();
-    
-    // 최대 날짜 설정
-    setMaxDate(`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
     setIsLoading(false);
     
   }, []);
