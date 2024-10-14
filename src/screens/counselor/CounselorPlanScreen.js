@@ -130,7 +130,7 @@ function CounselorPlanScreen() {
         date: selectedDate,
         times: availableTimes,
       },
-      onSuccess: () => Alert.alert("요청 성공", "상담 시간 변경 완료"),
+      onSuccess: () => Alert.alert("요청 성공", `${selectedDate}  상담 시간 변경 완료`),
       onFailure: () => Alert.alert("요청 실패", "상담 시간 변경 실패"),
     })
   };
@@ -167,7 +167,7 @@ function CounselorPlanScreen() {
 
           {selectedDate ? (
                   <TouchableOpacity style={styles.submitButton} onPress={handleComplete}>
-                      <Text style={styles.submitButtonText}>변경 완료</Text>
+                      <Text style={styles.submitButtonText}>{selectedDate} 변경 </Text>
                   </TouchableOpacity>
               ) : null}
           </View>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white', // 텍스트 색상
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   timeDetailContainer: {
@@ -241,6 +241,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonText: {
+      fontSize: 17,
       color: '#fff',
       fontWeight: 'bold',
       textAlign: 'center',

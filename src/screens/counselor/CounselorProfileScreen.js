@@ -68,14 +68,14 @@ function CounselorProfileScreen() {
     
             {/* 경력 및 자격 */}
             <Text style={styles.sectionTitle}>👩‍🎓 공인 자격</Text>
-            {counselorData.licenses.map((license) => (
-              <Text key={license.licenseDto} style={styles.license}>
+            {counselorData.licenses.map((license, index) => (
+              <Text key={`${license.licenseDto}-${index}`} style={styles.license}>
                 🏅 {license.licenseName} ({license.organization})
               </Text>
             ))}
             <Text style={styles.sectionTitle}>💼 경력</Text>
-            {counselorData.careers.map((career) => (
-              <Text key={career.careerId} style={styles.career}>
+            {counselorData.careers.map((career, index) => (
+              <Text key={`${career.careerId}-${index}`} style={styles.career}>
                 {career.classification === "CURRENT" ? "현재" : "이전"} ) {career.company} - {career.responsibility}
               </Text>
             ))}

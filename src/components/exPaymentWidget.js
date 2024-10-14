@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import { usePaymentWidget, AgreementWidget, PaymentMethodWidget } from '@tosspayments/widget-sdk-react-native'
-import { Alert, Button, StyleSheet, View, Text } from 'react-native'
+import { Alert, Button, StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native'
 import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
 import PaymentCompleteModal from './PaymentCompleteModal';
 import sendPostRequest from '../axios/SendPostRequest';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
   const paymentWidgetControl = usePaymentWidget();
+  const navigation = useNavigation();
   const [paymentMethodWidgetControl, setPaymentMethodWidgetControl] = useState(null);
   const [agreementWidgetControl, setAgreementWidgetControl] = useState(null);
   const { state } = useAuth();
@@ -127,13 +129,27 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
 
   return (
     <>
-      <View>
+      <View style= {{backgroundColor : '#fff'}}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => {
+            onClose(); 
+          }} style={styles.backButton}>
+            <Image source={require('../../assets/images/back.png')} style={styles.icon} />
+          </TouchableOpacity>
+                <Text style={styles.title}>상담 예약</Text>
+        </View>
+        <Text style={styles.infoTitle}>예약 내역 상세</Text>
         <View style={styles.infoContainer}>
-          <Text style={styles.title}>예약 내역</Text>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>상담사</Text>
-            <Text style={styles.counselorName}>{orderInfo.counselorName}</Text>
-            <Text style={styles.counselingType}>{orderInfo.counselingType}</Text>
+
+          <View style={styles.contentSection}>
+            <View style={styles.counselorInfo}>
+              <Text style={styles.sectionTitle}>상담사</Text>
+              <Text style={styles.counselorName}>{orderInfo.counselorName}</Text>
+            </View>
+            <View style={styles.counselorInfo}>
+              <Text style={styles.sectionTitle}>상담 종류</Text>
+              <Text style={styles.counselingType}>{orderInfo.counselingType}</Text>
+            </View>
           </View>
 
           <View style={styles.section}>
@@ -170,9 +186,9 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
         />
       </View>
       <View style={styles.container}>
-        <View style={styles.buttonContainer}>
-          <Button title="결제요청" onPress={handlePayment} />
-        </View>
+        <TouchableOpacity style={styles.button} onPress={handlePayment}>
+            <Text style={styles.buttonText}> 결제 요청 </Text>
+        </TouchableOpacity>
       </View>
       <PaymentCompleteModal
         visible={isModalVisible}
@@ -192,42 +208,90 @@ const styles = StyleSheet.create({
     right: 0,            // 화면의 오른쪽
     backgroundColor: '#fff',
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  infoContainer: {
-    marginBottom: 16,
-    marginTop: 20,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-    backgroundColor: '#f9f9f9',
-  },
-  section: {
-    marginBottom: 12,
+  header: {
     flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
   },
-  sectionTitle: {
+  icon: {
+    width: 20,
+    height: 20,
+  },
+  title: {
+    fontSize: 21,
+    fontWeight: 'bold',
+    color: '#333D4B',
+    marginBottom: 5,
+    marginLeft:10
+  },
+  infoTitle:{
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 5,
+    marginLeft:23,
+    color:'#333D4B'
+  },
+  infoContainer: {
+    marginBottom: 10,
+    marginHorizontal:20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#333D4B',
+    borderRadius: 10,
+  },
+  contentSection:{
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+  },
+  counselorInfo:{
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center', 
+  },
+  section: {
+    marginTop:10,
+    marginBottom: 5,
+    flexDirection: 'row',
+    alignItems: 'center', 
+  },
+  date:{
+    fontSize: 16,
+    marginLeft:10,
+    marginRight:5,
+    marginTop:3,
+    color: '#333D4B',
+  },
+  time:{
+    fontSize: 16,
+    marginLeft:2,
+    marginTop:3,
+    color: '#333D4B',
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    justifyContent: 'center',
   },
   counselorName: {
     fontSize: 16,
-    color: '#333',
+    color: '#333D4B',
+    marginLeft:10,
+    marginRight:30
   },
   counselingType: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 16,
+    color: '#333D4B',
+    marginLeft:10
   },
   paymentContainer: {
-
+    flexDirection: 'row',
+    marginHorizontal:23,
+    justifyContent: 'space-between',
   },
   paymentTitle: {
     fontSize: 18,
     fontWeight: 'bold',
+    color:'#333D4B'
   },
   totalAmount: {
     fontSize: 20,
@@ -247,6 +311,20 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     marginTop: 20,
+  },
+  button: {
+    backgroundColor: '#001F3F', // 버튼 색상
+    marginTop:30,
+    marginBottom:20,
+    padding: 10,
+    borderRadius: 5,
+    justifyContent: 'center', // 수직 중앙 정렬
+    alignItems: 'center', // 수평 중앙 정렬
+  },
+  buttonText: {
+      color: 'white',
+      fontSize: 16,
+      textAlign: 'center', // 텍스트 수평 중앙 정렬
   },
 });
 
