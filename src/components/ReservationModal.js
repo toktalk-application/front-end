@@ -126,7 +126,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
           setAvailability(newAvailableTimes); */
           setAvailableTimes(times);
         },
-        onFailure: () => Alert.alert("실패", "특정 상담사의 특정일 타임슬롯 조회 실패")
+        /* onFailure: () => Alert.alert("실패", "특정 상담사의 특정일 타임슬롯 조회 실패") */
       })
 
       setSelectedDate(day.dateString);

@@ -46,7 +46,7 @@ const CounselorCounselScreen = () => {
 
                 setIsLoading(false);
             },
-            onFailure: () => Alert.alert("실패", "내 특정월 상담 목록 조회 실패!")
+            /* onFailure: () => Alert.alert("실패", "내 특정월 상담 목록 조회 실패!") */
         }, [selectedMonth, selectedYear]);
 
         fetchReservations(selectedYear, selectedMonth);

@@ -93,9 +93,9 @@ const TestScreen = () => {
           createdAt: data.createdAt
         });
       },
-      onFailure: () => {
+      /* onFailure: () => {
           Alert.alert("오류", "테스트에 실패했습니다. 다시 시도해주세요.")
-      }
+      } */
   });
   };
 

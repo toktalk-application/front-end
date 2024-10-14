@@ -34,9 +34,9 @@ const ReviewModal = ({ visible, onClose, reservationId, onSubmit }) => {
                     setReviewContent(''); // 입력 초기화
                     setRating(0); // 별점 초기화
                 },
-                onFailure: () => {
+                /* onFailure: () => {
                     Alert.alert("실패", "후기 작성에 실패했습니다.");
-                }
+                } */
             });
         } catch (error) {
             console.error("후기 작성 중 오류 발생:", error);

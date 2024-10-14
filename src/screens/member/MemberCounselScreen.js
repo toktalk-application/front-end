@@ -92,7 +92,7 @@ const MemberCounselScreen = () => {
         setCounselors(data.data);
         setIsLoading(false);
       },
-      onFailure: () => Alert.alert("요청 실패", "상담사 목록 로드 실패!")
+      /* onFailure: () => Alert.alert("요청 실패", "상담사 목록 로드 실패!") */
     });
   }, []);
 

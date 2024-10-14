@@ -29,7 +29,7 @@ function CounselorEditScreen() {
                 setExpertise(data.data.expertise);
                 setSessionDescription(data.data.sessionDescription);
             },
-            onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패")
+            /* onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패") */
         });
     }, []);
 

@@ -20,7 +20,7 @@ const PassModal = ({ visible, onClose, name, phoneNumber, carrier, residentNumbe
                 onClose(); // 모달 닫기
             },
             onFailure: () => {
-                Alert.alert("오류", "인증에 실패했습니다. 다시 시도해주세요.")
+                /* Alert.alert("오류", "인증에 실패했습니다. 다시 시도해주세요.") */
                 onClose(); // 모달 닫기
             }
         });
