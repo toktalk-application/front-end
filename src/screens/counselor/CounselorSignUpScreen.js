@@ -226,7 +226,7 @@ function CounselorSignUpScreen() {
     }).toString();
 
     sendPostRequest({
-      endPoint: `/api/identity/verify?${queryParams}`, 
+      endPoint: `/identity/verify?${queryParams}`, 
       onSuccess: () => {
         setModalVisible(true);
 
@@ -313,7 +313,6 @@ function CounselorSignUpScreen() {
               <Picker.Item label="성별 선택" value="" />
               <Picker.Item label="여자" value="FEMALE" />
               <Picker.Item label="남자" value="MALE" />
-              <Picker.Item label="기타" value="ETC" />
             </Picker>
           </View>
         </View>

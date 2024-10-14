@@ -216,7 +216,7 @@ const CounselDetailScreen = () => {
                             <Text style={styles.memberDetailTitle}>출생년도</Text>
                             <Text style={styles.memberDetailContent}>{reservation.memberBirthYear}</Text>
                             <Text style={styles.memberDetailTitle}>점수</Text>
-                            <Text style={styles.memberDetailContent}>{reservation.memberDepressionScore + '점'}</Text>
+                            <Text style={styles.memberDetailContent}>{reservation.memberDepressionScore}</Text>
                         </View>
                     </View>
                 </>
@@ -238,7 +238,7 @@ const CounselDetailScreen = () => {
                             <Text style={styles.buttonText}>채팅방 열기</Text>
                         </TouchableOpacity>
                         <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
-                            <Text style={styles.buttonText}>상담 취소</Text>
+                            <Text style={styles.buttonText}>  상담 취소  </Text>
                         </TouchableOpacity>
                     </View>
                 ) : userType === 'MEMBER' && reservation.status === 'PENDING' ? (
@@ -321,7 +321,7 @@ const CounselDetailScreen = () => {
                             >
                                 <Picker.Item label="사유를 선택하세요" value="" />
                                 <Picker.Item label="개인적인 사정" value="개인적인 사정" />
-                                <Picker.Item label="업무 일정 충돌" value="업무 일정 충돌" />
+                                <Picker.Item label="일정 충돌" value="일정 충돌" />
                                 <Picker.Item label="건강 문제" value="건강 문제" />
                                 <Picker.Item label="기타" value="기타" />
                             </Picker>

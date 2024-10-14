@@ -14,7 +14,7 @@ const PassModal = ({ visible, onClose, name, phoneNumber, carrier, residentNumbe
         }).toString();
 
         sendPostRequest({
-            endPoint: `/api/identity/add-verify?${queryParams}`,
+            endPoint: `/identity/add-verify?${queryParams}`,
             onSuccess: () => {
                 Alert.alert("완료", "인증이 성공적으로 완료되었습니다.");
                 onClose(); // 모달 닫기
