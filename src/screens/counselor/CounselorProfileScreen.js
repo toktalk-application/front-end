@@ -24,7 +24,7 @@ function CounselorProfileScreen() {
                     setIsLoading(false);
                 },
                 onFailure: () => {
-                    Alert.alert("내 정보 GET요청 실패!");
+                    /* Alert.alert("내 정보 GET요청 실패!"); */
                     setIsLoading(false);
                 },
             });

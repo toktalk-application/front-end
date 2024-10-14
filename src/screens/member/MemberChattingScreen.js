@@ -23,9 +23,9 @@ function MemberChattingScreen() {
       onSuccess: (data) => {
         setChatRooms(data); // 가져온 데이터로 상태 업데이트
       },
-      onFailure: () => {
+      /* onFailure: () => {
         setError('채팅방 목록을 가져오는 데 실패했습니다.');
-      },
+      }, */
     });
 
     setLoading(false);

@@ -186,7 +186,7 @@ const CounselDetailScreen = () => {
                 }
                 navigation.goBack();
             },
-            onFailure: () => Alert.alert("실패", "예약 취소 실패!")
+            /* onFailure: () => Alert.alert("실패", "예약 취소 실패!") */
         });
     };
     

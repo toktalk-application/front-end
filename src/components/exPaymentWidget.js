@@ -107,7 +107,6 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
             endPoint: "/reservations",
             requestBody: requestBody,
             onSuccess: () => resetState(),
-            onFailure: () => Alert.alert('실패')
           });
 
           setIsModalVisible(true);  // 결제 완료 모달 표시

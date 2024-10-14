@@ -27,9 +27,9 @@ const TestResultScreen = ({ navigation }) => {
                     const sortedResults = data.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                     setTestResults(sortedResults); // 최신 순으로 정렬하여 상태 업데이트
                 },
-                onFailure: () => {
+                /* onFailure: () => {
                     setError('테스트 결과를 가져오는 데 실패했습니다.');
-                },
+                }, */
             });
 
             setLoading(false); // 로딩 종료

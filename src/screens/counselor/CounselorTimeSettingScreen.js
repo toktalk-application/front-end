@@ -100,7 +100,7 @@ function CounselorTimeSettingScreen({ route, navigation }) {
         setAvailability(newAvailability);
         setIsLoading(false);
       },
-      onFailure: () => Alert.alert("실패", "내 기본 상담 시간 조회 실패")
+      /* onFailure: () => Alert.alert("실패", "내 기본 상담 시간 조회 실패") */
     });
   }
 
@@ -135,7 +135,7 @@ function CounselorTimeSettingScreen({ route, navigation }) {
           times: availableTimes,
         },
         onSuccess: () => Alert.alert("성공", `${korDayAdd(selectedDay)} 기본 상담 시간 수정 완료`),
-        onFailure: () => Alert.alert("실패", "기본 상담 시간 수정 실패!")
+        /* onFailure: () => Alert.alert("실패", "기본 상담 시간 수정 실패!") */
       });
     }else{ // 기본 상담 시간 최초 등록
       console.log("기본 상담 시간 최초 등록");
@@ -147,7 +147,7 @@ function CounselorTimeSettingScreen({ route, navigation }) {
           times: availableTimes,
         },
         onSuccess: () => Alert.alert("성공", `${korDayAdd(selectedDay)} 기본 상담 시간 등록 완료`),
-        onFailure: () => Alert.alert("실패", "기본 상담 시간 등록 실패!")
+        /* onFailure: () => Alert.alert("실패", "기본 상담 시간 등록 실패!") */
       });
     }
   };

@@ -34,7 +34,7 @@ function CounselorPlanScreen() {
           resolve(data.data);
         },
         onFailure: (error) => {
-          Alert.alert("실패", "내 기본 시간 등록 여부 조회 실패");
+          /* Alert.alert("실패", "내 기본 시간 등록 여부 조회 실패"); */
           reject(error);
         },
       });
@@ -66,7 +66,7 @@ function CounselorPlanScreen() {
         console.log("newTimeslots: ", newTimeslots);
         setTimeslots(newTimeslots);
       },
-      onFailure: () => Alert.alert("실패", "내 상담시간 조회 실패!")
+      /* onFailure: () => Alert.alert("실패", "내 상담시간 조회 실패!") */
     });
   }, [selectedDate]);
 
@@ -131,7 +131,7 @@ function CounselorPlanScreen() {
         times: availableTimes,
       },
       onSuccess: () => Alert.alert("요청 성공", `${selectedDate}  상담 시간 변경 완료`),
-      onFailure: () => Alert.alert("요청 실패", "상담 시간 변경 실패"),
+      /* onFailure: () => Alert.alert("요청 실패", "상담 시간 변경 실패"), */
     })
   };
 

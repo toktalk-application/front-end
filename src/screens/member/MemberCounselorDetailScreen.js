@@ -22,7 +22,7 @@ const MemberCounselorDetailScreen = () => {
         setCounselorData(data.data);
         setIsLoading(false);
       },
-      onFailure: () => Alert.alert("요청 실패", "단일 상담사 정보 조회 실패")
+      /* onFailure: () => Alert.alert("요청 실패", "단일 상담사 정보 조회 실패") */
     })
   }, []);
 

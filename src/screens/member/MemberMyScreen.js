@@ -32,7 +32,7 @@ const MemberMyScreenScreen = () => {
         console.log("data: ", data);
         setMyData(data.data);
       },
-      onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"),
+      /* onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"), */
     });
   }, []);
 

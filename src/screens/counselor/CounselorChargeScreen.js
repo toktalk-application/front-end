@@ -20,7 +20,7 @@ function PricingSettingScreen() {
         setCallPrice(String(data.data.callPrice));
         setIsLoading(false);
       },
-      onFailure: () => Alert.alert("실패!", "내 정보 GET요청 실패")
+      /* onFailure: () => Alert.alert("실패!", "내 정보 GET요청 실패") */
     });
   }, []);
 
@@ -49,7 +49,7 @@ function PricingSettingScreen() {
                   chatPrice: chatPrice,
                 },
                 onSuccess: () => Alert.alert("성공", "상담 가격 변경 성공!"),
-                onFailure: () => Alert.alert("실패", "상담 가격 변경 실패!"),
+                /* onFailure: () => Alert.alert("실패", "상담 가격 변경 실패!"), */
               })
             }}>변경</Text>
         </TouchableOpacity>

@@ -31,9 +31,9 @@ const ReportModal = ({ visible, onClose, reservationId, onSubmit }) => {
                     onSubmit(); // 모달 닫기
                     setReportContent(''); // 입력 초기화
                 },
-                onFailure: () => {
+                /* onFailure: () => {
                     Alert.alert("실패", "리포트 작성에 실패했습니다.");
-                }
+                } */
             });
         } catch (error) {
             console.error("리포트 작성 중 오류 발생:", error);
