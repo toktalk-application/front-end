@@ -1,9 +1,10 @@
 import React, { useState } from 'react'
 import { usePaymentWidget, AgreementWidget, PaymentMethodWidget } from '@tosspayments/widget-sdk-react-native'
-import { Alert, Button } from 'react-native'
+import { Alert, Button, StyleSheet, View, Text} from 'react-native'
 import axios from 'axios';
 import { useAuth } from '../auth/AuthContext';
 import PaymentCompleteModal from './PaymentCompleteModal';
+import sendPostRequest from '../axios/SendPostRequest';
 
 export default function ExPaymentWidget({ onClose, orderInfo }) {
   const paymentWidgetControl = usePaymentWidget();
@@ -49,6 +50,16 @@ export default function ExPaymentWidget({ onClose, orderInfo }) {
   }).then(async (result) => {
     if (result?.success) {
       console.log("Toss Payments 결제 성공:", result.success);
+      const requestBody = {
+        counselorId: orderInfo.counselorId,
+        comment: orderInfo.comment,
+        // type: orderInfo.counselingType,
+        type:'CALL',
+        date: orderInfo.selectedDate,
+        startTimes: orderInfo.startTimes,
+        // fee:orderInfo.totalAmount,
+        fee:'60000'
+      }
       try {
         // 결제 성공 후 서버에 결제 정보 전송
         const response = await axios.post('http://10.0.2.2:8080/toss', {
@@ -83,6 +94,15 @@ export default function ExPaymentWidget({ onClose, orderInfo }) {
           amount: paymentData.amount || orderInfo.totalAmount,
           paymentMethod: paymentData.paymentMethod || '카드',
         });
+        console.log('orderId:', orderInfo);
+        console.log('paymentsWidgetRequestbody:', requestBody);
+        sendPostRequest({
+          token: state.token,
+          endPoint: "/reservations",
+          requestBody: requestBody,
+          onSuccess:() => Alert.alert('성공!'),
+          onFailure: () => Alert.alert('실패')
+        });
         
         setIsModalVisible(true);  // 결제 완료 모달 표시
       } catch (error) {
@@ -103,17 +123,38 @@ onClose();
 
 return (
   <>
+   <View>
+    <View style={styles.infoContainer}>
+      <Text style={styles.title}>예약 내역</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>상담사</Text>
+          <Text style={styles.counselorName}>{orderInfo.counselorName}</Text>
+          <Text style={styles.counselingType}>{orderInfo.counselingType}</Text>
+        </View>
+        
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>일정</Text>
+          <Text style={styles.date}>{orderInfo.selectedDate}</Text>
+          <Text style={styles.time}>{orderInfo.selectedTime}</Text>
+        </View>
+    </View>
+    <View style={styles.paymentContainer}>
+        <Text style={styles.paymentTitle}>결제 금액</Text>
+        <Text style={styles.totalAmount}>{orderInfo.totalAmount}</Text>
+      </View>
+  </View>
+  <View>
     <PaymentMethodWidget
-      selector="payment-methods"
-      onLoadEnd={() => {
-        paymentWidgetControl.renderPaymentMethods('payment-methods', { value: parseInt(orderInfo.totalAmount.replace(/[^0-9]/g, '')) }, {
-          variantKey: 'DEFAULT',
-        }).then((control) => {
-          setPaymentMethodWidgetControl(control);
-        });
-      }}
-    />
-    <AgreementWidget
+        selector="payment-methods"
+        onLoadEnd={() => {
+          paymentWidgetControl.renderPaymentMethods('payment-methods', { value: parseInt(orderInfo.totalAmount.replace(/[^0-9]/g, '')) }, {
+            variantKey: 'DEFAULT',
+          }).then((control) => {
+            setPaymentMethodWidgetControl(control);
+          });
+        }}
+      />
+      <AgreementWidget
       selector="agreement"
       onLoadEnd={() => {
         paymentWidgetControl.renderAgreement('agreement', {
@@ -123,17 +164,12 @@ return (
         });
       }}
     />
-    <Button title="결제요청" onPress={handlePayment} />
-    <Button
-      title="선택된 결제수단"
-      onPress={async () => {
-        if (paymentMethodWidgetControl == null) {
-          Alert.alert('주문 정보가 초기화되지 않았습니다.');
-          return;
-        }
-        Alert.alert(`선택된 결제수단: ${JSON.stringify(await paymentMethodWidgetControl.getSelectedPaymentMethod())}`);
-      }}
-    />
+  </View>
+    <View style={styles.container}>
+      <View style={styles.buttonContainer}>
+        <Button title="결제요청" onPress={handlePayment} />
+      </View>
+    </View>
     <PaymentCompleteModal 
       visible={isModalVisible}
       onClose={handleModalClose}
@@ -142,3 +178,71 @@ return (
   </>
 );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 10,
+    position: 'absolute', // 위치 고정
+    bottom: 0,              // 화면의 상단
+    left: 0,             // 화면의 왼쪽
+    right: 0,            // 화면의 오른쪽
+    backgroundColor: '#fff',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  infoContainer: {
+    marginBottom: 16,
+    marginTop: 20,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    backgroundColor: '#f9f9f9',
+  },
+  section: {
+    marginBottom: 12,
+    flexDirection: 'row',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  counselorName: {
+    fontSize: 16,
+    color: '#333',
+  },
+  counselingType: {
+    fontSize: 14,
+    color: '#666',
+  },
+  paymentContainer: {
+
+  },
+  paymentTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  totalAmount: {
+    fontSize: 20,
+    color: '#e74c3c',
+    fontWeight: 'bold',
+  },
+  methodContainer: {
+    marginTop: 10,
+  },
+  methodTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  paymentMethod: {
+    fontSize: 14,
+    color: '#666',
+  },
+  buttonContainer: {
+    marginTop: 20,
+  },
+});
+
