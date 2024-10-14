@@ -1,5 +1,6 @@
 import axios from "axios";
 import {REACT_APP_API_URL} from '@env';
+import handleErrorMessage from "./ErrorMessageHandler";
 
 const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFailure }) => {
     try{
@@ -26,6 +27,10 @@ const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFail
         console.error('message: ', error.message);
         console.error('server message: ', error.response.data.message);
 
+        /* console.error("error response: ", error.response); */
+        console.error("error status: ", error.response.status);
+
+        handleErrorMessage(error.response.status, error.response.data.message);
         if(onFailure) onFailure();
     }
 }

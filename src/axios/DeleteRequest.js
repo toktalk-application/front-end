@@ -25,6 +25,7 @@ const sendDeleteRequest = async({ token, endPoint, requestParams, onSuccess, onF
         console.error('message: ', error.message);
         console.error('server message: ', error.response.data.message);
 
+        handleErrorMessage(error.response.status, error.response.data.message);
         if(onFailure) onFailure();
     }
 }

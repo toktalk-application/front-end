@@ -37,7 +37,7 @@ const CounselorCounselScreen = () => {
                     return dateA - dateB; // 오름차순 정렬
                 });
 
-                const completedReservations = sortedReservations.filter(reservation => reservation.status === "COMPLETED");
+                const completedReservations = sortedReservations.filter(reservation => !reservation.status.includes("CANCELLED"));
                 const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
 
                 setReservations(sortedReservations); // 정렬된 예약을 설정
