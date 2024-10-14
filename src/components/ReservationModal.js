@@ -69,6 +69,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
     setIsTypeOpen(false);
     setIsDateOpen(false);
     setIsCommentOpen(false);
+    setAvailability(initialTimes);
   };
 
   // 수정
@@ -264,7 +265,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
         <PaymentWidgetProvider
           clientKey={REACT_APP_TOSS_CLIENT_KEY}
           customerKey={`sbd0Tg2oe-tJS4xNk1krs`}>
-          <ExPaymentWidget onClose={onClosee} orderInfo={orderInfo} />
+          <ExPaymentWidget onClose={onClosee} orderInfo={orderInfo} resetState={resetState} />
         </PaymentWidgetProvider>
       ) : (
         <View style={styles.modalContainer}>
