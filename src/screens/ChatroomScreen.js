@@ -114,21 +114,23 @@ const ChatRoomScreen = () => {
         : userType === 'COUNSELOR' ? name !== item.sender : false;
     
     
-    return (
-      <View style={[styles.messageContainer, isOtherMessage ? styles.otherMessage : styles.myMessage]}>
-        {!isOtherMessage && (
-          <Text style={styles.myTimestamp}>
-            {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </Text>
-        )}
-        <Text style={[styles.messageText, isOtherMessage ? styles.oterhMessageColor : styles.myMessageColor]}>{item.message}</Text>
-        {isOtherMessage && (
-          <Text style={styles.otherTimestamp}>
-            {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          </Text>
-        )}
-      </View>
-    );
+        return (
+          <View style={[styles.messageContainer, isOtherMessage ? styles.otherMessage : styles.myMessage]}>
+            {!isOtherMessage && (
+              <Text style={styles.myTimestamp}>
+                {item.timeOnly} {/* timeOnly 필드로 시간 표시 */}
+              </Text>
+            )}
+            <Text style={[styles.messageText, isOtherMessage ? styles.oterhMessageColor : styles.myMessageColor]}>
+              {item.message}
+            </Text>
+            {isOtherMessage && (
+              <Text style={styles.otherTimestamp}>
+                {item.timeOnly} {/* timeOnly 필드로 시간 표시 */}
+              </Text>
+            )}
+          </View>
+        );
   };
 
 
