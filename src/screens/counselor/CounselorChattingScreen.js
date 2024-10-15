@@ -81,7 +81,7 @@ function CounselorChattingScreen() {
 
   return (
     <View style={styles.container}>
-      {chatRooms.length === 0 ? <EmptyScreen message="채팅 내역이 없습니다"/> :<FlatList
+      {chatRooms.length === 0 ? <EmptyScreen message=""/> :<FlatList
         data={chatRooms}
         keyExtractor={(item) => item.roomId.toString()}
         renderItem={renderItem}

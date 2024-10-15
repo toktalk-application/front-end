@@ -61,7 +61,7 @@ const AlarmScreen = () => {
         keyExtractor={(item) => item.notificationId}
         ListEmptyComponent={
           <View style={styles.centerContainer}>
-            <EmptyScreen message="알림이 없습니다." />
+            <EmptyScreen message="알림이 없습니다" />
           </View>
         }
         refreshing={isLoading}
