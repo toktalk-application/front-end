@@ -114,10 +114,11 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
             token: state.token,
             endPoint: "/reservations",
             requestBody: requestBody,
-            onSuccess: () => resetState(),
+            onSuccess: () => {resetState(),
+              setIsModalVisible(true);
+            }
           });
-
-          setIsModalVisible(true);  // 결제 완료 모달 표시
+            // 결제 완료 모달 표시
         } catch (error) {
           console.error('POST 요청 실패:', error.response?.data || error.message);
           Alert.alert('결제 확인 실패', '서버와의 통신 중 오류가 발생했습니다.');

@@ -56,7 +56,43 @@ function CounselorEditScreen() {
                 Alert.alert('에러', '이미지를 선택하는 중 오류가 발생했습니다.');
             } else {
                 const uri = response.assets[0].uri;
+
+                // 이미지 업로드 (S3로 업로드)
+                const formData = new FormData();
+                formData.append('file', {
+                    uri: uri,
+                    type: 'image/jpeg',
+                    name: `image_${state.identifier}.jpg`,
+                });
+                console.log(uri);
                 setProfileImage(uri);
+
+                const uploadResponse = await fetch('http://10.0.2.2:8080/counselors/upload-image', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Authorization': `Bearer ${state.token}`,
+                    },
+                });
+                
+                const responseText = await uploadResponse.text(); // 응답 내용을 텍스트로 가져옵니다
+                console.log("서버 응답:", responseText); // 응답 내용을 로그로 출력합니다
+                setProfileImage(responseText);
+                
+                    let result;
+                
+                    // 응답 상태가 2xx일 경우에만 JSON으로 파싱 시도
+                    if (uploadResponse.ok) {
+                            result = JSON.parse(responseText); // JSON으로 파싱
+                            const uploadedImageUrl = typeof result === 'string' ? result : result.imageUrl;
+                            Alert.alert('성공', '이미지가 성공적으로 업로드되었습니다.');
+                            console.log('이미지 URL:', uploadedImageUrl);
+                            
+                    } else {
+                        // 에러 상태일 경우
+                        Alert.alert('실패', '이미지 업로드에 실패했습니다.');
+                        console.error('서버에서 반환한 오류:', responseText);
+                    }
             }
         });
     };

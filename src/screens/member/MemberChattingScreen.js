@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
@@ -23,6 +23,7 @@ function MemberChattingScreen() {
       endPoint: '/chat_rooms', // 채팅방 목록을 가져오는 API 엔드포인트
       onSuccess: (data) => {
         setChatRooms(data); // 가져온 데이터로 상태 업데이트
+        console.log(chatRooms);
       },
       /* onFailure: () => {
         setError('채팅방 목록을 가져오는 데 실패했습니다.');
@@ -68,9 +69,15 @@ function MemberChattingScreen() {
         style={styles.chatRoom}
         onPress={() => handleChatRoomPress(item.roomId, item.memberNickname, item.counselorName)}
       >
-        <View style={styles.row}>
-          <Text style={styles.memberName}>{item.counselorName} 상담사</Text>
-          <Text style={styles.createdAt}>{displayText}</Text>
+        <View style={styles.chatRoomContainer}>
+          <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
+          <View style={styles.infoContainer}>
+            <View style={styles.row}>
+              <Text style={styles.memberName}>{item.counselorName} 상담사</Text>
+              <Text style={styles.createdAt}>{displayText}</Text>
+            </View>
+              <Text style= {styles.message}>{item.message}</Text>
+          </View>
         </View>
       </TouchableOpacity>
     );
@@ -94,13 +101,32 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   listContainer: {
-    padding: 10,
   },
-  chatRoom: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-    marginBottom: 5,
+  image: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    marginRight: 10,
+  },
+  chatRoomContainer: {
+    flexDirection: 'row',
+    padding: 20,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  infoContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
   row: {
     flexDirection: 'row',
@@ -109,15 +135,17 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   createdAt: {
     color: '#666',
+    fontSize:16,
+    marginRight:10
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
+  message:{
+    marginTop:10,
+    marginLeft:0,
+    fontSize:16
   },
 });
 
