@@ -254,6 +254,7 @@ const CounselDetailScreen = () => {
                             <Text style={styles.subtitle}>후기</Text>
                             {!reservation.review ? <View /> :
                                 <View style={{ flexDirection: 'row' }}>
+                                    <Text>{"⭐".repeat(reservation.review.rating)}</Text>
                                     {Array.from({ length: 5 - reservation.review.rating }, (_, index) => (
                                         <Image
                                             key={index} // 고유 키 지정
@@ -261,7 +262,6 @@ const CounselDetailScreen = () => {
                                             style={{ width: 15, height: 15, marginTop: 3, marginLeft: 2 }} // 왼쪽 여백 추가
                                         />
                                     ))}
-                                    <Text>{"⭐".repeat(reservation.review.rating)}</Text>
                                 </View>
                             }
                         </View>
