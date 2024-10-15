@@ -82,7 +82,7 @@ function MemberMainScreen() {
                     month: formattedMonth
                 },
                 onSuccess: (data) => {
-                    console.log("data: ", data);
+                    console.log("mood data: ", data);
                     const formattedData = getFormattedMoodDates(data.data);
                     setMoodDates(formattedData);
                     setIsMoodLoading(false);
