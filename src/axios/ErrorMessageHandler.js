@@ -40,7 +40,7 @@ const getPrettyMessage = (status, message) => {
             if(message.includes('Given date')) return '해당 날짜에 예약할 수 없습니다.'
             if(message.includes('Given time')) return '해당 시간에 예약할 수 없습니다.'
             if(message.includes('License')) return '존재하지 않는 자격증입니다.'
-            if(message.includes('Careen')) return '존재하지 않는 경력사항입니다.'
+            if(message.includes('Career')) return '존재하지 않는 경력사항입니다.'
             if(message.includes('Payment_Amount')) return '잘못된 결제액입니다.'
             if(message.includes('Payment_Not')) return '존재하지 않는 결제정보입니다.'
             if(message.includes('Payment_Failed')) return '결제에 실패하였습니다.'

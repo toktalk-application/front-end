@@ -177,6 +177,13 @@ function CounselorLoginScreen({ navigation }) {
   const [userIdError, setUserIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
+  useFocusEffect(
+    useCallback(() => {
+      setUserId('');
+      setPassword('');
+    }, [])
+  );
+
   const validateUserId = (input) => {
     const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
     if (!userIdPattern.test(input)) {

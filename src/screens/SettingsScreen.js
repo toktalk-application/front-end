@@ -5,6 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import sendPostRequest from '../axios/SendPostRequest';
 import sendDeleteRequest from '../axios/DeleteRequest';
+import sendGetRequest from '../axios/SendGetRequest';
 
 const SettingsScreen = () => {
   const { state } = useAuth();
@@ -41,20 +42,54 @@ const SettingsScreen = () => {
 };
   const handleDeleteAccount = () => {
     // 회원 탈퇴 로직 추가
-    Alert.alert("회원 탈퇴", "정말 회원 탈퇴 하시겠습니까?", [
-      { text: "취소", style: "cancel" },
-      { text: "탈퇴", onPress: () => {
-        sendDeleteRequest({
-          token: state.token,
-          endPoint: "/members",
-          onSuccess: () => {
-            Alert.alert("탈퇴 완료", "톡터를 이용해주셔서 감사합니다.");
-            logout();
-            navigation.navigate("로그인");
-          }
-        })
-      } },
-    ]);
+    if(state.usertype === 'MEMBER'){ // 멤버일 때 
+      sendGetRequest({
+        token: state.token,
+        endPoint: "/members/reservation-counts",
+        onSuccess: (data) => {
+          const title = data.data === 0 ? "회원 탈퇴" : "회원 탈퇴하시겠습니까?";
+          const content = data.data === 0 ? '정말 탈퇴하시겠습니까?' : `${data.data} 건의 상담 예약이 자동 취소됩니다.`;
+          Alert.alert(title, content, [
+            { text: "취소", style: "cancel" },
+            { text: "탈퇴", onPress: () => {
+              sendDeleteRequest({
+                token: state.token,
+                endPoint: "/members",
+                onSuccess: () => {
+                  Alert.alert("탈퇴 완료", "톡터를 이용해주셔서 감사합니다.");
+                  logout();
+                  navigation.navigate("로그인");
+                }
+              })
+            } },
+          ]);
+        }
+      })
+    };
+    if(state.usertype === 'COUNSELOR'){ // 상담사일 때 
+      sendGetRequest({
+        token: state.token,
+        endPoint: "/counselors/reservation-counts",
+        onSuccess: (data) => {
+          const title = data.data === 0 ? "회원 탈퇴" : "회원 탈퇴하시겠습니까?";
+          const content = data.data === 0 ? '정말 탈퇴하시겠습니까?' : `${data.data} 건의 상담 예약이 자동 취소됩니다.`;
+          Alert.alert(title, content, [
+            { text: "취소", style: "cancel" },
+            { text: "탈퇴", onPress: () => {
+              sendDeleteRequest({
+                token: state.token,
+                endPoint: "/counselors",
+                onSuccess: () => {
+                  Alert.alert("탈퇴 완료", "톡터를 이용해주셔서 감사합니다.");
+                  logout();
+                  navigation.navigate("로그인");
+                }
+              })
+            } },
+          ]);
+        }
+      })
+    }
   };
 
   return (
