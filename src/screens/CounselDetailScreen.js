@@ -17,26 +17,26 @@ const CounselDetailScreen = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedValue, setSelectedValue] = useState("");
 
-    useEffect(() => {
-        sendGetRequest({
-            token: state.token,
-            endPoint: `/reservations/${reservationId}`,
-            onSuccess: (data) => {
-                console.log("data: ", data);
-                setReservation(data.data);
-                setLoading(false);
+    // useEffect(() => {
+    //     sendGetRequest({
+    //         token: state.token,
+    //         endPoint: `/reservations/${reservationId}`,
+    //         onSuccess: (data) => {
+    //             console.log("data: ", data);
+    //             setReservation(data.data);
+    //             setLoading(false);
 
-                // 알림 읽음 처리
-                if (notificationId) {
-                    markNotificationAsRead(notificationId);
-                }
-            },
-            onFailure: () => {
-                Alert.alert("실패", "예약 정보 조회 실패");
-                setLoading(false);
-            }
-        });
-    }, [reservationId, notificationId]);
+    //             // 알림 읽음 처리
+    //             if (notificationId) {
+    //                 markNotificationAsRead(notificationId);
+    //             }
+    //         },
+    //         onFailure: () => {
+    //             Alert.alert("실패", "예약 정보 조회 실패");
+    //             setLoading(false);
+    //         }
+    //     });
+    // }, [reservationId, notificationId]);
 
     useFocusEffect(
         useCallback(() => {
