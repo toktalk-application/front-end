@@ -238,7 +238,7 @@ function App() {
             <Stack.Screen name="우울 검사" component={TestScreen}/>
             <Stack.Screen name="우울 검사 내역" component={TestResultScreen}/>
             <Stack.Screen name="TestResult" component={TestResultModal} options={{ title: '' }} />
-            <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
+            <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '상담 상세 정보' }} />
             <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
             <Stack.Screen name="MemberWriteReview" component={MemberWriteReviewScreen} options={{ title: '' }} />
             <Stack.Screen name="MemberCounselorDetail" component={MemberCounselorDetailScreen} options={{ title: '' }} />
