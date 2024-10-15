@@ -57,9 +57,7 @@ const getPrettyMessage = (status, message) => {
             if(message.includes('credential')) return '서버 오류: 회원 정보에 오류가 있습니다.'
             if(message.includes('Month parameter')) return '서버 오류: 달 파라미터는 양수여야 합니다.'
             break;
-        default:
-            return "처리되지 않은 예외가 발생하였습니다."
-
     }
+    return "처리되지 않은 예외가 발생하였습니다.";
 }
 export default handleErrorMessage;
