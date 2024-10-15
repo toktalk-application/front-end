@@ -66,6 +66,10 @@ function CounselorChargeScreen() {
             <Text style={styles.buttonText} onPress={() => {
               if (chatPrice === initialChatPrice) {
                 Alert.alert("알림", "수정된 내용이 없습니다."); // 수정된 내용이 없을 경우
+              } else if (!chatPrice) {
+                Alert.alert("알림", "입력 필드를 채워주세요."); // 필드가 비워있을 경우
+              } else if ( chatPrice <= 0 ) {
+                Alert.alert("알림", "가격은 0 원 이상이어야 합니다."); // 필드가 비워있을 경우
               } else {
                 sendPatchRequest({
                   token: state.token,
@@ -104,6 +108,10 @@ function CounselorChargeScreen() {
         <Text style={styles.buttonText} onPress={() => {
               if (callPrice === initialCallPrice) {
                 Alert.alert("알림", "수정된 내용이 없습니다."); // 수정된 내용이 없을 경우
+              } else if (!callPrice ) {
+                Alert.alert("알림", "입력 필드를 채워주세요."); // 필드가 비워있을 경우
+              } else if ( callPrice <= 0 ) {
+                Alert.alert("알림", "가격은 0 원 이상이어야 합니다."); // 필드가 비워있을 경우
               } else {
                 sendPatchRequest({
                   token: state.token,

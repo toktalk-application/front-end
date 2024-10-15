@@ -125,13 +125,16 @@ const CounselorCounselScreen = () => {
                     ))}
                 </Picker>
             </View>
-            <ScrollView>
-                {isLoading ? <View /> : reservations.length === 0 ? <EmptyScreen message="상담이 없습니다"/> : reservations.map(reservation => (
-                    <TouchableOpacity
-                        key={reservation.reservationId}
-                        onPress={() => handleReservationPress(reservation.reservationId)}
-                        style={styles.card}
-                    >
+            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+                {isLoading ? <View> </View> : reservations.length === 0 ? 
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <EmptyScreen message="상담 내역이 없습니다" />
+                        </View> : reservations.map(reservation => (
+                        <TouchableOpacity
+                            key={reservation.reservationId}
+                            onPress={() => handleReservationPress(reservation.reservationId)}
+                            style={styles.card}
+                        >
                         <View style={styles.row}>
                             <View style={styles.verticalLine} />
                             <View style={styles.infoContainer}>

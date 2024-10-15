@@ -15,14 +15,14 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#f9f9f9',
+        backgroundColor: 'white',
     },
     logo: {
         width: 150,
         height: 50,
     },
     text: {
-        marginTop:50,
+        marginTop:40,
         fontSize: 18,
         color: '#555',
     },
