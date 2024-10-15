@@ -5,7 +5,7 @@ import { useAuth } from '../../auth/AuthContext';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useFocusEffect } from '@react-navigation/native';
 
-function PricingSettingScreen() {
+function CounselorChargeScreen() {
   const { state } = useAuth();
   const [chatPrice, setChatPrice] = useState('0');
   const [initialChatPrice, setInitialChatPrice] = useState('0'); // 초기 가격 상태 추가
@@ -187,4 +187,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PricingSettingScreen;
+export default CounselorChargeScreen;
