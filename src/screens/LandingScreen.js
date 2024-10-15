@@ -1,14 +1,25 @@
-import React, { useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import React, { useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 
 const LandingScreen = ({ navigation }) => {
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      navigation.replace('로그인'); // 2초 후에 'Tabs' 화면으로 이동
-    }, 1500);
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     navigation.replace('로그인'); // 2초 후에 'Tabs' 화면으로 이동
+  //   }, 1500);
 
-    return () => clearTimeout(timer); // 타이머 정리
-  }, [navigation]);
+  //   return () => clearTimeout(timer); // 타이머 정리
+  // }, [navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const timer = setTimeout(() => {
+        navigation.replace('로그인'); // 2초 후에 'Tabs' 화면으로 이동
+      }, 1500);
+  
+      return () => clearTimeout(timer); // 타이머 정리
+    }, [navigation])
+  );
 
   return (
     <View style={styles.container}>

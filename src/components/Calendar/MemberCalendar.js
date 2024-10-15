@@ -79,8 +79,7 @@ const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate, minD
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(false);
-    
+    setIsLoading(false); 
   }, []);
 
   return (

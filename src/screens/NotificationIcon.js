@@ -1,25 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { fetchNotifications } from './notificationApi';
+import { useFocusEffect } from '@react-navigation/native';
 
 const NotificationIcon = ({ navigation }) => {
   const [unreadCount, setUnreadCount] = useState(0);
 
-  useEffect(() => {
-    const loadUnreadCount = async () => {
-      try {
-        const notifications = await fetchNotifications();
-        const unread = notifications.filter(n => !n.isRead).length;
-        setUnreadCount(unread);
-      } catch (error) {
-        console.error('알림 수 가져오기 실패:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const loadUnreadCount = async () => {
+  //     try {
+  //       const notifications = await fetchNotifications();
+  //       const unread = notifications.filter(n => !n.isRead).length;
+  //       setUnreadCount(unread);
+  //     } catch (error) {
+  //       console.error('알림 수 가져오기 실패:', error);
+  //     }
+  //   };
 
-    loadUnreadCount();
-    // 여기에 주기적으로 알림을 확인하는 로직을 추가할 수 있습니다.
-  }, []);
+  //   loadUnreadCount();
+  //   // 여기에 주기적으로 알림을 확인하는 로직을 추가할 수 있습니다.
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadUnreadCount = async () => {
+        try {
+          const notifications = await fetchNotifications();
+          const unread = notifications.filter(n => !n.isRead).length;
+          setUnreadCount(unread);
+        } catch (error) {
+          console.error('알림 수 가져오기 실패:', error);
+        }
+      };
+  
+      loadUnreadCount();
+      // 여기에 주기적으로 알림을 확인하는 로직을 추가할 수 있습니다.
+    }, [])
+  );
 
   return (
     <View style={styles.container}>

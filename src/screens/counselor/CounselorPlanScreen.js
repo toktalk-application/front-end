@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button, Alert } from 'react-native';
 import CounselorPlanCalendar from '../../components/Calendar/CounselorPlanCalendar';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendPatchRequest from '../../axios/PatchRequest';
@@ -41,41 +41,74 @@ function CounselorPlanScreen() {
     });
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     getDefaultDayInitialized();
-  },[]);
+  },[]); */
 
-  useEffect(() => {
-    // 페이지 처음 들어왔을 땐 실행 안함
-    if(!selectedDate) return;
-    // 기본 시간이 등록되지 않았다면 실행 안함
-    if(!defaultDayInitialized) return;
+  useFocusEffect(
+    useCallback(() => {
+      getDefaultDayInitialized();
+    }, [])
+  );
 
-    sendGetRequest({
-      token: state.token,
-      endPoint: "/counselors/available-dates",
-      requestParams: {
-        date: selectedDate
-      },
-      onSuccess: (data) => {
-        console.log("data: ", data);
-        let newTimeslots = initialTimeslots;
-        Object.keys(data.data.availableTimes).forEach(time => {
-          newTimeslots[time] = true;
-        });
-        console.log("newTimeslots: ", newTimeslots);
-        setTimeslots(newTimeslots);
-      },
-      /* onFailure: () => Alert.alert("실패", "내 상담시간 조회 실패!") */
-    });
-  }, [selectedDate]);
+  useFocusEffect(
+    useCallback(() => {
+      // 페이지 처음 들어왔을 땐 실행 안함
+      if (!selectedDate) return;
+      // 기본 시간이 등록되지 않았다면 실행 안함
+      if (!defaultDayInitialized) return;
 
-  const handleDayPress = async(day) => {
-    if(!defaultDayInitialized){
+      sendGetRequest({
+        token: state.token,
+        endPoint: "/counselors/available-dates",
+        requestParams: {
+          date: selectedDate
+        },
+        onSuccess: (data) => {
+          console.log("data: ", data);
+          let newTimeslots = initialTimeslots;
+          Object.keys(data.data.availableTimes).forEach(time => {
+            newTimeslots[time] = true;
+          });
+          console.log("newTimeslots: ", newTimeslots);
+          setTimeslots(newTimeslots);
+        },
+        /* onFailure: () => Alert.alert("실패", "내 상담시간 조회 실패!") */
+      });
+    }, [selectedDate])
+  );
+
+  // useEffect(() => {
+  //   // 페이지 처음 들어왔을 땐 실행 안함
+  //   if (!selectedDate) return;
+  //   // 기본 시간이 등록되지 않았다면 실행 안함
+  //   if (!defaultDayInitialized) return;
+
+  //   sendGetRequest({
+  //     token: state.token,
+  //     endPoint: "/counselors/available-dates",
+  //     requestParams: {
+  //       date: selectedDate
+  //     },
+  //     onSuccess: (data) => {
+  //       console.log("data: ", data);
+  //       let newTimeslots = initialTimeslots;
+  //       Object.keys(data.data.availableTimes).forEach(time => {
+  //         newTimeslots[time] = true;
+  //       });
+  //       console.log("newTimeslots: ", newTimeslots);
+  //       setTimeslots(newTimeslots);
+  //     },
+  //     /* onFailure: () => Alert.alert("실패", "내 상담시간 조회 실패!") */
+  //   });
+  // }, [selectedDate]);
+
+  const handleDayPress = async (day) => {
+    if (!defaultDayInitialized) {
       const initialized = await getDefaultDayInitialized();
-      if(initialized) {
+      if (initialized) {
         setDefaultDayInitialized(true);
-      }else{
+      } else {
         Alert.alert("요청 거부", "기본 상담 시간을 먼저 등록해주세요");
         return;
       };
@@ -118,7 +151,7 @@ function CounselorPlanScreen() {
     }
 
     const availableTimes = Object.keys(timeslots).filter(time => timeslots[time]);
-    
+
     // 각 요일 및 날짜에 해당하는 배열을 콘솔에 출력
     console.log('예약 가능 시간:', availableTimes);
 
@@ -140,13 +173,13 @@ function CounselorPlanScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('기본 시간 설정', {defaultDayInitialized: defaultDayInitialized})}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('기본 시간 설정', { defaultDayInitialized: defaultDayInitialized })}>
           <Text style={styles.buttonText}>기본 시간 설정</Text>
         </TouchableOpacity>
       </View>
       <CounselorPlanCalendar onDayPress={handleDayPress} selectedDate={selectedDate} />
       <View style={styles.timeDetailContainer}>
-        {!selectedDate ? <View/> : <View style={styles.timeGrid}>
+        {!selectedDate ? <View /> : <View style={styles.timeGrid}>
           {Object.keys(timeslots).map((time) => (
             <TouchableOpacity
               key={time}
@@ -159,18 +192,18 @@ function CounselorPlanScreen() {
         </View>}
         <View style={styles.buttonContainer}>
           {selectedDate ? (
-              <View style={{ marginBottom: 10 }}>
-                  <Text style={styles.notice}>변경 시,</Text>
-                  <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>
-              </View>
+            <View style={{ marginBottom: 10 }}>
+              <Text style={styles.notice}>변경 시,</Text>
+              <Text style={styles.notice}>현재 날짜 이후의 모든 예약 가능한 시간이 업데이트 됩니다.</Text>
+            </View>
           ) : null}
 
           {selectedDate ? (
-                  <TouchableOpacity style={styles.submitButton} onPress={handleComplete}>
-                      <Text style={styles.submitButtonText}>{selectedDate} 변경 </Text>
-                  </TouchableOpacity>
-              ) : null}
-          </View>
+            <TouchableOpacity style={styles.submitButton} onPress={handleComplete}>
+              <Text style={styles.submitButtonText}>{selectedDate} 변경 </Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
       </View>
     </ScrollView>
   );
@@ -241,10 +274,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonText: {
-      fontSize: 17,
-      color: '#fff',
-      fontWeight: 'bold',
-      textAlign: 'center',
+    fontSize: 17,
+    color: '#fff',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });
 
