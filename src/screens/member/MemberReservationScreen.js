@@ -50,8 +50,7 @@ const MemberReservationScreen = () => {
                     month: selectedYear + '-' + String(selectedMonth).padStart(2, '0') // 월 형식을 9 -> 09 와 같이 변환
                 },
                 onSuccess: (data) => {
-                    console.log("reservations: ", data);
-                    const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED");
+                    const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED_BY_CLIENT" && reservation.status !== "CANCELLED_BY_COUNSELOR");
                     const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
                     setReservations(data.data);
                     setCompletedCount(completedReservations.length || 0);
@@ -70,23 +69,27 @@ const MemberReservationScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.dropdown}>
-                <Picker
-                    selectedValue={selectedYear}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setSelectedYear(itemValue)}
-                >
-                    <Picker.Item label={`${currentDate.getFullYear()}년`} value={currentDate.getFullYear().toString()} />
-                    <Picker.Item label={`${currentDate.getFullYear() - 1}년`} value={(currentDate.getFullYear() - 1).toString()} />
-                </Picker>
-                <Picker
-                    selectedValue={selectedMonth}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-                >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                        <Picker.Item key={month} label={`${month}월`} value={month.toString()} />
-                    ))}
-                </Picker>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedYear}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setSelectedYear(itemValue)}
+                    >
+                        <Picker.Item label={`${currentDate.getFullYear()}년`} value={currentDate.getFullYear().toString()} />
+                        <Picker.Item label={`${currentDate.getFullYear() - 1}년`} value={(currentDate.getFullYear() - 1).toString()} />
+                    </Picker>
+                </View>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedMonth}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+                    >
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                            <Picker.Item key={month} label={`${month}월`} value={month.toString()} />
+                        ))}
+                    </Picker>
+                </View>
             </View>
             <ScrollView>
                 {isLoading ? <View></View> : reservations.length === 0 ? 
@@ -140,7 +143,7 @@ const MemberReservationScreen = () => {
             </ScrollView>
             <View style={styles.totalAmountContainer}>
                 <View style={styles.totalAmountTitle}>
-                    <Text style={styles.totalAmount}>결제액 </Text>
+                    <Text style={styles.totalAmount}>총 결제 금액 </Text>
                     <Text style={{ marginTop: 3 }}> {completedCount} 건 </Text>
                 </View>
                 <Text style={{ fontSize: 16 }} >{totalAmount.toLocaleString()} 원</Text>
@@ -157,11 +160,31 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         flexDirection: 'row', // 가로 방향으로 정렬
-        justifyContent: 'flex-start', // 아이템 사이의 간격 조정
+        justifyContent: 'flex-end', // 아이템 사이의 간격 조정
+
+    },
+    pickerContainer: {
+        backgroundColor: '#fff', // 배경색
+        width: '32%', // 너비 설정
+        borderRadius: 10, // 둥근 테두리
+        borderWidth: 1, // 테두리 두께
+        borderColor: '#ccc', // 테두리 색
+        shadowColor: '#000', // 그림자 색
+        shadowOffset: {
+          width: 0,
+          height: 2, // 그림자 수직 위치
+        },
+        shadowOpacity: 0.1, // 그림자 투명도
+        shadowRadius: 4, // 그림자 크기
+        elevation: 2, // 안드로이드에서 그림자 효과
+        marginTop:5,
+        marginRight: 15
     },
     picker: {
-        height: 20,
-        width: '40%', // 두 Picker가 가로로 배치되도록 일부 너비 설정
+    height: 50, // 높이 설정
+    width: '100%', // 너비 설정
+    marginTop:-8,
+    marginLeft:5
     },
     title: {
         fontSize: 24,

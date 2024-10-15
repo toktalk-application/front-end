@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef} from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
 import MemberCalendar from '../../components/Calendar/MemberCalendar'; // 경로를 상황에 맞게 수정하세요.
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -28,6 +28,7 @@ function MemberMainScreen() {
     const today = new Date().toISOString().split('T')[0];
     const [isReservationLoading, setIsReservationLoading] = useState(true);
     const [isMoodLoading, setIsMoodLoading] = useState(true);
+    const flatListRef = useRef(null);
 
     const toggleModal = () => {
         setModalVisible(!modalVisible);
@@ -168,9 +169,21 @@ function MemberMainScreen() {
         return(`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
     }
 
+    useEffect(() => {
+        if (flatListRef.current) {
+            flatListRef.current.scrollToEnd({
+                y: flatListRef.current.scrollHeight,
+                animated: true, // 부드럽게 스크롤
+              });
+            // 데이터가 변경될 때마다 FlatList의 끝으로 스크롤
+        }
+    }, [selectedDate, reservations]);
+
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
-            {isReservationLoading || isMoodLoading ? <View /> : <FlatList
+            {isReservationLoading || isMoodLoading ? <View /> : 
+            <FlatList
+                ref={flatListRef}
                 data={reservations}
                 keyExtractor={(item) => item.reservationId.toString()}
                 ListHeaderComponent={() => (
@@ -289,16 +302,18 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
+        fontSize:15
     },
     timeContainer: {
         flex: 2,
-        padding: 5,
+        padding: 3,
+        marginBottom:2,
         alignItems: 'center',
         flexDirection: 'column',
     },
     timeText: {
         color: 'black',
-        fontSize: 12,
+        fontSize: 14,
     },
     detailsContainer: {
         backgroundColor: '#001932',
@@ -316,12 +331,12 @@ const styles = StyleSheet.create({
     },
     nickNameText: {
         color: 'white',
-        fontSize: 13,
+        fontSize: 15,
         fontWeight: 'bold',
     },
     typeText: {
         color: 'black',
-        fontSize: 11,
+        fontSize: 13,
         backgroundColor: 'white',
         borderRadius: 10,
         paddingHorizontal: 5,
@@ -332,7 +347,7 @@ const styles = StyleSheet.create({
         marginRight: 5,
         marginTop: 5,
         marginBottom: 10,
-        fontSize: 12,
+        fontSize: 14,
     },
     modalBackground: {
         flex: 1,
