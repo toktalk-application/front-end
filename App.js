@@ -9,6 +9,8 @@ import notifee, { AndroidImportance, EventType } from '@notifee/react-native'; /
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthProvider } from './src/auth/AuthContext.js'; 
 import { Platform, PermissionsAndroid } from 'react-native';
+import { NotificationProvider, useNotification } from './src/components/NotificationContext';
+import { configureNotifications } from './src/components/notificationUtils';
 
 import MemberMainScreen from './src/screens/member/MemberMainScreen.js';
 import MemberCounselScreen from './src/screens/member/MemberCounselScreen.js';
@@ -106,46 +108,24 @@ const setupNotificationsOnFirstLogin = async (memberId) => {
 };
 
 // 알림 채널 생성 및 알림 관련 로직 추가
-const configureNotifications = () => {
+const NotificationSetup = () => {
+  const { setUnreadNotifications } = useNotification();
+
   useEffect(() => {
-    const createChannel = async () => {
-      await notifee.createChannel({
-        id: '1',
-        name: 'Default Channel',
-        importance: AndroidImportance.HIGH,
-      });
+    const unsubscribe = configureNotifications(setUnreadNotifications);
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
     };
-    createChannel();
+  }, [setUnreadNotifications]);
 
-    const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
-      console.log('[Foreground Remote Message]', remoteMessage);
-      await notifee.displayNotification({
-        title: remoteMessage.notification.title,
-        body: remoteMessage.notification.body,
-        android: {
-          channelId: '1',
-          pressAction: { id: 'default' },
-        },
-      });
-    });
-
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
-      console.log('[Background Remote Message]', remoteMessage);
-      await notifee.displayNotification({
-        title: remoteMessage.notification.title,
-        body: remoteMessage.notification.body,
-        android: {
-          channelId: '1',
-          pressAction: { id: 'default' },
-        },
-      });
-    });
-
-    return () => unsubscribeForeground();
-  }, []);
+  return null;
 };
 
 const CustomHeader = ({ routeName, navigation }) => {
+  const { unreadNotifications } = useNotification();
+
   return (
     <View style={styles.header}>
       {routeName === 'Main' ? (
@@ -153,8 +133,11 @@ const CustomHeader = ({ routeName, navigation }) => {
       ) : (
         <Text style={styles.title}>{routeName}</Text>
       )}
-      <TouchableOpacity onPress={() => navigation.navigate('알림')}>
+      <TouchableOpacity onPress={() => navigation.navigate('알림')} style={styles.alarmContainer}>
         <Image source={require('./assets/images/alarm.png')} style={styles.alarmIcon} />
+        {unreadNotifications > 0 && (
+          <View style={styles.redDot} />
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -229,37 +212,41 @@ function Tabs({ route, navigation }) {
 }
 
 function App() {
-  configureNotifications();
-  setupNotificationsOnFirstLogin();
+    configureNotifications();
+    setupNotificationsOnFirstLogin();
+
   
   return (
     <AuthProvider>
-      <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
-          <Stack.Screen name="로그인" component={LoginScreen} />
-          <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
-          <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
-          <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
-          <Stack.Screen name="알림" component={AlarmScreen} />
-          <Stack.Screen name="CounselDetailScreen" component={CounselDetailScreen} options={{ title: '상담 상세 정보' }} />
-          <Stack.Screen name="프로필 관리" component={CounselorProfileScreen} />
-          <Stack.Screen name="프로필 수정" component={CounselorEditScreen} />
-          <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
-          <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
-          <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
-          <Stack.Screen name="내 상담 내역" component={MemberReservationScreen} />
-          <Stack.Screen name="우울 검사" component={TestScreen}/>
-          <Stack.Screen name="우울 검사 내역" component={TestResultScreen}/>
-          <Stack.Screen name="TestResult" component={TestResultModal} options={{ title: '' }} />
-          <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
-          <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
-          <Stack.Screen name="MemberWriteReview" component={MemberWriteReviewScreen} options={{ title: '' }} />
-          <Stack.Screen name="MemberCounselorDetail" component={MemberCounselorDetailScreen} options={{ title: '' }} />
-          <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ headerShown: false }}/>
-          <Stack.Screen name="설정" component={SettingsScreen}/>
-        </Stack.Navigator>
-      </NavigationContainer>
+      <NotificationProvider>
+      <NotificationSetup />
+        <NavigationContainer>
+          <Stack.Navigator>
+            <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="로그인" component={LoginScreen} />
+            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
+            <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
+            <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
+            <Stack.Screen name="알림" component={AlarmScreen} />
+            <Stack.Screen name="CounselDetailScreen" component={CounselDetailScreen} options={{ title: '상담 상세 정보' }} />
+            <Stack.Screen name="프로필 관리" component={CounselorProfileScreen} />
+            <Stack.Screen name="프로필 수정" component={CounselorEditScreen} />
+            <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
+            <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
+            <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
+            <Stack.Screen name="내 상담 내역" component={MemberReservationScreen} />
+            <Stack.Screen name="우울 검사" component={TestScreen}/>
+            <Stack.Screen name="우울 검사 내역" component={TestResultScreen}/>
+            <Stack.Screen name="TestResult" component={TestResultModal} options={{ title: '' }} />
+            <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '' }} />
+            <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '' }} />
+            <Stack.Screen name="MemberWriteReview" component={MemberWriteReviewScreen} options={{ title: '' }} />
+            <Stack.Screen name="MemberCounselorDetail" component={MemberCounselorDetailScreen} options={{ title: '' }} />
+            <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ headerShown: false }}/>
+            <Stack.Screen name="설정" component={SettingsScreen}/>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </NotificationProvider>
     </AuthProvider>
   );
 }
@@ -272,6 +259,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 20,
     height: 80,
+  },
+  alarmContainer: {
+    position: 'relative',
+  },
+  redDot: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'red',
   },
   logo: {
     width: 100,
