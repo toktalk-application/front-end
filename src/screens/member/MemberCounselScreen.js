@@ -3,6 +3,7 @@ import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Alert } from
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+import EmptyScreen from '../EmptyScreen';
 
 const MemberCounselScreen = () => {
   const { state } = useAuth();
@@ -61,7 +62,7 @@ const MemberCounselScreen = () => {
 
   return (
     <View style={styles.container}>
-      {counselors.length === 0 ? <View><Text>상담사가 없습니다.</Text></View> : <FlatList
+      {counselors.length === 0 ? <EmptyScreen message="상담사가 없습니다"/> : <FlatList
         data={counselors}
         renderItem={renderItem}
         keyExtractor={item => item.counselorId.toString()}

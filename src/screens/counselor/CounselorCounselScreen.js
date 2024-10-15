@@ -5,6 +5,7 @@ import timeLine from '../../../assets/images/timeLine.png'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+import EmptyScreen from '../EmptyScreen';
 
 const CounselorCounselScreen = () => {
     const { state } = useAuth();
@@ -125,7 +126,7 @@ const CounselorCounselScreen = () => {
                 </Picker>
             </View>
             <ScrollView>
-                {isLoading ? <View /> : reservations.length === 0 ? <View><Text>상담이 없습니다</Text></View> : reservations.map(reservation => (
+                {isLoading ? <View /> : reservations.length === 0 ? <EmptyScreen message="상담이 없습니다"/> : reservations.map(reservation => (
                     <TouchableOpacity
                         key={reservation.reservationId}
                         onPress={() => handleReservationPress(reservation.reservationId)}
