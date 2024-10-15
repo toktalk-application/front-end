@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Alert, View, Text, Button, StyleSheet, TouchableOpacity } from 'react-native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendPatchRequest from '../../axios/PatchRequest';
 import sendPostRequest from '../../axios/SendPostRequest';
+import { useFocusEffect } from '@react-navigation/native';
 
 function CounselorTimeSettingScreen({ route, navigation }) {
   const { state } = useAuth();
@@ -41,9 +42,15 @@ function CounselorTimeSettingScreen({ route, navigation }) {
     },
   });
 
-  useEffect(() => {
+  /* useEffect(() => {
     getDefaultTimes(korDayToEng(selectedDay));
-  },[selectedDay]);
+  },[selectedDay]); */
+
+  useFocusEffect(
+    useCallback(() => {
+      getDefaultTimes(korDayToEng(selectedDay));
+    }, [selectedDay])
+  );
 
   const engDayToKor = (dayOfWeek) => {
     switch(dayOfWeek){

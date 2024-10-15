@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import sendPatchRequest from '../../axios/PatchRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendGetRequest from '../../axios/SendGetRequest';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendPostRequest from '../../axios/SendPostRequest';
 
 
@@ -18,20 +18,37 @@ function CounselorEditScreen() {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedImage, setSelectedImage] = useState(null);
 
-    useEffect(() => {
-        sendGetRequest({
-            token: state.token,
-            endPoint: `/counselors/${state.identifier}`,
-            onSuccess: (data) => {
-                /* console.log("data: ", data); */
-                setProfileImage(data.data.profileImage);
-                setIntroduction(data.data.introduction);
-                setExpertise(data.data.expertise);
-                setSessionDescription(data.data.sessionDescription);
-            },
-            /* onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패") */
-        });
-    }, []);
+    // useEffect(() => {
+    //     sendGetRequest({
+    //         token: state.token,
+    //         endPoint: `/counselors/${state.identifier}`,
+    //         onSuccess: (data) => {
+    //             /* console.log("data: ", data); */
+    //             setProfileImage(data.data.profileImage);
+    //             setIntroduction(data.data.introduction);
+    //             setExpertise(data.data.expertise);
+    //             setSessionDescription(data.data.sessionDescription);
+    //         },
+    //         /* onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패") */
+    //     });
+    // }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            sendGetRequest({
+                token: state.token,
+                endPoint: `/counselors/${state.identifier}`,
+                onSuccess: (data) => {
+                    /* console.log("data: ", data); */
+                    setProfileImage(data.data.profileImage);
+                    setIntroduction(data.data.introduction);
+                    setExpertise(data.data.expertise);
+                    setSessionDescription(data.data.sessionDescription);
+                },
+                /* onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패") */
+            });
+        }, [])
+    );
 
 
     // 이미지 선택 및 S3에 업로드하는 함수

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button, Alert,TouchableOpacity, Modal, TextInput} from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, ScrollView, Button, Alert, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
-import { useRoute, useNavigation } from '@react-navigation/native';
+import { useRoute, useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../axios/SendGetRequest';
 import sendPostRequest from '../axios/SendPostRequest';  // 추가
 import { useAuth } from '../auth/AuthContext';
@@ -14,7 +14,7 @@ const CounselDetailScreen = () => {
     const { reservationId, notificationId } = route.params;  // notificationId 추가
     const [reservation, setReservation] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [modalVisible, setModalVisible] = useState(false); 
+    const [modalVisible, setModalVisible] = useState(false);
     const [selectedValue, setSelectedValue] = useState("");
 
     useEffect(() => {
@@ -25,7 +25,7 @@ const CounselDetailScreen = () => {
                 console.log("data: ", data);
                 setReservation(data.data);
                 setLoading(false);
-                
+
                 // 알림 읽음 처리
                 if (notificationId) {
                     markNotificationAsRead(notificationId);
@@ -37,6 +37,29 @@ const CounselDetailScreen = () => {
             }
         });
     }, [reservationId, notificationId]);
+
+    useFocusEffect(
+        useCallback(() => {
+            sendGetRequest({
+                token: state.token,
+                endPoint: `/reservations/${reservationId}`,
+                onSuccess: (data) => {
+                    console.log("data: ", data);
+                    setReservation(data.data);
+                    setLoading(false);
+
+                    // 알림 읽음 처리
+                    if (notificationId) {
+                        markNotificationAsRead(notificationId);
+                    }
+                },
+                onFailure: () => {
+                    Alert.alert("실패", "예약 정보 조회 실패");
+                    setLoading(false);
+                }
+            });
+        }, [reservationId, notificationId])
+    );
 
     // 알림 읽음 처리 함수
     const markNotificationAsRead = (notificationId) => {
@@ -64,34 +87,34 @@ const CounselDetailScreen = () => {
             console.warn("Invalid date string:", dateString);
             return ""; // 기본값 반환 (예: 빈 문자열)
         }
-    
+
         const dateParts = dateString.split('-');
         const year = dateParts[0].slice(-2); // "2024"에서 "24"를 가져옴
         const month = dateParts[1];
         const day = dateParts[2];
-    
+
         // Date 객체 생성
         const date = new Date(dateString);
         // 요일 배열
         const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
         // 요일 가져오기
         const dayOfWeek = daysOfWeek[date.getDay()];
-    
+
         return `${year}.${month}.${day} (${dayOfWeek})`; // "YY.MM.DD (요일)" 형식으로 반환
     };
-    
+
     const sendDeleteReservationRequest = ({ cancelReason, onSuccess }) => {
         const requestParams = {};
-        if(cancelReason !== null) requestParams.cancelReason = cancelReason;
+        if (cancelReason !== null) requestParams.cancelReason = cancelReason;
 
         sendDeleteRequest({
             token: state.token,
             endPoint: `/reservations/${reservationId}`,
             requestParams: requestParams,
             onSuccess: () => {
-                if(onSuccess){
+                if (onSuccess) {
                     onSuccess();
-                }else{
+                } else {
                     Alert.alert("성공", "예약 취소 성공!");
                 }
                 navigation.goBack();
@@ -99,25 +122,25 @@ const CounselDetailScreen = () => {
             /* onFailure: () => Alert.alert("실패", "예약 취소 실패!") */
         });
     };
-    
+
     // 상담 취소 시 사유 받기 
     const handleCancelPress = () => {
         console.log("userType: ", state.usertype);
         // 회원은 취소 사유 필요 없음
-        if(state.usertype === "MEMBER") {
+        if (state.usertype === "MEMBER") {
             Alert.alert(
                 "취소 확인", // 제목
                 "예약을 취소하시겠습니까?", // 메시지
                 [
-                  {
-                    text: "아니요",
-                    onPress: () => console.log("예약 취소 취소"),
-                    style: "cancel"
-                  },
-                  { text: "예", onPress: () => sendDeleteReservationRequest({ cancelReason: null }) }
+                    {
+                        text: "아니요",
+                        onPress: () => console.log("예약 취소 취소"),
+                        style: "cancel"
+                    },
+                    { text: "예", onPress: () => sendDeleteReservationRequest({ cancelReason: null }) }
                 ],
                 { cancelable: false } // 백 버튼으로 취소할 수 없게 설정 (Android)
-              );
+            );
             return;
         }
         setModalVisible(true); // 모달 열기
@@ -137,99 +160,99 @@ const CounselDetailScreen = () => {
     };
 
     // 후에 UserInfo 받아서 처리 할 예정. 
-    const userType = state.usertype; 
+    const userType = state.usertype;
 
     const getKorGender = (gender) => {
-        if(gender === 'MALE') return "남";
-        if(gender === "FEMALE") return "여";
+        if (gender === 'MALE') return "남";
+        if (gender === "FEMALE") return "여";
         return "기타";
     }
-    
+
     return (
         <ScrollView style={styles.container}>
             <View style={styles.infoContainer}>
                 <View style={styles.dateContainer}>
-                    <View style= {styles.dateDetailContainer}>
+                    <View style={styles.dateDetailContainer}>
                         <Text style={styles.subtitle}>상담 날짜</Text>
                         <Text style={styles.dateText}>{formatDate(reservation.date)} {reservation.startTime} - {reservation.endTime}</Text>
                     </View>
                     <Text style={styles.type}>  {reservation.type}  </Text>
                 </View>
                 <View style={styles.memberContainer}>
-                {userType === 'COUNSELOR' ? (
-                <>
-                    <Text style={styles.subtitle}>내담자 정보</Text>
-                    <View style={styles.memberDetailContainer}>
-                        <View style={styles.memberDetail}>
-                            <Text style={styles.memberDetailTitleNickname}>닉네임</Text>   
-                            <Text style={styles.memberDetailContent}>{reservation.memberNickname}</Text>
-                            <Text style={styles.memberDetailTitle}>성별</Text>
-                            <Text style={styles.memberDetailContent}>{getKorGender(reservation.memberGender)}</Text>
+                    {userType === 'COUNSELOR' ? (
+                        <>
+                            <Text style={styles.subtitle}>내담자 정보</Text>
+                            <View style={styles.memberDetailContainer}>
+                                <View style={styles.memberDetail}>
+                                    <Text style={styles.memberDetailTitleNickname}>닉네임</Text>
+                                    <Text style={styles.memberDetailContent}>{reservation.memberNickname}</Text>
+                                    <Text style={styles.memberDetailTitle}>성별</Text>
+                                    <Text style={styles.memberDetailContent}>{getKorGender(reservation.memberGender)}</Text>
+                                </View>
+                                <View style={styles.memberDetail}>
+                                    <Text style={styles.memberDetailTitle}>출생년도</Text>
+                                    <Text style={styles.memberDetailContent}>{reservation.memberBirthYear}</Text>
+                                    <Text style={styles.memberDetailTitle}>점수</Text>
+                                    <Text style={styles.memberDetailContent}>{reservation.memberDepressionScore}</Text>
+                                </View>
+                            </View>
+                        </>
+                    ) : userType === 'MEMBER' ? (
+                        <View style={styles.dateDetailContainer}>
+                            <Text style={styles.subtitle}>상담사 </Text>
+                            <Text style={styles.nameText}> {reservation.counselorName}</Text>
                         </View>
-                        <View style={styles.memberDetail}>
-                            <Text style={styles.memberDetailTitle}>출생년도</Text>
-                            <Text style={styles.memberDetailContent}>{reservation.memberBirthYear}</Text>
-                            <Text style={styles.memberDetailTitle}>점수</Text>
-                            <Text style={styles.memberDetailContent}>{reservation.memberDepressionScore}</Text>
-                        </View>
-                    </View>
-                </>
-            ) : userType === 'MEMBER' ? (
-                <View style= {styles.dateDetailContainer}>
-                    <Text style={styles.subtitle}>상담사 </Text>
-                    <Text style={styles.nameText}> {reservation.counselorName}</Text>
-                </View>
-            ) : null}
+                    ) : null}
                 </View>
                 <View style={styles.contentContainer}>
                     <Text style={styles.subtitle}>상담 내용</Text>
-                    <Text style={{ marginLeft:15, fontSize:16}}>{reservation.comment}</Text>
+                    <Text style={{ marginLeft: 15, fontSize: 16 }}>{reservation.comment}</Text>
                 </View>
             </View>
-                {userType === 'COUNSELOR' && reservation.status === 'PENDING' ? (
-                    <View style={styles.pendingButtonContainer}>
-                        <TouchableOpacity style={styles.pendingButton}>
-                            <Text style={styles.buttonText}>채팅방 열기</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
-                            <Text style={styles.buttonText}>  상담 취소  </Text>
-                        </TouchableOpacity>
+            {userType === 'COUNSELOR' && reservation.status === 'PENDING' ? (
+                <View style={styles.pendingButtonContainer}>
+                    <TouchableOpacity style={styles.pendingButton}>
+                        <Text style={styles.buttonText}>채팅방 열기</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
+                        <Text style={styles.buttonText}>  상담 취소  </Text>
+                    </TouchableOpacity>
+                </View>
+            ) : userType === 'MEMBER' && reservation.status === 'PENDING' ? (
+                <View style={styles.memberPendingButtonContainer}>
+                    <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
+                        <Text style={styles.buttonText}>상담 취소</Text>
+                    </TouchableOpacity>
+                </View>
+            ) : reservation.status === "CANCELLED_BY_CLIENT" ? (
+                <View style={styles.cancelReasonContainer}>
+                    <Text style={styles.subtitle}>취소 내용</Text>
+                    <View style={styles.cancelDetailContainer}>
+                        <Text style={styles.cencelName}> 취소자 </Text>
+                        <Text style={{ fontSize: 15 }}>  내담자 </Text>
                     </View>
-                ) : userType === 'MEMBER' && reservation.status === 'PENDING' ? (
-                    <View style={styles.memberPendingButtonContainer}>
-                        <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
-                            <Text style={styles.buttonText}>상담 취소</Text>
-                        </TouchableOpacity>
+                </View>
+            ) : reservation.status === "CANCELLED_BY_COUNSELOR" ? (
+                <View style={styles.cancelReasonContainer}>
+                    <Text style={styles.subtitle}>취소 내용</Text>
+                    <View style={styles.cancelDetailContainer}>
+                        <Text style={styles.cencelName}> 취소자 </Text>
+                        <Text style={{ fontSize: 15 }}>  상담사 </Text>
                     </View>
-                ) : reservation.status === "CANCELLED_BY_CLIENT" ? (
-                    <View style={styles.cancelReasonContainer}>
-                        <Text style={styles.subtitle}>취소 내용</Text>
-                        <View style={styles.cancelDetailContainer}>
-                            <Text style={styles.cencelName}> 취소자 </Text>
-                            <Text style={{fontSize: 15}}>  내담자 </Text>
-                        </View>
+                    <View style={styles.cancelDetailContainer}>
+                        <Text style={styles.cencelName}> 취소 사유 </Text>
+                        <Text style={{ fontSize: 15 }}>  {reservation.cancelComment}</Text>
                     </View>
-                ) : reservation.status === "CANCELLED_BY_COUNSELOR" ? (
-                    <View style={styles.cancelReasonContainer}>
-                        <Text style={styles.subtitle}>취소 내용</Text>
-                        <View style={styles.cancelDetailContainer}>
-                            <Text style={styles.cencelName}> 취소자 </Text>
-                            <Text style={{fontSize: 15}}>  상담사 </Text>
-                        </View>
-                        <View style={styles.cancelDetailContainer}>
-                            <Text style={styles.cencelName}> 취소 사유 </Text>
-                            <Text style={{fontSize: 15}}>  {reservation.cancelComment}</Text>
-                        </View>
-                    </View>
-                ) : (
+                </View>
+            ) : (
                 <>
                     {/* 후기 섹션 */}
                     <View style={styles.reviewContainer}>
-                            <View style={styles.reviewTitle}>
-                                <Text style={styles.subtitle}>후기</Text>
-                                <Text>{"⭐".repeat(reservation.review.rating)}</Text>
-                            </View>
-                            {reservation.review && reservation.review.content ? (
+                        <View style={styles.reviewTitle}>
+                            <Text style={styles.subtitle}>후기</Text>
+                            <Text>{"⭐".repeat(reservation.review.rating)}</Text>
+                        </View>
+                        {reservation.review && reservation.review.content ? (
                             <View>
                                 <Text style={styles.reviewContent}>{reservation.review.content}</Text>
                             </View>
@@ -237,9 +260,9 @@ const CounselDetailScreen = () => {
                             userType === 'MEMBER' && (
                                 <View>
                                     <Text style={styles.reviewContent}>후기가 없습니다.</Text>
-                                    <TouchableOpacity 
-                                        style={styles.button} 
-                                        onPress={() => navigation.navigate('MemberWriteReview', { reservationId: reservation.reservationId })} 
+                                    <TouchableOpacity
+                                        style={styles.button}
+                                        onPress={() => navigation.navigate('MemberWriteReview', { reservationId: reservation.reservationId })}
                                     >
                                         <Text style={styles.buttonText}>작성하기</Text>
                                     </TouchableOpacity>
@@ -247,8 +270,8 @@ const CounselDetailScreen = () => {
                             )
                         )}
                     </View>
-    
-                {/* 상담 리포트 섹션 */}
+
+                    {/* 상담 리포트 섹션 */}
                     <View style={styles.reportContainer}>
                         <Text style={styles.subtitle}>상담 리포트</Text>
                         {reservation.report && Object.keys(reservation.report).length > 0 ? (
@@ -257,9 +280,9 @@ const CounselDetailScreen = () => {
                             userType === 'COUNSELOR' && (
                                 <View>
                                     <Text>리포트가 없습니다.</Text>
-                                    <TouchableOpacity 
-                                        style={styles.button} 
-                                        onPress={() => navigation.navigate('CounselWriteReport', { reservationId: reservation.reservationId })} 
+                                    <TouchableOpacity
+                                        style={styles.button}
+                                        onPress={() => navigation.navigate('CounselWriteReport', { reservationId: reservation.reservationId })}
                                     >
                                         <Text style={styles.buttonText}>리포트 작성하기</Text>
                                     </TouchableOpacity>
@@ -267,8 +290,8 @@ const CounselDetailScreen = () => {
                             )
                         )}
                     </View>
-            </>
-                  
+                </>
+
             )}
             <Modal
                 animationType="slide"
@@ -349,24 +372,24 @@ const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom:5,
-        marginLeft:15
+        marginBottom: 5,
+        marginLeft: 15
     },
-    memberDetailTitleNickname:{
-        width:60,
+    memberDetailTitleNickname: {
+        width: 60,
         fontWeight: 'bold',
         textAlign: 'center',
-        fontSize:15
+        fontSize: 15
     },
-    memberDetailTitle:{
-        width:60,
+    memberDetailTitle: {
+        width: 60,
         fontWeight: 'bold',
         textAlign: 'right',
-        fontSize:15
+        fontSize: 15
     },
-    memberDetailContent:{
-        width:90,
-        marginLeft:20,
+    memberDetailContent: {
+        width: 90,
+        marginLeft: 20,
     },
     subtitle: {
         fontSize: 18,
@@ -377,7 +400,7 @@ const styles = StyleSheet.create({
         color: '#333',
         marginHorizontal: 7,
     },
-    nameText:{
+    nameText: {
         fontSize: 16,
         color: '#333',
         marginHorizontal: 10,
@@ -385,14 +408,14 @@ const styles = StyleSheet.create({
     type: {
         color: 'white',
         fontSize: 13,
-        backgroundColor:'#778DA9',
+        backgroundColor: '#778DA9',
         borderRadius: 10,
         marginTop: 2,
-        padding:2,
-        marginBottom:10
+        padding: 2,
+        marginBottom: 10
     },
     contentContainer: {
-        marginTop:20
+        marginTop: 20
     },
 
     reviewContainer: {
@@ -409,7 +432,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4, // 그림자 퍼짐 정도
         elevation: 5, // Android에서의 그림자 깊이
     },
-    reviewTitle:{
+    reviewTitle: {
         flexDirection: 'row',
         justifyContent: 'space-between',
 
@@ -450,23 +473,23 @@ const styles = StyleSheet.create({
         shadowRadius: 4, // 그림자 퍼짐 정도
         elevation: 5, // Android에서의 그림자 깊이
     },
-    cancelDetailContainer:{
+    cancelDetailContainer: {
         flexDirection: 'row', // 가로 방향 정렬
         alignItems: 'center',
-        marginBottom:10,
-        marginLeft:10
+        marginBottom: 10,
+        marginLeft: 10
     },
-    cencelName:{
+    cencelName: {
         textAlign: 'center',
-        fontSize:16,
+        fontSize: 16,
         fontWeight: 'bold',
 
     },
     pendingButtonContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginHorizontal:50
-    }, 
+        marginHorizontal: 50
+    },
     memberPendingButtonContainer: {
         flexDirection: 'row', // 가로 방향 정렬
         alignItems: 'center', // 세로 방향 중앙 정렬
@@ -557,7 +580,7 @@ const styles = StyleSheet.create({
         borderRadius: 5, // 모서리 둥글기
         overflow: 'hidden', // 모서리 둥글기 효과 적용
         width: '80%', // 너비 설정
-        marginBottom:20
+        marginBottom: 20
     },
     picker: {
         height: 40, // 높이를 줄임

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import sendPatchRequest from '../../axios/PatchRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendGetRequest from '../../axios/SendGetRequest';
+import { useFocusEffect } from '@react-navigation/native';
 
 function PricingSettingScreen() {
   const { state } = useAuth();
@@ -10,19 +11,35 @@ function PricingSettingScreen() {
   const [callPrice, setCallPrice] = useState('0');
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    sendGetRequest({
-      token: state.token,
-      endPoint: `/counselors/${state.identifier}`,
-      onSuccess: (data) => {
-        console.log("initial data: ", data);
-        setChatPrice(String(data.data.chatPrice));
-        setCallPrice(String(data.data.callPrice));
-        setIsLoading(false);
-      },
-      /* onFailure: () => Alert.alert("실패!", "내 정보 GET요청 실패") */
-    });
-  }, []);
+  // useEffect(() => {
+  //   sendGetRequest({
+  //     token: state.token,
+  //     endPoint: `/counselors/${state.identifier}`,
+  //     onSuccess: (data) => {
+  //       console.log("initial data: ", data);
+  //       setChatPrice(String(data.data.chatPrice));
+  //       setCallPrice(String(data.data.callPrice));
+  //       setIsLoading(false);
+  //     },
+  //     /* onFailure: () => Alert.alert("실패!", "내 정보 GET요청 실패") */
+  //   });
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      sendGetRequest({
+        token: state.token,
+        endPoint: `/counselors/${state.identifier}`,
+        onSuccess: (data) => {
+          console.log("initial data: ", data);
+          setChatPrice(String(data.data.chatPrice));
+          setCallPrice(String(data.data.callPrice));
+          setIsLoading(false);
+        },
+        /* onFailure: () => Alert.alert("실패!", "내 정보 GET요청 실패") */
+      });
+    },[])
+  );
 
   return (
     <View style={styles.container}>

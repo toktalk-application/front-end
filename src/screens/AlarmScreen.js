@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getNotifications, markNotificationAsRead, deleteNotification } from './notificationService';
 
 const AlarmScreen = () => {
@@ -8,9 +8,15 @@ const AlarmScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
 
-  useEffect(() => {
+  /* useEffect(() => {
     loadNotifications();
-  }, []);
+  }, []); */
+
+  useFocusEffect(
+    useCallback(() => {
+      loadNotifications();
+    }, [])
+  );
 
   const loadNotifications = async () => {
     setIsLoading(true);

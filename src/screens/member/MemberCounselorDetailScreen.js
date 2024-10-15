@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { useFocusEffect, useRoute } from '@react-navigation/native';
 import ReservationModal from '../../components/ReservationModal';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
@@ -14,17 +14,31 @@ const MemberCounselorDetailScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [counselorData, setCounselorData] = useState({});
 
-  useEffect(() => {
-    sendGetRequest({
-      token: state.token,
-      endPoint: `/counselors/${counselorId}`,
-      onSuccess: (data) => {
-        setCounselorData(data.data);
-        setIsLoading(false);
-      },
-      /* onFailure: () => Alert.alert("요청 실패", "단일 상담사 정보 조회 실패") */
-    })
-  }, []);
+  // useEffect(() => {
+  //   sendGetRequest({
+  //     token: state.token,
+  //     endPoint: `/counselors/${counselorId}`,
+  //     onSuccess: (data) => {
+  //       setCounselorData(data.data);
+  //       setIsLoading(false);
+  //     },
+  //     /* onFailure: () => Alert.alert("요청 실패", "단일 상담사 정보 조회 실패") */
+  //   })
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      sendGetRequest({
+        token: state.token,
+        endPoint: `/counselors/${counselorId}`,
+        onSuccess: (data) => {
+          setCounselorData(data.data);
+          setIsLoading(false);
+        },
+        /* onFailure: () => Alert.alert("요청 실패", "단일 상담사 정보 조회 실패") */
+      })
+    }, [])
+  );
 
   // counselorId에 해당하는 상담사 정보를 찾기
   /* const counselorData = counselorDataArray.find(counselor => counselor.counselorId === counselorId); */
