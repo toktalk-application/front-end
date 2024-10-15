@@ -50,7 +50,7 @@ const MemberReservationScreen = () => {
                 },
                 onSuccess: (data) => {
                     console.log("reservations: ", data);
-                    const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED");
+                    const completedReservations = data.data.filter(reservation => !reservation.status.includes("CANCELLED"));
                     const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
                     setReservations(data.data);
                     setCompletedCount(completedReservations.length || 0);
