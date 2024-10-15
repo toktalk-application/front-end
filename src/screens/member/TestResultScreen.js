@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, ActivityIndicator, BackHandler } from 'react-native';
 import sendGetRequest from '../../axios/SendGetRequest'; // sendGetRequest 경로를 수정하세요
 import { useAuth } from '../../auth/AuthContext';
+import EmptyScreen from '../EmptyScreen';
 
 const TestResultScreen = ({ navigation }) => {
     const { state } = useAuth();
@@ -53,21 +54,33 @@ const TestResultScreen = ({ navigation }) => {
 
     const renderItem = ({ item }) => (
         <View style={styles.resultCard}>
-            <Text style={styles.title}>총 점수 {item.score}</Text>
-            <Text style={styles.date}>검사일: {new Date(item.createdAt).toLocaleDateString()}</Text>
-            <Text style={styles.description}>수준: {item.description}</Text>
-            <Text style={styles.comment}>코멘트: {item.comment}</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <Text style={styles.title}>총 점수 {item.score}</Text>
+                </View>
+                <Text style={styles.date}> {new Date(item.createdAt).toLocaleDateString('ko-KR', {
+                                                year: 'numeric',
+                                                month: '2-digit',
+                                                day: '2-digit',
+                                            }).replace(/\//g, '.')}</Text>
+            </View>
+            <Text style={styles.description}>수준 | {item.description}</Text>
+            <Text style={styles.comment}>코멘트 | {item.comment}</Text>
         </View>
     );
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={testResults}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.createdAt} // 고유 키로 createdAt 사용
-                contentContainerStyle={styles.listContainer}
-            />
+            {testResults.length === 0 ? (
+                <EmptyScreen message="검사내역이 없습니다" />
+            ) : (
+                <FlatList
+                    data={testResults}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.createdAt} // 고유 키로 createdAt 사용
+                    contentContainerStyle={styles.listContainer}
+                />
+            )}
         </View>
     );
 };
@@ -75,17 +88,17 @@ const TestResultScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
-        backgroundColor: '#f8f8f8',
+        padding: 30,
+        backgroundColor: '#fff',
     },
     listContainer: {
-        paddingBottom: 20,
+        paddingBottom: 10,
     },
     resultCard: {
-        backgroundColor: '#fff',
+        backgroundColor: '#f7f7f7',
         borderRadius: 10,
-        padding: 15,
-        marginBottom: 15,
+        padding: 20,
+        marginBottom: 20,
         shadowColor: '#000',
         shadowOffset: {
             width: 0,
@@ -101,14 +114,15 @@ const styles = StyleSheet.create({
     },
     description: {
         fontSize: 16,
-        marginVertical: 5,
+        marginTop:20,
+        marginBottom:5
     },
     comment: {
         fontSize: 16,
         marginVertical: 5,
     },
     date: {
-        fontSize: 14,
+        fontSize: 16,
         color: '#888',
     },
     errorText: {

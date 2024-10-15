@@ -4,6 +4,7 @@ import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import { useCallback } from 'react';
+import EmptyScreen from '../EmptyScreen';
 
 function MemberChattingScreen() {
   const navigation = useNavigation();
@@ -77,7 +78,7 @@ function MemberChattingScreen() {
 
   return (
     <View style={styles.container}>
-      {chatRooms.length === 0 ? <View><Text>채팅이 없습니다.</Text></View> : <FlatList
+      {chatRooms.length === 0 ? <EmptyScreen message="채팅 내역이 없습니다"/>  : <FlatList
         data={chatRooms}
         keyExtractor={(item) => item.roomId.toString()}
         renderItem={renderItem}

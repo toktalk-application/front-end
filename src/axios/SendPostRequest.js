@@ -2,7 +2,7 @@ import axios from "axios";
 import {REACT_APP_API_URL} from '@env';
 import handleErrorMessage from "./ErrorMessageHandler";
 
-const sendPostRequest = async({ token, endPoint, requestBody, onSuccess, onFailure }) => {
+const sendPostRequest = async({ token, endPoint, requestBody, onSuccess, onFailure, disableDefaultAlert }) => {
     try{
         console.log('REACT_APP_API_URL:', REACT_APP_API_URL);
         
@@ -24,12 +24,14 @@ const sendPostRequest = async({ token, endPoint, requestBody, onSuccess, onFailu
             if (onSuccess) onSuccess(response.data.data);
         }
     }catch(error){
+        const errorStatus = error.response.status;
+        const errorMessage = error.response.data.message;
         console.error('요청 실패: ', error);
         console.error('message: ', error.message);
-        console.error('server message: ', error.response.data.message);
+        console.error('server message: ', errorMessage);
 
-        handleErrorMessage(error.response.status, error.response.data.message);
-        if(onFailure) onFailure();
+        if(!disableDefaultAlert) handleErrorMessage(errorStatus, errorMessage);
+        if(onFailure) onFailure(errorStatus, errorMessage);
     }
 }
 export default sendPostRequest;

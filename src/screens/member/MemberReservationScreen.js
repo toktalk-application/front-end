@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import timeLine from '../../../assets/images/timeLine.png'
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+import EmptyScreen from '../EmptyScreen';
 
 const MemberReservationScreen = () => {
     const { state } = useAuth();
@@ -20,140 +21,47 @@ const MemberReservationScreen = () => {
 
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        fetchReservations(selectedYear, selectedMonth);
-    }, [selectedYear, selectedMonth]); // year와 month가 변경될 때마다 호출
+    // useEffect(() => {
+    //     sendGetRequest({
+    //         token: state.token,
+    //         endPoint: "/reservations/monthly-detail",
+    //         requestParams: {
+    //             month: selectedYear + '-' + String(selectedMonth).padStart(2, '0') // 월 형식을 9 -> 09 와 같이 변환
+    //         },
+    //         onSuccess: (data) => {
+    //             console.log("reservations: ", data);
+    //             const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED");
+    //             const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
+    //             setReservations(data.data);
+    //             setCompletedCount(completedReservations.length || 0);
+    //             setTotalAmount(total);
+    //             setIsLoading(false);
+    //         },
+    //         /* onFailure: () => Alert.alert("실패", "내 특정월 상담 목록 조회 실패") */
+    //     })
+    // }, [selectedMonth, selectedYear]);
 
-    const fetchReservations = async (year, month) => {
-        // try {
-        //     const response = await fetch(`https://your-api-url.com/reservations?year=${year}&month=${month}`);
-        //     const data = await response.json();
-        //     const total = data.filter(reservation => reservation.status === "COMPLETED").reduce((sum, reservation) => sum + reservation.price, 0);
-        //     setReservations(data);
-        //     setTotalAmount(total);
-        //     setCompletedCount(data.filter(reservation => reservation.status === "COMPLETED").length);
-        // } catch (error) {
-        //     console.error("Error fetching reservations:", error);
-        // }
-    };
-
-    useEffect(() => {
-        sendGetRequest({
-            token: state.token,
-            endPoint: "/reservations/monthly-detail",
-            requestParams: {
-                month: selectedYear + '-' + String(selectedMonth).padStart(2, '0') // 월 형식을 9 -> 09 와 같이 변환
-            },
-            onSuccess: (data) => {
-                console.log("reservations: ", data);
-                const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED");
-                const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
-                setReservations(data.data);
-                setCompletedCount(completedReservations.length || 0);
-                setTotalAmount(total);
-                setIsLoading(false);
-            },
-            /* onFailure: () => Alert.alert("실패", "내 특정월 상담 목록 조회 실패") */
-        })
-    }, [selectedMonth, selectedYear]);
-
-    useEffect(() => {
-        // 더미 데이터 생성
-        const dummyData = [
-            {
-                reservationId: 1,
-                counselorId: 101,
-                memberNickname: "홍길동",
-                counselorName: "김상담사",
-                comment: "제 고민은 이거고요...",
-                type: "CHAT",
-                status: "COMPLETED",
-                date: "2024-01-17",
-                startTime: "09:00",
-                endTime: "10:50",
-                price: 50000,
-            },
-            {
-                reservationId: 2,
-                counselorId: 102,
-                memberNickname: "김철수",
-                counselorName: "이상담사",
-                comment: "지금 제 상황이 너무 힘들고...",
-                type: "CALL",
-                status: "CANCELLED_BY_CLIENT",
-                date: "2024-01-18",
-                startTime: "11:00",
-                endTime: "11:50",
-                price: 50000,
-            },
-            {
-                reservationId: 3,
-                counselorId: 103,
-                memberNickname: "이영희",
-                counselorName: "박상담사",
-                comment: "상담을 받고 싶습니다.",
-                type: "CHAT",
-                status: "COMPLETED",
-                date: "2024-01-19",
-                startTime: "12:00",
-                endTime: "12:50",
-                price: 50000,
-            },
-            {
-                reservationId: 4,
-                counselorId: 104,
-                memberNickname: "유재석",
-                counselorName: "김상담사",
-                comment: "상담을 받고 싶습니다.",
-                type: "CALL",
-                status: "CANCELLED_BY_COUNSELOR",
-                date: "2024-01-20",
-                startTime: "13:00",
-                endTime: "13:50",
-                price: 50000,
-            },
-            {
-                reservationId: 5,
-                counselorId: 1,
-                memberNickname: "눈누난나",
-                counselorName: "안상담사",
-                comment: "지친다 정말루다가",
-                type: "CHAT",
-                status: "COMPLETED",
-                date: "2024-10-18",
-                startTime: "09:00",
-                endTime: "10:50",
-                price: 50000,
-            },
-            {
-                reservationId: 6,
-                counselorId: 1,
-                memberNickname: "김철수",
-                counselorName: "고상담사",
-                comment: "우울해요",
-                type: "CALL",
-                status: "COMPLETED",
-                date: "2024-10-18",
-                startTime: "11:00",
-                endTime: "11:50",
-                price: 50000,
-            },
-        ];
-
-        // 날짜와 시간으로 정렬
-        const sortedReservations = dummyData.sort((a, b) => {
-            const dateA = new Date(`${a.date}T${a.startTime}`);
-            const dateB = new Date(`${b.date}T${b.startTime}`);
-            return dateA - dateB; // 오름차순 정렬
-        });
-
-        const completedReservations = sortedReservations.filter(reservation => reservation.status === "COMPLETED");
-        const total = completedReservations.reduce((sum, reservation) => sum + reservation.price, 0);
-
-        /* setReservations(sortedReservations); // 정렬된 예약을 설정 */
-        setTotalAmount(total);
-        setCompletedCount(completedReservations.length);
-    }, []);
+    useFocusEffect(
+        useCallback(() => {
+            sendGetRequest({
+                token: state.token,
+                endPoint: "/reservations/monthly-detail",
+                requestParams: {
+                    month: selectedYear + '-' + String(selectedMonth).padStart(2, '0') // 월 형식을 9 -> 09 와 같이 변환
+                },
+                onSuccess: (data) => {
+                    console.log("reservations: ", data);
+                    const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED");
+                    const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
+                    setReservations(data.data);
+                    setCompletedCount(completedReservations.length || 0);
+                    setTotalAmount(total);
+                    setIsLoading(false);
+                },
+                /* onFailure: () => Alert.alert("실패", "내 특정월 상담 목록 조회 실패") */
+            })
+        }, [selectedMonth, selectedYear])
+    );
 
     const handleReservationPress = (reservationId) => {
         navigation.navigate('CounselDetail', { reservationId });
@@ -181,7 +89,10 @@ const MemberReservationScreen = () => {
                 </Picker>
             </View>
             <ScrollView>
-                {isLoading ? <View></View> : reservations.length === 0 ? <View><Text>상담 예약 내역이 없습니다</Text></View> : reservations.map(reservation => (
+                {isLoading ? <View></View> : reservations.length === 0 ? 
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <EmptyScreen message="상담 예약 내역이 없습니다" />
+                    </View> : reservations.map(reservation => (
                     <TouchableOpacity
                         key={reservation.reservationId}
                         onPress={() => handleReservationPress(reservation.reservationId)}
@@ -374,3 +285,4 @@ const styles = StyleSheet.create({
 });
 
 export default MemberReservationScreen;
+

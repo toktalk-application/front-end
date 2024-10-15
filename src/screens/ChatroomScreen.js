@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard
 import { useRoute } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import sendGetRequest from '../axios/SendGetRequest';
-import { Client } from '@stomp/stompjs';
+import io from 'socket.io-client';
 
 const ChatRoomScreen = () => {
   const { state } = useAuth();
@@ -15,7 +15,7 @@ const ChatRoomScreen = () => {
   const flatListRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const stompClient = useRef(null);
+  const socketRef = useRef(null);
   const userType = state.usertype;
 
   useEffect(() => {
@@ -39,54 +39,47 @@ const ChatRoomScreen = () => {
   }, [roomId, state.token]);
 
   useEffect(() => {
-    const client = new Client({
-      webSocketFactory: () => new WebSocket('ws://10.0.2.2:8080/ws/chat'),
-      debug: (str) => {
-        console.log('STOMP: ' + str);
-      },
-      reconnectDelay: 5000,
-      onConnect: () => {
-        console.log('STOMP 연결 성공');
-        client.subscribe(`/topic/chat/${roomId}`, onMessageReceived);
-      },
-      onStompError: (frame) => {
-        console.error('STOMP 오류:', frame);
-      },
-      onWebSocketError: (event) => {
-        console.error('WebSocket 오류:', event);
-      },
+    // Socket.IO 연결
+    const socket = io('http://10.0.2.2:9092', {
+      transports: ['websocket'],
+      query: { roomId }
     });
-  
-    client.activate();
-    stompClient.current = client;
-  
-    return () => {
-      if (client) {
-        client.deactivate();
+
+    socket.on('connect', () => {
+      console.log('Socket.IO 연결 성공');
+      socket.emit('joinRoom', roomId);
+    });
+
+    socket.on('message', (newMessage) => {
+      console.log('메시지 수신:', newMessage);
+      setMessages((prevMessages) => [...prevMessages, newMessage]);
+    });
+
+    socket.on('connect_error', (error) => {
+      console.error('Socket.IO 연결 오류:', error);
+    });
+
+    socketRef.current = socket;
+
+    return () => {  
+      if (socket) {
+        socket.disconnect();
       }
     };
   }, [roomId]);
 
-  const onMessageReceived = (payload) => {
-    console.log('메시지 수신:', payload.body);
-    const newMessage = JSON.parse(payload.body);
-    setMessages((prevMessages) => [...prevMessages, newMessage]);
-  };
-
   const handleSendMessage = () => {
-    if (messageInput.trim() && stompClient.current && stompClient.current.connected) {
+    if (messageInput.trim() && socketRef.current) {
       const newMessage = {
         sender: userType === 'COUNSELOR' ? state.name : state.nickname,
         message: messageInput,
+        roomId: roomId
       };
       console.log('메시지 전송:', newMessage);
-      stompClient.current.publish({
-        destination: `/app/chat/${roomId}`,
-        body: JSON.stringify(newMessage)
-      });
+      socketRef.current.emit('message', newMessage);  // 클라이언트에서 'message' 이벤트 전송
       setMessageInput('');
     } else {
-      console.error('STOMP client is not connected or message is empty');
+      console.error('Socket is not connected or message is empty');
     }
   };
 
@@ -121,12 +114,12 @@ const ChatRoomScreen = () => {
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding" keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
       <FlatList
-        ref={flatListRef} // FlatList에 ref 추가
+        ref={flatListRef}
         data={messages}
         renderItem={renderMessage}
-        keyExtractor={(item, index) => index.toString()} // 인덱스를 키로 사용
+        keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.chatContainer}
-        inverted={false} // 메시지를 과거 순서대로 표시 (최신 메시지 아래로)
+        inverted={false}
       />
       <View style={styles.inputContainer}>
         <TextInput
@@ -134,7 +127,7 @@ const ChatRoomScreen = () => {
           placeholder="메시지를 입력하세요..."
           value={messageInput}
           onChangeText={setMessageInput}
-          onSubmitEditing={handleSendMessage} // Enter 키로 메시지 전송
+          onSubmitEditing={handleSendMessage}
         />
         <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
           <Text style={styles.sendButtonText}>전송</Text>

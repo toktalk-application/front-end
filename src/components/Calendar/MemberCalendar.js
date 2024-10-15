@@ -79,13 +79,12 @@ const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate, minD
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setIsLoading(false);
-    
+    setIsLoading(false); 
   }, []);
 
   return (
     <Calendar
-      current={new Date().toISOString().split('T')[0]}
+      current={selectedDate || new Date().toISOString().split('T')[0]}
       minDate={minDate}
       maxDate={maxDate}
       dayComponent={({ date }) => {

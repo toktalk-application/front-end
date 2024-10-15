@@ -1,38 +1,44 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, ScrollView, Alert } from 'react-native';
 import { launchImageLibrary } from 'react-native-image-picker';
 import sendPatchRequest from '../../axios/PatchRequest';
 import { useAuth } from '../../auth/AuthContext';
 import sendGetRequest from '../../axios/SendGetRequest';
-import { useNavigation } from '@react-navigation/native';
-import sendPostRequest from '../../axios/SendPostRequest';
-
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 function CounselorEditScreen() {
     const { state } = useAuth();
     const navigation = useNavigation();
     const [profileImage, setProfileImage] = useState(null);
-    const [introduction, setIntroduction] = useState(''); // 자기 소개
-    const [expertise, setExpertise] = useState(''); // 전문 분야
-    const [sessionDescription, setSessionDescription] = useState(''); // 상담 세션 설명
+    const [initialProfileImage, setInitialProfileImage] = useState(null); // 초기 이미지 상태
+    const [introduction, setIntroduction] = useState('');
+    const [initialIntroduction, setInitialIntroduction] = useState(''); // 초기 자기소개 상태
+    const [expertise, setExpertise] = useState('');
+    const [initialExpertise, setInitialExpertise] = useState(''); // 초기 전문 분야 상태
+    const [sessionDescription, setSessionDescription] = useState('');
+    const [initialSessionDescription, setInitialSessionDescription] = useState(''); // 초기 상담 세션 설명 상태
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedImage, setSelectedImage] = useState(null);
 
-    useEffect(() => {
-        sendGetRequest({
-            token: state.token,
-            endPoint: `/counselors/${state.identifier}`,
-            onSuccess: (data) => {
-                /* console.log("data: ", data); */
-                setProfileImage(data.data.profileImage);
-                setIntroduction(data.data.introduction);
-                setExpertise(data.data.expertise);
-                setSessionDescription(data.data.sessionDescription);
-            },
-            /* onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패") */
-        });
-    }, []);
-
+    useFocusEffect(
+        useCallback(() => {
+            sendGetRequest({
+                token: state.token,
+                endPoint: `/counselors/${state.identifier}`,
+                onSuccess: (data) => {
+                    setProfileImage(data.data.profileImage);
+                    setInitialProfileImage(data.data.profileImage); // 초기 이미지 저장
+                    setIntroduction(data.data.introduction);
+                    setInitialIntroduction(data.data.introduction); // 초기 자기소개 저장
+                    setExpertise(data.data.expertise);
+                    setInitialExpertise(data.data.expertise); // 초기 전문 분야 저장
+                    setSessionDescription(data.data.sessionDescription);
+                    setInitialSessionDescription(data.data.sessionDescription); // 초기 상담 세션 설명 저장
+                    setIsLoading(false);
+                },
+                /* onFailure: () => Alert.alert("실패!", "내 정보 GET 요청 실패") */
+            });
+        }, [])
+    );
 
     // 이미지 선택 및 S3에 업로드하는 함수
     const selectImage = () => {
@@ -50,53 +56,39 @@ function CounselorEditScreen() {
                 Alert.alert('에러', '이미지를 선택하는 중 오류가 발생했습니다.');
             } else {
                 const uri = response.assets[0].uri;
-
-                // 이미지 업로드 (S3로 업로드)
-                const formData = new FormData();
-                formData.append('file', {
-                    uri: uri,
-                    type: 'image/jpeg',
-                    name: `image_${state.identifier}.jpg`,
-                });
-                console.log(uri);
                 setProfileImage(uri);
-
-                const uploadResponse = await fetch('http://10.0.2.2:8080/counselors/upload-image', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'Authorization': `Bearer ${state.token}`,
-                    },
-                });
-                
-                const responseText = await uploadResponse.text(); // 응답 내용을 텍스트로 가져옵니다
-                console.log("서버 응답:", responseText); // 응답 내용을 로그로 출력합니다
-                
-                    let result;
-                
-                    // 응답 상태가 2xx일 경우에만 JSON으로 파싱 시도
-                    if (uploadResponse.ok) {
-                    } else {
-                        // 에러 상태일 경우
-                        Alert.alert('실패', '이미지 업로드에 실패했습니다.');
-                        console.error('서버에서 반환한 오류:', responseText);
-                    }
             }
         });
     };
-    
-
 
     const handleSubmit = async () => {
         const data = {
             profileImage: profileImage ? profileImage : null,
+            introduction,
+            expertise,
+            sessionDescription,
         };
+        if (!introduction || !expertise || !sessionDescription) {
+            Alert.alert("알림", "모든 필드를 채워주세요."); // 필드가 비어있을 경우 경고
+            return;
+        }
 
-        if (introduction) data.introduction = introduction;
-        if (expertise) data.expertise = expertise;
-        if (sessionDescription) data.sessionDescription = sessionDescription;
+        if (!profileImage) {
+            Alert.alert("알림", "사진을 등록해주세요"); // 필드가 비어있을 경우 경고
+            return;
+        }
 
-        /* console.log(data); */
+        // 변경된 내용 체크
+        if (
+            profileImage === initialProfileImage &&
+            introduction === initialIntroduction &&
+            expertise === initialExpertise &&
+            sessionDescription === initialSessionDescription
+        ) {
+            Alert.alert("알림", "수정된 내용이 없습니다."); // 수정된 내용이 없을 경우
+            return;
+        }
+
         try {
             await sendPatchRequest({
                 token: state.token,
@@ -114,7 +106,6 @@ function CounselorEditScreen() {
 
     return (
         <ScrollView style={styles.container}>
-            {/* 프로필 이미지 표시 */}
             <View style={styles.imageContainer}>
                 {profileImage ? (
                     <Image source={{ uri: profileImage }} style={styles.image} />
@@ -127,23 +118,31 @@ function CounselorEditScreen() {
             </View>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>자기 소개</Text>
-                <Text style={styles.sectionDescription}>- 자신이 어떤 상담사인지 한 줄로 설명해 주세요.</Text>
-                <TextInput style={styles.input} placeholder= {isLoading ? "입력해주세요" : introduction}
+                <TextInput
+                    style={styles.input}
+                    placeholder="입력해주세요"
                     value={introduction}
                     onChangeText={setIntroduction} />
             </View>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>전문 분야 소개</Text>
-                <Text style={styles.sectionDescription}>- 자신의 전문 분야와 강점을 소개해주세요.</Text>
-                <TextInput style={styles.bingInput} placeholder="입력해주세요" multiline numberOfLines={4} textAlignVertical="top"
+                <TextInput
+                    style={styles.bingInput}
+                    placeholder="입력해주세요"
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
                     value={expertise}
                     onChangeText={setExpertise} />
             </View>
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>상담 세션 소개</Text>
-                <Text style={styles.sectionDescription}>- 상담이 어떻게 진행되는지 구체적으로 설명해주세요.</Text>
-                <Text style={styles.sectionDescription}>- 상담을 통해 얻을 수 있는 긍정적인 변화나 기대할 수 있는 효과를 구체적으로 적어주세요.</Text>
-                <TextInput style={styles.bigInput} placeholder="입력해주세요" multiline numberOfLines={4} textAlignVertical="top"
+                <TextInput
+                    style={styles.bigInput}
+                    placeholder="입력해주세요"
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
                     value={sessionDescription}
                     onChangeText={setSessionDescription} />
             </View>
@@ -198,11 +197,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginBottom: 5,
-    },
-    sectionDescription: {
-        fontSize: 13,
-        marginBottom: 5,
-        color: '#555',
     },
     input: {
         height: 40,

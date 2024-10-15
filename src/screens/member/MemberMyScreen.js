@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity,Alert } from 'react-native';
 import MenuItem from '../../components/MenuItem.js'; 
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest.js';
 import { useAuth } from '../../auth/AuthContext';
 
@@ -24,17 +24,31 @@ const MemberMyScreenScreen = () => {
 
   const [myData, setMyData] = useState({data:{}});
 
-  useEffect(() => {
-    sendGetRequest({
-      token: state.token,
-      endPoint: `/members/${state.identifier}`,
-      onSuccess: (data) => {
-        console.log("data: ", data);
-        setMyData(data.data);
-      },
-      /* onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"), */
-    });
-  }, []);
+  // useEffect(() => {
+  //   sendGetRequest({
+  //     token: state.token,
+  //     endPoint: `/members/${state.identifier}`,
+  //     onSuccess: (data) => {
+  //       console.log("data: ", data);
+  //       setMyData(data.data);
+  //     },
+  //     /* onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"), */
+  //   });
+  // }, []);
+
+  useFocusEffect(
+    useCallback(() => {
+      sendGetRequest({
+        token: state.token,
+        endPoint: `/members/${state.identifier}`,
+        onSuccess: (data) => {
+          console.log("data: ", data);
+          setMyData(data.data);
+        },
+        /* onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"), */
+      });
+    }, [])
+  );
 
 
   return (

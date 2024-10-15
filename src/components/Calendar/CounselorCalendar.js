@@ -81,7 +81,7 @@ const CounselorCalendar = ({ markedDates, onDayPress, selectedDate, minDate, max
 
   return (
     <Calendar
-      current={new Date().toISOString().split('T')[0]}
+      current={selectedDate || new Date().toISOString().split('T')[0]}
       minDate={minDate}
       maxDate={maxDate}
       dayComponent={({ date }) => {

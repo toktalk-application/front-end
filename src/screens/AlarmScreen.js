@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getNotifications, markNotificationAsRead, deleteNotification } from './notificationService';
 import { useNotification } from '../components/NotificationContext';
+import EmptyScreen from './EmptyScreen';
 
 const AlarmScreen = () => {
   const [notifications, setNotifications] = useState([]);
@@ -10,9 +11,11 @@ const AlarmScreen = () => {
   const navigation = useNavigation();
   const { setUnreadNotifications } = useNotification();
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadNotifications();
+    }, [])
+  );
 
   useEffect(() => {
     // 화면에 진입할 때 읽지 않은 알림 수를 알림 목록의 길이로 설정
@@ -67,9 +70,14 @@ const AlarmScreen = () => {
         data={notifications}
         renderItem={renderNotificationItem}
         keyExtractor={(item) => item.notificationId}
-        ListEmptyComponent={<Text>알림이 없습니다.</Text>}
+        ListEmptyComponent={
+          <View style={styles.centerContainer}>
+            <EmptyScreen message="알림이 없습니다" />
+          </View>
+        }
         refreshing={isLoading}
         onRefresh={loadNotifications}
+        contentContainerStyle={notifications.length === 0 ? styles.emptyList : null} // 알림이 없을 때 중앙 정렬
       />
     </View>
   );
@@ -82,7 +90,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   centerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
     flex: 1,
+  },
+  emptyList: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
