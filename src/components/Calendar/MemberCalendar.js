@@ -84,7 +84,7 @@ const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate, minD
 
   return (
     <Calendar
-      current={new Date().toISOString().split('T')[0]}
+      current={selectedDate || new Date().toISOString().split('T')[0]}
       minDate={minDate}
       maxDate={maxDate}
       dayComponent={({ date }) => {

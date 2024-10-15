@@ -27,7 +27,7 @@ function CounselorMainScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      setSelectedDate('');
+      //setSelectedDate('');
       const today = new Date();
       const year = today.getFullYear();
       const month = String(today.getMonth() + 1).padStart(2, '0'); // 두 자리로 맞추기 위해 padStart 사용
