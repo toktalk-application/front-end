@@ -49,7 +49,10 @@ const MemberCounselScreen = () => {
         <View style={styles.card}>
           <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
           <View style={styles.infoContainer}>
-          <Text style={styles.name}>{item.name} ⭐ {item.rating || '없음'} ({'리뷰 ' + item.reviews + "건"})</Text>
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{item.name} </Text>
+              <Text style={styles.star}>  ⭐ {item.rating || '없음'} ({'리뷰 ' + item.reviews + "건"})</Text>
+            </View>
             <Text style={styles.introduction}>{item.introduction}</Text>
             <View style={styles.priceContainer}>
               <Text style={styles.yellowText}>전화 </Text>
@@ -107,14 +110,23 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     justifyContent: 'center',
+    marginLeft:5
+  },
+  nameContainer:{
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   name: {
     fontWeight: 'bold',
     fontSize: 18,
     marginBottom:8
   },
-  introduction: {
+  star:{
     fontSize: 15,
+    marginBottom:10
+  },
+  introduction: {
+    fontSize: 14,
     color: 'gray',
   },
   priceContainer: {
@@ -124,9 +136,10 @@ const styles = StyleSheet.create({
   },
   yellowText: {
     color: '#FFA500', // 노란색
+    fontSize:15
   },
   grayText: {
-    fontSize: 12,
+    fontSize: 14,
     color: '#555', // 진한 회색
     marginRight: 5,
   },

@@ -12,7 +12,8 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice, counselorData }) => {
   const { state } = useAuth();
   const navigation = useNavigation();
-  const [slideAnim] = useState(new Animated.Value(800));
+  const slideAnim = useRef(new Animated.Value(800)).current; // 슬라이드 애니메이션
+  const [scrollAnim] = useState(new Animated.Value(0));
   const [selectedType, setSelectedType] = useState('');
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState([]);
@@ -20,7 +21,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   const [showWebView, setShowWebView] = useState(false);
-  const webViewRef = useRef(null);
+  const scrollViewRef = useRef(null);
   const [orderInfo, setOrderInfo] = useState(null);
 
   // 아코디언 상태 관리
@@ -35,6 +36,17 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
   };
   const [availability, setAvailability] = useState(initialTimes);
   const [availableTimes, setAvailableTimes] = useState({});
+  useEffect(() => {
+    // ScrollView가 늘어날 때마다 스크롤을 아래로 이동
+    if (scrollViewRef.current) {
+      // 스크롤 위치를 부드럽게 설정
+      scrollViewRef.current.scrollToEnd({
+        y: scrollViewRef.current.scrollHeight,
+        duration: 800,
+        animated: true, // 부드럽게 스크롤
+      });
+    }
+  }, [isTypeOpen, isDateOpen, isCommentOpen, selectedDate, details, time])
 
   useEffect(() => {
     if (visible) {
@@ -298,7 +310,9 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
           <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             </TouchableOpacity>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
+            <ScrollView 
+              ref={scrollViewRef} //
+              contentContainerStyle={styles.scrollContainer}>
               {/* 상담 종류 선택 섹션 */}
               <TouchableOpacity onPress={() => setIsTypeOpen(!isTypeOpen)} style={styles.accordionHeader}>
                 <Text style={styles.label}>📞  상담 종류 선택 </Text>
@@ -310,11 +324,11 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
               {isTypeOpen && (
                 <View style={styles.accordionContent}>
                   <View style={styles.typeContainer}>
-                    <TouchableOpacity onPress={() => { setSelectedType('전화 상담'); setIsDateOpen(true); }} style={selectedType === '전화 상담' ? styles.selectedType : styles.typeButton}>
-                      <Text>전화 상담</Text>
-                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => { setSelectedType('채팅 상담'); setIsDateOpen(true); }} style={selectedType === '채팅 상담' ? styles.selectedType : styles.typeButton}>
                       <Text>채팅 상담</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => { setSelectedType('전화 상담'); setIsDateOpen(true); }} style={selectedType === '전화 상담' ? styles.selectedType : styles.typeButton}>
+                      <Text>전화 상담</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
