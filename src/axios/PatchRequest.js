@@ -2,7 +2,7 @@ import axios from "axios";
 import {REACT_APP_API_URL} from '@env';
 import handleErrorMessage from "./ErrorMessageHandler";
 
-const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFailure }) => {
+const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFailure, disableDefaultAlert }) => {
     try{
         console.log('REACT_APP_API_URL:', REACT_APP_API_URL);
         
@@ -23,15 +23,14 @@ const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFail
             if (onSuccess) onSuccess();
         }
     }catch(error){
+        const errorStatus = error.response.status;
+        const errorMessage = error.response.data.message;
         console.error('요청 실패: ', error);
         console.error('message: ', error.message);
-        console.error('server message: ', error.response.data.message);
+        console.error('server message: ', errorMessage);
 
-        /* console.error("error response: ", error.response); */
-        console.error("error status: ", error.response.status);
-
-        handleErrorMessage(error.response.status, error.response.data.message);
-        if(onFailure) onFailure();
+        if(!disableDefaultAlert) handleErrorMessage(errorStatus, errorMessage);
+        if(onFailure) onFailure(errorStatus, errorMessage);
     }
 }
 export default sendPatchRequest;

@@ -52,7 +52,7 @@ function CounselorMainScreen() {
           console.log("filtered data: ", filteredData);
           setMarkedDates(filteredData);
         },
-        /* onFailure: () => Alert.alert("실패", "월별 일정 조회 실패") */
+        /* onFailure: () => Alert.alert("요청 실패", "월별 일정 조회 실패"), */
       });
     }, [])
   );
@@ -69,7 +69,14 @@ function CounselorMainScreen() {
         console.log("data: ", data);
         setReservations(data.data);
       },
-      /* onFailure: () => Alert.alert("실패", "내 특정일 상담 목록 조회 실패"), */
+      onFailure: (status, message) => {
+        if(message.includes("Given")) {
+          Alert.alert("요청 실패", "기본 상담 시간을 설정해주세요");
+          return;
+        }
+        Alert.alert("실패", "내 특정일 상담 목록 조회 실패")
+      },
+      disableDefaultAlert: true,
     });
   };
 
