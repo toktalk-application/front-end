@@ -39,6 +39,9 @@ const MemberCounselScreen = () => {
       });
     }, [])
   );
+  const formatPrice = (price) => {
+    return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  };
 
   const renderItem = ({ item }) => {
     return (
@@ -46,13 +49,13 @@ const MemberCounselScreen = () => {
         <View style={styles.card}>
           <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
           <View style={styles.infoContainer}>
-            <Text style={styles.name}>{item.name} ⭐ {item.rating || '없음'} ({item.reviews})</Text>
+            <Text style={styles.name}>{item.name}   ⭐ {item.rating || '없음'} ({item.reviews})</Text>
             <Text style={styles.introduction}>{item.introduction}</Text>
             <View style={styles.priceContainer}>
               <Text style={styles.yellowText}>전화 </Text>
-              <Text style={styles.grayText}>{item.callPrice}원 </Text>
+              <Text style={styles.grayText}>{formatPrice(item.callPrice)}원 </Text>
               <Text style={styles.yellowText}>채팅 </Text>
-              <Text style={styles.grayText}>{item.chatPrice}원</Text>
+              <Text style={styles.grayText}>{formatPrice(item.chatPrice)}원</Text>
             </View>
           </View>
         </View>
@@ -81,7 +84,7 @@ const styles = StyleSheet.create({
   },
   card: {
     flexDirection: 'row',
-    padding: 10,
+    padding: 20,
     marginVertical: 10,
     marginHorizontal: 20,
     borderRadius: 10,
@@ -107,15 +110,17 @@ const styles = StyleSheet.create({
   },
   name: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
+    marginBottom:8
   },
   introduction: {
-    fontSize: 13,
+    fontSize: 15,
     color: 'gray',
   },
   priceContainer: {
     flexDirection: 'row', // 수평 정렬
     alignItems: 'center',
+    marginTop:5
   },
   yellowText: {
     color: '#FFA500', // 노란색

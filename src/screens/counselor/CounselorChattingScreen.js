@@ -51,8 +51,8 @@ function CounselorChattingScreen() {
     );
   }
 
-  const handleChatRoomPress = (roomId, nickname) => {
-    navigation.navigate('ChatRoom', { roomId, nickname });
+  const handleChatRoomPress = (roomId, nickname, counselorName) => {
+    navigation.navigate('ChatRoom', { roomId, nickname, counselorName});
   };
 
   const renderItem = ({ item }) => {
@@ -66,14 +66,16 @@ function CounselorChattingScreen() {
     return (
       <TouchableOpacity
         style={styles.chatRoom}
-        onPress={() => handleChatRoomPress(item.roomId, item.nickname)}
+        onPress={() => handleChatRoomPress(item.roomId, item.nickname, item.counselorName)}
       >
-        <View style={styles.row}>
-          <View>
-            <Text style={styles.memberName}>{item.nickname}</Text>
-            <Text style={styles.createdAt}>{displayText}</Text>
+        <View style={styles.chatRoomContainer}>
+          <View style={styles.infoContainer}>
+            <View style={styles.row}>
+              <Text style={styles.memberName}>{item.nickname} 내담자</Text>
+              <Text style={styles.createdAt}>{displayText}</Text>
+            </View>
+              <Text style= {styles.message}>{item.message}</Text>
           </View>
-            <Text></Text>
         </View>
       </TouchableOpacity>
     );
@@ -97,13 +99,30 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   listContainer: {
-    padding: 10,
   },
   chatRoom: {
-    padding: 15,
-    borderBottomWidth: 1,
     borderBottomColor: '#ccc',
     marginBottom: 5,
+  },
+  chatRoomContainer:{
+    flexDirection: 'row',
+    padding: 20,
+    marginVertical: 10,
+    marginHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 5,
+  },
+  infoContainer: {
+    flex: 1,
+    justifyContent: 'center',
   },
   row: {
     flexDirection: 'row',
@@ -112,15 +131,16 @@ const styles = StyleSheet.create({
   },
   memberName: {
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   createdAt: {
     color: '#666',
+    fontSize:16
   },
-  errorText: {
-    color: 'red',
-    textAlign: 'center',
-    marginTop: 20,
+  message:{
+    marginTop:5,
+    marginLeft:0,
+    fontSize:16
   },
 });
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
-import { useRoute } from '@react-navigation/native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, KeyboardAvoidingView, Platform, ActivityIndicator,Image } from 'react-native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import sendGetRequest from '../axios/SendGetRequest';
 import io from 'socket.io-client';
@@ -8,7 +8,8 @@ import io from 'socket.io-client';
 const ChatRoomScreen = () => {
   const { state } = useAuth();
   const route = useRoute();
-  const { roomId, memberNickname, counselorName } = route.params;
+  const navigation = useNavigation();
+  const { roomId, nickname, counselorName } = route.params;
 
   const [messages, setMessages] = useState([]);
   const [messageInput, setMessageInput] = useState('');
@@ -16,7 +17,10 @@ const ChatRoomScreen = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const socketRef = useRef(null);
+  const [inputHeight, setInputHeight] = useState(60); 
   const userType = state.usertype;
+  const maxHeight = 100; //input 값 최대. 
+  
 
   useEffect(() => {
     const fetchChatRoomInfo = () => {
@@ -24,8 +28,9 @@ const ChatRoomScreen = () => {
         token: state.token,
         endPoint: `/chat_rooms/${roomId}`,
         onSuccess: (data) => {
-          const sortedMessages = data.chatLogs.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+          const sortedMessages = data.chatLogs.sort((a, b) => b.logId - a.logId);
           setMessages(sortedMessages);
+          console.log(messages);
           setLoading(false);
         },
         onFailure: () => {
@@ -52,7 +57,7 @@ const ChatRoomScreen = () => {
 
     socket.on('message', (newMessage) => {
       console.log('메시지 수신:', newMessage);
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setMessages((prevMessages) => [newMessage, ...prevMessages ]);
     });
 
     socket.on('connect_error', (error) => {
@@ -78,24 +83,54 @@ const ChatRoomScreen = () => {
       console.log('메시지 전송:', newMessage);
       socketRef.current.emit('message', newMessage);  // 클라이언트에서 'message' 이벤트 전송
       setMessageInput('');
+      
     } else {
       console.error('Socket is not connected or message is empty');
     }
   };
+  useEffect(() => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+    }
+    }, [messages]);
+  useEffect(() => {
+      if (flatListRef.current) {
+        flatListRef.current.scrollToOffset({ offset: 0, animated: true });
+      }
+    }, []);
 
 
   // 메시지 렌더링 함수
   const renderMessage = ({ item }) => {
-    const isMyMessage = userType === 'MEMBER' ? state.nickname === item.sender : state.name === item.sender;
+    const nickname = state.nickname;
+    const name = state.name;
 
+    // 사용자가 member로 로그인했을 때, 현재 로그인한 사람의 nickname과 item.sender가 다르면 
+    // isOtherMessage가 true가 됨.
+    // 사용자가 counselor로 로그인했을 때, 현재 로그인한 사람의 name과 item.sender가 다르면 
+    // isOtherMessage가 true가 됨.
+    // isOtehrMessage 가 true 이면 아래 styles.oterMessage style 값을 가짐. 
+    const isOtherMessage = userType === 'MEMBER' ? nickname !== item.sender 
+        : userType === 'COUNSELOR' ? name !== item.sender : false;
+    
+    
     return (
-      <View style={[styles.messageContainer, isMyMessage ? styles.myMessage : styles.otherMessage]}>
-        {!isMyMessage && <Text style={styles.senderName}>{item.sender}</Text>}
-        <Text style={styles.messageText}>{item.message}</Text>
-        <Text style={styles.timestamp}>{new Date(item.createdAt).toLocaleTimeString()}</Text>
+      <View style={[styles.messageContainer, isOtherMessage ? styles.otherMessage : styles.myMessage]}>
+        {!isOtherMessage && (
+          <Text style={styles.myTimestamp}>
+            {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </Text>
+        )}
+        <Text style={[styles.messageText, isOtherMessage ? styles.oterhMessageColor : styles.myMessageColor]}>{item.message}</Text>
+        {isOtherMessage && (
+          <Text style={styles.otherTimestamp}>
+            {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </Text>
+        )}
       </View>
     );
   };
+
 
   // 로딩 중일 때 로딩 스피너 표시
   if (loading) {
@@ -113,24 +148,51 @@ const ChatRoomScreen = () => {
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding" keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Image source={require('../../assets/images/back.png')} style={styles.icon} />
+        </TouchableOpacity>
+        {userType === 'COUNSELOR' ? (
+              <Text style={styles.memberName}>{nickname} 내담자</Text>
+            ) : userType === 'MEMBER' ? (
+              <Text style={styles.memberName}>{counselorName} 상담사</Text>
+            ) : null}
+          <View style={styles.ImageCover}>
+              <Image source={require('../../assets/images/exist.png')} style={styles.ExistButtonImg}/>
+          </View>
+      </View>
       <FlatList
         ref={flatListRef}
         data={messages}
         renderItem={renderMessage}
         keyExtractor={(item, index) => index.toString()}
         contentContainerStyle={styles.chatContainer}
-        inverted={false}
+        inverted={true}
       />
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="메시지를 입력하세요..."
-          value={messageInput}
-          onChangeText={setMessageInput}
-          onSubmitEditing={handleSendMessage}
-        />
+          <TextInput
+                style={[styles.input, { height: inputHeight }]} // 동적으로 높이 설정
+                placeholder="메시지를 입력하세요..."
+                value={messageInput}
+                onChangeText={setMessageInput}
+                onSubmitEditing={handleSendMessage} // Enter 키로 메시지 전송
+                multiline={true} // 멀티라인 설정
+                onContentSizeChange={(e) => {
+                  const { height } = e.nativeEvent.contentSize; // nativeEvent를 사용하여 높이 가져오기
+                  // 최대 높이를 초과하지 않도록 설정
+                  if (height <= maxHeight) {
+                      setInputHeight(height);
+                  }
+                }}
+              // 텍스트가 삭제될 때 높이를 재조정
+                onKeyPress={({ nativeEvent }) => {
+                    if (nativeEvent.key === 'Backspace') {
+                        setInputHeight(Math.max(40, inputHeight - 10)); // 기본 높이로 리셋
+                    }
+                }}
+            />
         <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-          <Text style={styles.sendButtonText}>전송</Text>
+          <Image source={require('../../assets/images/send.png')} style={styles.sendButtonText}/>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -143,31 +205,80 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'white',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 25,
+  },
+  backButton: {
+    marginRight: 10,
+  },
+  icon: {
+    width: 25,
+    height: 25,
+  },
+  memberName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 4,
+    flex: 1,
+  },
+  ImageCover: {
+    backgroundColor:'#F1F1F1',
+    borderRadius: 30,
+    padding: 18,
+  },
+  ExistButtonImg:{
+    width:15,
+    height:15
+  },
   chatContainer: {
     padding: 10,
   },
   messageContainer: {
-    marginVertical: 10,
-    padding: 10,
-    borderRadius: 10,
-    maxWidth: '80%',
-  },
-  myMessage: {
-    alignSelf: 'flex-end',
-    backgroundColor: '#99A5B2', // 자신의 메시지 배경색
+    flexDirection: 'row', // 메시지와 타임스탬프를 가로로 정렬
+    alignItems: 'center', // 중앙 정렬
   },
   otherMessage: {
     alignSelf: 'flex-start',
-    backgroundColor: '#f1f0f0', // 상대방 메시지 배경색
+    alignItems: 'flex-end',
+  },
+  oterhMessageColor:{
+    marginVertical: 5,
+    padding: 10,
+    borderRadius: 10,
+    maxWidth: '100%', 
+    backgroundColor: '#f1f0f0',
+  },
+  myMessage: {
+    alignSelf: 'flex-end',
+    alignItems: 'flex-end',
+  },
+  myMessageColor: {
+    marginVertical: 5,
+    padding: 10,
+    borderRadius: 10,
+    maxWidth: '80%', 
+    backgroundColor: '#99A5B2', 
+    color:'#F1F1F1'
   },
   messageText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: 14,
+    marginHorizontal:5
   },
-  timestamp: {
-    fontSize: 12,
+  myTimestamp: {
+    fontSize: 11,
     color: '#888',
-    marginTop: 5,
+    marginLeft: 5, // 메시지와 타임스탬프 사이의 간격
+    marginBottom: 7 
+  },
+  otherTimestamp: {
+    fontSize: 11,
+    color: '#888',
+    marginRight: 5, // 메시지와 타임스탬프 사이의 간격
+    marginLieft: 5,
+    marginTop:3,
+    marginBottom: 7 
   },
   senderName: {
     fontSize: 14,
@@ -176,7 +287,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
-    padding: 10,
+    padding: 20,
     borderTopWidth: 1,
     borderTopColor: '#ccc',
     backgroundColor: 'white',
@@ -186,7 +297,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
-    paddingHorizontal: 10,
+    paddingHorizontal: 30,
   },
   sendButton: {
     marginLeft: 10,
@@ -203,6 +314,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 5,
+    borderTopWidth: 1,
+    borderTopColor: '#ccc',
+    backgroundColor: 'white',
+    marginBottom:15,
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical:10,
+    marginHorizontal:10,
+    marginTop:2
+  },
+  sendButton: {
+    backgroundColor:'#001F3F',
+    borderRadius: 20,
+    padding: 10,
+    marginTop:2,
+    marginRight:10
+  },
+  sendButtonText: {
+    width:20,
+    height:20
+  },
+
+
 });
 
 export default ChatRoomScreen;
