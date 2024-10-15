@@ -1,10 +1,11 @@
-import React, { memo, useState } from 'react';
+import React, { memo, useCallback, useState } from 'react';
 import { View, Text, TextInput, Button, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import { REACT_APP_API_URL } from '@env';
 import { useAuth } from '../auth/AuthContext';
 import messaging from '@react-native-firebase/messaging';
 import * as Keychain from 'react-native-keychain';
+import { useFocusEffect } from '@react-navigation/native';
 
 // 일반 사용자 로그인 화면
 function MemberLoginScreen({ navigation }) {
@@ -14,6 +15,13 @@ function MemberLoginScreen({ navigation }) {
   const { state } = useAuth();
   const [userIdError, setUserIdError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+
+  useFocusEffect(
+    useCallback(() => {
+      setUserId('');
+      setPassword('');
+    }, [])
+  );
 
   const validateUserId = (input) => {
     const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
