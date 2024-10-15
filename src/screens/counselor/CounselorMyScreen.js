@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import MenuItem from '../../components/MenuItem.js'; 
+import MenuItem from '../../components/MenuItem.js';
 import calendarIcon from '../../../assets/images/calendar.png'
 import chargeIcon from '../../../assets/images/charge.png'
 import profileIcon from '../../../assets/images/profile.png'
@@ -21,7 +21,7 @@ const CounselorMyScreen = () => {
       navigation.navigate('일정 관리'); // 일정 관리 화면으로 이동
     }
   };
-  const [myData, setMyData] = useState({data:{}});
+  const [myData, setMyData] = useState({ data: {} });
 
   useFocusEffect(
     React.useCallback(() => {
@@ -34,7 +34,7 @@ const CounselorMyScreen = () => {
         },
         /* onFailure: () => Alert.alert("요청 실패", "내 정보 GET요청 실패"), */
       });
-  
+
       // Optional cleanup if needed (none in your case)
       return () => {
         // Cleanup logic if any
@@ -47,28 +47,34 @@ const CounselorMyScreen = () => {
     <View style={styles.containder}>
       <View style={styles.infoContainer}>
         <View style={styles.nameBingContainer}>
-        <Image source={{ uri: myData.profileImage || 'https://via.placeholder.com/120' }} style={styles.image} />
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>{myData.name}</Text>
-            <Text style={styles.counselor}> 상담사님 </Text>
+          <Image source={{ uri: myData.profileImage || 'https://via.placeholder.com/120' }} style={styles.image} />
+          <View style = {{flexDirection: 'column'}}>
+            <View style={styles.nameContainer}>
+              <Text style={styles.name}>{myData.name}</Text>
+              <Text style={styles.counselor}> 상담사님 </Text>
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <Text>⭐</Text>
+              <Text>{' ' + myData.rating}</Text>
+            </View>
           </View>
         </View>
         <TouchableOpacity onPress={() => navigation.navigate('설정')}>
           <Image source={require('../../../assets/images/settings.png')} style={styles.icon} />
-      </TouchableOpacity>
+        </TouchableOpacity>
       </View>
       <View style={styles.menuContainer}>
-        <MenuItem 
+        <MenuItem
           icon={profileIcon} // 프로필 관리 이미지
           title="프로필 관리"
           onPress={() => handleMenuPress('프로필 관리')}
         />
-        <MenuItem 
+        <MenuItem
           icon={chargeIcon} // 요금 관리 아이콘
           title="요금 관리"
           onPress={() => handleMenuPress('요금 관리')}
         />
-        <MenuItem 
+        <MenuItem
           icon={calendarIcon} // 일정 관리 아이콘
           title="일정 관리"
           onPress={() => handleMenuPress('일정 관리')}
@@ -79,9 +85,9 @@ const CounselorMyScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  containder:{
-    backgroundColor:'white',
-    flex:1
+  containder: {
+    backgroundColor: 'white',
+    flex: 1
   },
   infoContainer: {
     flexDirection: 'row', // 좌우 배치
@@ -91,9 +97,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     padding: 10, // 약간의 패딩 추가
   },
-  nameBingContainer:{
+  nameBingContainer: {
     flexDirection: 'row', // 가로 방향으로 배치
-
+    alignItems: 'center'
   },
   image: {
     width: 80,
@@ -102,7 +108,7 @@ const styles = StyleSheet.create({
     marginRight: 10, // 이미지와 이름 사이의 간격
     marginLeft: 20
   },
-  nameContainer:{
+  nameContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10
@@ -118,12 +124,12 @@ const styles = StyleSheet.create({
   },
   menuContainer: {
     flexDirection: 'column', // 좌우 배치
-    padding: 20, 
+    padding: 20,
   },
   icon: {
     width: 20,
     height: 20,
-    marginRight:20
+    marginRight: 20
   },
 });
 
