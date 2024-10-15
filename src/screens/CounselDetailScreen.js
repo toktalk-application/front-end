@@ -7,6 +7,7 @@ import sendPostRequest from '../axios/SendPostRequest';  // 추가
 import { useAuth } from '../auth/AuthContext';
 import sendDeleteRequest from '../axios/DeleteRequest';
 import EmptyScreen from './EmptyScreen';
+import { Image } from 'react-native-animatable';
 
 const CounselDetailScreen = () => {
     const { state } = useAuth();
@@ -45,7 +46,7 @@ const CounselDetailScreen = () => {
                 token: state.token,
                 endPoint: `/reservations/${reservationId}`,
                 onSuccess: (data) => {
-                    console.log("data: ", data);
+                    console.log("reservation data: ", data);
                     setReservation(data.data);
                     setLoading(false);
 
@@ -81,7 +82,7 @@ const CounselDetailScreen = () => {
     }
 
     if (!reservation) {
-        return <EmptyScreen message='상담 정보를 찾을 수 없습니다'/>;
+        return <EmptyScreen message='상담 정보를 찾을 수 없습니다' />;
     }
     const formatDate = (dateString) => {
         if (!dateString) {
@@ -251,7 +252,18 @@ const CounselDetailScreen = () => {
                     <View style={styles.reviewContainer}>
                         <View style={styles.reviewTitle}>
                             <Text style={styles.subtitle}>후기</Text>
-                            <Text>{"⭐".repeat(reservation.review.rating)}</Text>
+                            {!reservation.review ? <View /> :
+                                <View style={{ flexDirection: 'row' }}>
+                                    {Array.from({ length: 5 - reservation.review.rating }, (_, index) => (
+                                        <Image
+                                            key={index} // 고유 키 지정
+                                            source={require('../../assets/images/starGray.png')}
+                                            style={{ width: 15, height: 15, marginTop: 3, marginLeft: 2 }} // 왼쪽 여백 추가
+                                        />
+                                    ))}
+                                    <Text>{"⭐".repeat(reservation.review.rating)}</Text>
+                                </View>
+                            }
                         </View>
                         {reservation.review && reservation.review.content ? (
                             <View>
@@ -440,6 +452,7 @@ const styles = StyleSheet.create({
     },
     reviewContent: {
         marginTop: 5,
+        marginRight: 10,
     },
     reportContainer: {
         marginBottom: 50,
