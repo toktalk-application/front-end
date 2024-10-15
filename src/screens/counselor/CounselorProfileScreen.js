@@ -46,6 +46,10 @@ function CounselorProfileScreen() {
             {/* 상담사 이름 및 정보 */}
             <View style={styles.infoContainer}>
               <Text style={styles.name}>{counselorData.name} 상담사</Text>
+              <View style={styles.ratingContainer}>
+                <Text>⭐</Text>
+                <Text>{' ' + counselorData.rating}</Text>
+              </View>
               <Text style={styles.introduce}>{counselorData.introduction}</Text>
               <View style={styles.pricingContainer}>
                 <Text style={styles.pricingName}>채팅</Text>
@@ -123,7 +127,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   pricingContainer: {
-    marginTop: 10,
+    /* marginTop: 10, */
     flexDirection: 'row',
   },
   pricingName: {
@@ -180,6 +184,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
+  ratingContainer:{
+    flexDirection: 'row',
+    alignItems: 'center', // 별점과 점수를 수평 중앙 정렬
+    marginTop: 5,
+    marginBottom: -18,
+  }
 });
 
 export default CounselorProfileScreen;
