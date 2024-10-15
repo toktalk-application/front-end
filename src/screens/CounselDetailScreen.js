@@ -52,128 +52,6 @@ const CounselDetailScreen = () => {
         });
     };
 
-    useEffect(() => {
-        const fetchReservationDetails = async () => {
-            try {
-                // 실제 API 호출 대신 더미 데이터 사용
-
-            const dummyData = [
-                {
-                    reservationId: 1,
-                    counselorId: 101,
-                    memberNickname: "홍길동",
-                    counselorName: "김상담사",
-                    comment: "제 고민은 이거고요...",
-                    type: "CHAT",
-                    status: "COMPLETED",
-                    date: "2024-01-17",
-                    startTime: "09:00",
-                    endTime: "10:50",
-                    price: 50000,
-                    review: {
-                        content: "오랜 심리적, 인간관계 상의 어려움에 대해 도움을 받고싶어 신청하였습니다.",
-                        rating: 4,
-                        createdAt: new Date().toISOString(),
-                    },
-                    report: {
-                        content: "최근 직장 내 갈등으로 힘들다고 하셨고...",
-                        createdAt: new Date().toISOString(),
-                    },
-                },
-                {
-                    reservationId: 2,
-                    counselorId: 102,
-                    memberNickname: "늄념",
-                    counselorName: "이상담사",
-                    comment: "지금 제 상황이 너무 힘들고...",
-                    type: "CALL",
-                    status: "CANCELLED_BY_CLIENT",
-                    cancelReason: "일정 변경",
-                    date: "2024-01-18",
-                    startTime: "11:00",
-                    endTime: "11:50",
-                    price: 50000,
-                },
-                {
-                    reservationId: 3,
-                    counselorId: 103,
-                    memberNickname: "이영희",
-                    counselorName: "박상담사",
-                    comment: "상담을 받고 싶습니다.",
-                    type: "CHAT",
-                    status: "COMPLETED",
-                    date: "2024-01-19",
-                    startTime: "12:00",
-                    endTime: "12:50",
-                    price: 50000,
-                    review: {
-                        content: "상담을 통해 많은 도움을 받았습니다.",
-                        rating: 5,
-                        createdAt: new Date().toISOString(),
-                    },
-                    report: {
-                    },
-                },
-                {
-                    reservationId: 4,
-                    counselorId: 104,
-                    memberNickname: "유재석",
-                    counselorName: "김상담사",
-                    comment: "상담을 받고 싶습니다.",
-                    type: "CALL",
-                    status: "CANCELLED_BY_COUNSELOR",
-                    cancelReason: "개인 사정",
-                    date: "2024-01-20",
-                    startTime: "13:00",
-                    endTime: "13:50",
-                    price: 50000,
-                },
-                {
-                    reservationId: 5,
-                    counselorId: 1,
-                    memberNickname: "눈누난나",
-                    counselorName: "안상담사",
-                    comment: "지친다 정말루다가",
-                    type: "CHAT",
-                    status: "COMPLETED",
-                    date: "2024-10-18",
-                    startTime: "09:00",
-                    endTime: "10:50",
-                    review: {
-                    },
-                    report: {
-                    },
-                },
-                {
-                    reservationId: 6,
-                    counselorId: 1,
-                    memberNickname: "김철수",
-                    counselorName: "고상담사",
-                    comment: "우울해요",
-                    type: "CALL",
-                    status: "COMPLETED",
-                    date: "2024-10-18",  
-                    startTime: "11:00",
-                    endTime: "11:50",
-                    review: {
-                    },
-                    report: {
-                    },
-                },
-            ];
-
-            const selectedReservation = dummyData.find(item => item.reservationId === reservationId);
-            setReservation(selectedReservation);
-            } catch (error) {
-                Alert.alert("오류", "예약 정보를 가져오는 데 실패했습니다.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchReservationDetails();
-    }, [reservationId]);
-
     if (loading) {
         return <ActivityIndicator size="large" color="#0000ff" />;
     }
@@ -192,9 +70,16 @@ const CounselDetailScreen = () => {
         const month = dateParts[1];
         const day = dateParts[2];
     
-        return `${month}.${day}`; // "YY.MM.DD" 형식으로 반환
+        // Date 객체 생성
+        const date = new Date(dateString);
+        // 요일 배열
+        const daysOfWeek = ["일", "월", "화", "수", "목", "금", "토"];
+        // 요일 가져오기
+        const dayOfWeek = daysOfWeek[date.getDay()];
+    
+        return `${year}.${month}.${day} (${dayOfWeek})`; // "YY.MM.DD (요일)" 형식으로 반환
     };
-
+    
     const sendDeleteReservationRequest = ({ cancelReason, onSuccess }) => {
         const requestParams = {};
         if(cancelReason !== null) requestParams.cancelReason = cancelReason;
@@ -292,13 +177,13 @@ const CounselDetailScreen = () => {
             ) : userType === 'MEMBER' ? (
                 <View style= {styles.dateDetailContainer}>
                     <Text style={styles.subtitle}>상담사 </Text>
-                    <Text style={styles.dateText}> {reservation.counselorName}</Text>
+                    <Text style={styles.nameText}> {reservation.counselorName}</Text>
                 </View>
             ) : null}
                 </View>
                 <View style={styles.contentContainer}>
                     <Text style={styles.subtitle}>상담 내용</Text>
-                    <Text>{reservation.comment}</Text>
+                    <Text style={{ marginLeft:15, fontSize:16}}>{reservation.comment}</Text>
                 </View>
             </View>
                 {userType === 'COUNSELOR' && reservation.status === 'PENDING' ? (
@@ -316,10 +201,25 @@ const CounselDetailScreen = () => {
                             <Text style={styles.buttonText}>상담 취소</Text>
                         </TouchableOpacity>
                     </View>
-                ) : reservation.status === "CANCELLED_BY_CLIENT" || reservation.status === "CANCELLED_BY_COUNSELOR" ? (
+                ) : reservation.status === "CANCELLED_BY_CLIENT" ? (
                     <View style={styles.cancelReasonContainer}>
-                        <Text style={styles.subtitle}>취소 사유</Text>
-                        <Text>{reservation.cancelReason}</Text>
+                        <Text style={styles.subtitle}>취소 내용</Text>
+                        <View style={styles.cancelDetailContainer}>
+                            <Text style={styles.cencelName}> 취소자 </Text>
+                            <Text style={{fontSize: 15}}>  내담자 </Text>
+                        </View>
+                    </View>
+                ) : reservation.status === "CANCELLED_BY_COUNSELOR" ? (
+                    <View style={styles.cancelReasonContainer}>
+                        <Text style={styles.subtitle}>취소 내용</Text>
+                        <View style={styles.cancelDetailContainer}>
+                            <Text style={styles.cencelName}> 취소자 </Text>
+                            <Text style={{fontSize: 15}}>  상담사 </Text>
+                        </View>
+                        <View style={styles.cancelDetailContainer}>
+                            <Text style={styles.cencelName}> 취소 사유 </Text>
+                            <Text style={{fontSize: 15}}>  {reservation.cancelComment}</Text>
+                        </View>
                     </View>
                 ) : (
                 <>
@@ -447,33 +347,40 @@ const styles = StyleSheet.create({
     },
     memberDetail: {
         flex: 1,
-        marginRight: 10,
         flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom:5,
+        marginLeft:15
     },
     memberDetailTitleNickname:{
         width:60,
         fontWeight: 'bold',
         textAlign: 'center',
-        paddingLeft:8
+        fontSize:15
     },
     memberDetailTitle:{
         width:60,
         fontWeight: 'bold',
         textAlign: 'right',
+        fontSize:15
     },
     memberDetailContent:{
-        width:60,
-        marginLeft:20
+        width:90,
+        marginLeft:20,
     },
     subtitle: {
         fontSize: 18,
         fontWeight: 'bold',
     },
     dateText: {
-        fontSize: 15,
+        fontSize: 16,
+        color: '#333',
+        marginHorizontal: 7,
+    },
+    nameText:{
+        fontSize: 16,
         color: '#333',
         marginHorizontal: 10,
-        marginTop: 2
     },
     type: {
         color: 'white',
@@ -542,6 +449,18 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1, // 그림자 투명도
         shadowRadius: 4, // 그림자 퍼짐 정도
         elevation: 5, // Android에서의 그림자 깊이
+    },
+    cancelDetailContainer:{
+        flexDirection: 'row', // 가로 방향 정렬
+        alignItems: 'center',
+        marginBottom:10,
+        marginLeft:10
+    },
+    cencelName:{
+        textAlign: 'center',
+        fontSize:16,
+        fontWeight: 'bold',
+
     },
     pendingButtonContainer: {
         flexDirection: 'row',
