@@ -88,10 +88,10 @@ const MemberReservationScreen = () => {
                     ))}
                 </Picker>
             </View>
-            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
-                {isLoading ? <View> </View> : reservations.length === 0 ? 
+            <ScrollView>
+                {isLoading ? <View></View> : reservations.length === 0 ? 
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <EmptyScreen message="상담 내역이 없습니다" />
+                        <EmptyScreen message="상담 예약 내역이 없습니다" />
                     </View> : reservations.map(reservation => (
                     <TouchableOpacity
                         key={reservation.reservationId}
