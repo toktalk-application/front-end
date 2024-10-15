@@ -46,7 +46,7 @@ const MemberCounselScreen = () => {
         <View style={styles.card}>
           <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
           <View style={styles.infoContainer}>
-            <Text style={styles.name}>{item.name} ⭐ {item.rating} ({item.reviews})</Text>
+            <Text style={styles.name}>{item.name} ⭐ {item.rating || '없음'} ({item.reviews})</Text>
             <Text style={styles.introduction}>{item.introduction}</Text>
             <View style={styles.priceContainer}>
               <Text style={styles.yellowText}>전화 </Text>
