@@ -8,7 +8,9 @@ import { useFocusEffect } from '@react-navigation/native';
 function PricingSettingScreen() {
   const { state } = useAuth();
   const [chatPrice, setChatPrice] = useState('0');
+  const [initialChatPrice, setInitialChatPrice] = useState('0'); // 초기 가격 상태 추가
   const [callPrice, setCallPrice] = useState('0');
+  const [initialCallPrice, setInitialCallPrice] = useState('0'); // 초기 가격 상태 추가
   const [isLoading, setIsLoading] = useState(true);
 
   // useEffect(() => {
@@ -33,7 +35,9 @@ function PricingSettingScreen() {
         onSuccess: (data) => {
           console.log("initial data: ", data);
           setChatPrice(String(data.data.chatPrice));
+          setInitialChatPrice(String(data.data.chatPrice)); // 초기 가격 저장
           setCallPrice(String(data.data.callPrice));
+          setInitialCallPrice(String(data.data.callPrice)); // 초기 가격 저장
           setIsLoading(false);
         },
         /* onFailure: () => Alert.alert("실패!", "내 정보 GET요청 실패") */
@@ -58,16 +62,24 @@ function PricingSettingScreen() {
           />
           <Text style={styles.currency}>원</Text>
           <TouchableOpacity style={styles.button}>
+
             <Text style={styles.buttonText} onPress={() => {
-              sendPatchRequest({
-                token: state.token,
-                endPoint: "/counselors",
-                requestBody: {
-                  chatPrice: chatPrice,
-                },
-                onSuccess: () => Alert.alert("성공", "상담 가격 변경 성공!"),
-                /* onFailure: () => Alert.alert("실패", "상담 가격 변경 실패!"), */
-              })
+              if (chatPrice === initialChatPrice) {
+                Alert.alert("알림", "수정된 내용이 없습니다."); // 수정된 내용이 없을 경우
+              } else {
+                sendPatchRequest({
+                  token: state.token,
+                  endPoint: "/counselors",
+                  requestBody: {
+                    chatPrice: chatPrice,
+                  },
+                  onSuccess: () => {
+                    Alert.alert("성공", "채팅 상담 가격 변경 성공!")
+                    setInitialChatPrice(chatPrice);
+                  },
+                  /* onFailure: () => Alert.alert("실패", "상담 가격 변경 실패!"), */
+                });
+              }
             }}>변경</Text>
         </TouchableOpacity>
       </View>
@@ -89,7 +101,24 @@ function PricingSettingScreen() {
       />
       <Text style={styles.currency}>원</Text>
       <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>변경</Text>
+        <Text style={styles.buttonText} onPress={() => {
+              if (callPrice === initialCallPrice) {
+                Alert.alert("알림", "수정된 내용이 없습니다."); // 수정된 내용이 없을 경우
+              } else {
+                sendPatchRequest({
+                  token: state.token,
+                  endPoint: "/counselors",
+                  requestBody: {
+                    callPrice: callPrice,
+                  },
+                  onSuccess: () => {
+                    Alert.alert("성공", "채팅 상담 가격 변경 성공!")
+                    setInitialCallPrice(callPrice);
+                  },
+                  /* onFailure: () => Alert.alert("실패", "상담 가격 변경 실패!"), */
+                });
+              }
+            }} >변경</Text>
       </TouchableOpacity>
     </View>
   </View>

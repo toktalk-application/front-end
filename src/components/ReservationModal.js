@@ -36,7 +36,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
   const [availability, setAvailability] = useState(initialTimes);
   const [availableTimes, setAvailableTimes] = useState({});
 
-  /* useEffect(() => {
+  useEffect(() => {
     if (visible) {
       // 모달이 열릴 때 애니메이션 시작
       Animated.timing(slideAnim, {
@@ -59,36 +59,36 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
 
   useEffect(() => {
     console.log('Updated time:', time); // time 상태가 변경될 때마다 출력
-  }, [time]); */
+  }, [time]); 
 
-  useFocusEffect(
-    useCallback(() => {
-      if (visible) {
-        // 모달이 열릴 때 애니메이션 시작
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-      } else {
-        // 모달이 닫힐 때 애니메이션 시작
-        Animated.timing(slideAnim, {
-          toValue: 800,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (visible) {
+  //       // 모달이 열릴 때 애니메이션 시작
+  //       Animated.timing(slideAnim, {
+  //         toValue: 0,
+  //         duration: 300,
+  //         useNativeDriver: true,
+  //       }).start();
+  //     } else {
+  //       // 모달이 닫힐 때 애니메이션 시작
+  //       Animated.timing(slideAnim, {
+  //         toValue: 800,
+  //         duration: 300,
+  //         useNativeDriver: true,
+  //       }).start();
   
-        // 모달이 닫힐 때 상태 초기화
-        resetState();
-      }
-    }, [time])
-  );
+  //       // 모달이 닫힐 때 상태 초기화
+  //       resetState();
+  //     }
+  //   }, [time])
+  // );
 
-  useFocusEffect(
-    useCallback(() => {
-      console.log('Updated time:', time); // time 상태가 변경될 때마다 출력
-    }, [visible])
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     console.log('Updated time:', time); // time 상태가 변경될 때마다 출력
+  //   }, [visible])
+  // );
 
   // 상태 초기화 함수
   const resetState = () => {
