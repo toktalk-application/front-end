@@ -5,6 +5,7 @@ import timeLine from '../../../assets/images/timeLine.png'
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+import EmptyScreen from '../EmptyScreen';
 
 const MemberReservationScreen = () => {
     const { state } = useAuth();
@@ -50,7 +51,7 @@ const MemberReservationScreen = () => {
                 },
                 onSuccess: (data) => {
                     console.log("reservations: ", data);
-                    const completedReservations = data.data.filter(reservation => !reservation.status.includes("CANCELLED"));
+                    const completedReservations = data.data.filter(reservation => reservation.status !== "CANCELLED");
                     const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
                     setReservations(data.data);
                     setCompletedCount(completedReservations.length || 0);
@@ -87,8 +88,11 @@ const MemberReservationScreen = () => {
                     ))}
                 </Picker>
             </View>
-            <ScrollView>
-                {isLoading ? <View></View> : reservations.length === 0 ? <View><Text>상담 예약 내역이 없습니다</Text></View> : reservations.map(reservation => (
+            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+                {isLoading ? <View> </View> : reservations.length === 0 ? 
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <EmptyScreen message="상담 내역이 없습니다" />
+                    </View> : reservations.map(reservation => (
                     <TouchableOpacity
                         key={reservation.reservationId}
                         onPress={() => handleReservationPress(reservation.reservationId)}
@@ -281,3 +285,4 @@ const styles = StyleSheet.create({
 });
 
 export default MemberReservationScreen;
+

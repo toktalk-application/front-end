@@ -6,6 +6,7 @@ import sendGetRequest from '../axios/SendGetRequest';
 import sendPostRequest from '../axios/SendPostRequest';  // 추가
 import { useAuth } from '../auth/AuthContext';
 import sendDeleteRequest from '../axios/DeleteRequest';
+import EmptyScreen from './EmptyScreen';
 
 const CounselDetailScreen = () => {
     const { state } = useAuth();
@@ -80,7 +81,7 @@ const CounselDetailScreen = () => {
     }
 
     if (!reservation) {
-        return <Text>예약 정보를 찾을 수 없습니다.</Text>;
+        return <EmptyScreen message='상담 정보를 찾을 수 없습니다'/>;
     }
     const formatDate = (dateString) => {
         if (!dateString) {

@@ -68,6 +68,15 @@ function CounselorEditScreen() {
             expertise,
             sessionDescription,
         };
+        if (!introduction || !expertise || !sessionDescription) {
+            Alert.alert("알림", "모든 필드를 채워주세요."); // 필드가 비어있을 경우 경고
+            return;
+        }
+
+        if (!profileImage) {
+            Alert.alert("알림", "사진을 등록해주세요"); // 필드가 비어있을 경우 경고
+            return;
+        }
 
         // 변경된 내용 체크
         if (
@@ -111,7 +120,7 @@ function CounselorEditScreen() {
                 <Text style={styles.sectionTitle}>자기 소개</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder={isLoading ? "입력해주세요" : introduction}
+                    placeholder="입력해주세요"
                     value={introduction}
                     onChangeText={setIntroduction} />
             </View>

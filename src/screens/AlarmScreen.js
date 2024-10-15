@@ -1,16 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getNotifications, markNotificationAsRead, deleteNotification } from './notificationService';
+import EmptyScreen from './EmptyScreen';
 
 const AlarmScreen = () => {
   const [notifications, setNotifications] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
-
-  /* useEffect(() => {
-    loadNotifications();
-  }, []); */
 
   useFocusEffect(
     useCallback(() => {
@@ -62,9 +59,14 @@ const AlarmScreen = () => {
         data={notifications}
         renderItem={renderNotificationItem}
         keyExtractor={(item) => item.notificationId}
-        ListEmptyComponent={<Text>알림이 없습니다.</Text>}
+        ListEmptyComponent={
+          <View style={styles.centerContainer}>
+            <EmptyScreen message="알림이 없습니다." />
+          </View>
+        }
         refreshing={isLoading}
         onRefresh={loadNotifications}
+        contentContainerStyle={notifications.length === 0 ? styles.emptyList : null} // 알림이 없을 때 중앙 정렬
       />
     </View>
   );
@@ -77,7 +79,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   centerContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
     flex: 1,
+  },
+  emptyList: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
