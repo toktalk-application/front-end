@@ -4,6 +4,7 @@ import MenuItem from '../components/MenuItem';
 import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import sendPostRequest from '../axios/SendPostRequest';
+import sendDeleteRequest from '../axios/DeleteRequest';
 
 const SettingsScreen = () => {
   const { state } = useAuth();
@@ -42,7 +43,17 @@ const SettingsScreen = () => {
     // 회원 탈퇴 로직 추가
     Alert.alert("회원 탈퇴", "정말 회원 탈퇴 하시겠습니까?", [
       { text: "취소", style: "cancel" },
-      { text: "탈퇴", onPress: () => console.log("Account deleted") },
+      { text: "탈퇴", onPress: () => {
+        sendDeleteRequest({
+          token: state.token,
+          endPoint: "/members",
+          onSuccess: () => {
+            Alert.alert("탈퇴 완료", "톡터를 이용해주셔서 감사합니다.");
+            logout();
+            navigation.navigate("로그인");
+          }
+        })
+      } },
     ]);
   };
 
