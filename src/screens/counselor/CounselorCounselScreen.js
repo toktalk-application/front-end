@@ -126,15 +126,18 @@ const CounselorCounselScreen = () => {
                 </Picker>
             </View>
             <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
-                {isLoading ? <View> </View> : reservations.length === 0 ? 
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <EmptyScreen message="상담 내역이 없습니다" />
-                        </View> : reservations.map(reservation => (
-                        <TouchableOpacity
-                            key={reservation.reservationId}
-                            onPress={() => handleReservationPress(reservation.reservationId)}
-                            style={styles.card}
-                        >
+                {isLoading ? (
+                    <Text> 로딩중... </Text>  // Add proper loading text
+                ) : reservations.length === 0 ? (
+                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                        <EmptyScreen message="상담 내역이 없습니다" />
+                    </View>
+                ) : reservations.map(reservation => (
+                    <TouchableOpacity
+                        key={reservation.reservationId}
+                        onPress={() => handleReservationPress(reservation.reservationId)}
+                        style={styles.card}
+                    >
                         <View style={styles.row}>
                             <View style={styles.verticalLine} />
                             <View style={styles.infoContainer}>
@@ -149,13 +152,13 @@ const CounselorCounselScreen = () => {
                                 <View style={styles.contentsContainer}>
                                     <View style={styles.detailsFirstContainer}>
                                         <View style={styles.nicknameContainer}>
-                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>내담자     </Text>
+                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>내담자</Text>
                                             <Text style={styles.nickname}>{reservation.memberNickname}</Text>
                                         </View>
                                         <Text style={styles.type}>{reservation.type}</Text>
                                     </View>
                                     <View style={styles.detailsContainer}>
-                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담 내용  </Text>
+                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담 내용</Text>
                                         <Text style={styles.comment}>{reservation.comment}</Text>
                                     </View>
                                     <View style={styles.divider} />
@@ -180,7 +183,7 @@ const CounselorCounselScreen = () => {
                     <Text style={styles.totalAmount}>총 매출액 </Text>
                     <Text style={{ marginTop: 3 }}> {completedCount} 건 </Text>
                 </View>
-                <Text style={{ fontSize: 16 }} >{totalAmount.toLocaleString()} 원</Text>
+                <Text style={{ fontSize: 16 }}>{totalAmount.toLocaleString()} 원</Text>
             </View>
         </View>
     );
