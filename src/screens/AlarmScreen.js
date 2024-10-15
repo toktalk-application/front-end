@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { getNotifications, markNotificationAsRead, deleteNotification } from './notificationService';
@@ -18,17 +18,21 @@ const AlarmScreen = () => {
   );
 
   useEffect(() => {
-    // 화면에 진입할 때 읽지 않은 알림 수를 알림 목록의 길이로 설정
-    setUnreadNotifications(notifications.length);
+    setUnreadNotifications(notifications.filter(n => !n.read).length);
   }, [notifications]);
 
   const loadNotifications = async () => {
     setIsLoading(true);
     try {
       const fetchedNotifications = await getNotifications();
-      setNotifications(fetchedNotifications);
+      const validatedNotifications = fetchedNotifications.map(notification => ({
+        ...notification,
+        notificationId: notification.notificationId || `temp-${Date.now()}-${Math.random()}`
+      }));
+      setNotifications(validatedNotifications);
     } catch (error) {
       console.error('알림 로드 실패:', error);
+      Alert.alert('오류', '알림을 불러오는 데 실패했습니다. 다시 시도해 주세요.');
     } finally {
       setIsLoading(false);
     }
@@ -38,22 +42,34 @@ const AlarmScreen = () => {
     try {
       await markNotificationAsRead(notification.notificationId);
       await deleteNotification(notification.notificationId);
-      // 알림 목록에서 해당 알림 제거
+      
       setNotifications(prevNotifications => 
         prevNotifications.filter(n => n.notificationId !== notification.notificationId)
       );
-      // 읽지 않은 알림 수 감소
+      
       setUnreadNotifications(prev => Math.max(0, prev - 1));
-      // CounselDetailScreen으로 네비게이트
-      navigation.navigate('CounselDetailScreen', { reservationId: notification.reservationId });
+      
+      switch (notification.type) {
+        case 'RESERVATION':
+          console.log('Reservation ID:', notification.reservationId);
+          navigation.navigate('CounselDetailScreen', { reservationId: notification.reservationId });
+          break;
+        case 'CHAT':
+          navigation.navigate('ChatRoomScreen', { roomId: notification.roomId });
+          break;
+        default:
+          console.warn('알 수 없는 알림 타입:', notification.type);
+          Alert.alert('알림', '지원하지 않는 알림 유형입니다.');
+      }
     } catch (error) {
       console.error('알림 처리 실패:', error);
+      Alert.alert('오류', '알림 처리 중 문제가 발생했습니다. 다시 시도해 주세요.');
     }
   };
 
   const renderNotificationItem = ({ item }) => (
     <TouchableOpacity 
-      style={styles.notificationItem}
+      style={[styles.notificationItem, item.read && styles.readNotification]}
       onPress={() => handleNotificationPress(item)}
     >
       <Text style={styles.notificationTitle}>{item.title}</Text>
@@ -69,7 +85,7 @@ const AlarmScreen = () => {
       <FlatList
         data={notifications}
         renderItem={renderNotificationItem}
-        keyExtractor={(item) => item.notificationId}
+        keyExtractor={(item) => item.notificationId || `notification-${item.createdAt}`}
         ListEmptyComponent={
           <View style={styles.centerContainer}>
             <EmptyScreen message="알림이 없습니다" />
@@ -77,7 +93,7 @@ const AlarmScreen = () => {
         }
         refreshing={isLoading}
         onRefresh={loadNotifications}
-        contentContainerStyle={notifications.length === 0 ? styles.emptyList : null} // 알림이 없을 때 중앙 정렬
+        contentContainerStyle={notifications.length === 0 ? styles.emptyList : null}
       />
     </View>
   );
