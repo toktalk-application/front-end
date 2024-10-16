@@ -315,7 +315,7 @@ function MemberSignUpScreen() {
         </View>
         <View style={{ width : '100%' }}>
           <View style={styles.datePickerContainer}>
-            <CustomDatePicker style={styles.datePicker} birthDate={birthDate} setBirthDate={setBirthDate} />
+            <CustomDatePicker style={styles.datePicker} birthDate={birthDate} setBirthDate={setBirthDate} placeholder={'생년월일을 입력해주세요'} />
           </View>
         </View>
       </View>

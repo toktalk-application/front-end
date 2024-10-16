@@ -259,7 +259,7 @@ function CounselorSignUpScreen() {
     }
   };
 
-
+  console.log("birthDate in screen: ", birthDate);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.sectionContainer}>
@@ -324,7 +324,7 @@ function CounselorSignUpScreen() {
         </View>
         <View style={{ width : '100%' }}>
           <View style={styles.datePickerContainer}>
-            <CustomDatePicker style={styles.datePicker} birthDate={birthDate} setBirthDate={setBirthDate} />
+            <CustomDatePicker style={styles.datePicker} birthDate={birthDate} setBirthDate={setBirthDate} placeholder='생년월일을 선택해주세요' />
           </View>
         </View>
       </View>
