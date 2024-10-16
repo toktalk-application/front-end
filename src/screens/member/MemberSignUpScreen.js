@@ -38,8 +38,10 @@ function MemberSignUpScreen() {
   const [residentNumber1, setResidentNumber1] = useState('');
   const [residentNumber2, setResidentNumber2] = useState('');
   const [carrier, setCarrier] = useState('');
+
   // 본인인증 내용이 다 맞으면 패스 인증으로 넘어감. 
   const [modalVisible, setModalVisible] = useState(false);
+  const [passVerified, setPassVerified] = useState(false);
 
   const residentNumber2InputRef = React.useRef(null);
 
@@ -162,6 +164,10 @@ function MemberSignUpScreen() {
 
     if(!nicknameDuplChecked) {
       Alert.alert('오류', '닉네임 중복 확인을 진행해주세요.');
+      return;
+    }
+    if(!passVerified){
+      Alert.alert('오류', 'PASS인증을 진행해주세요.');
       return;
     }
 
@@ -417,7 +423,11 @@ function MemberSignUpScreen() {
 
       <PassModal 
         visible={modalVisible} 
-        onClose={() => setModalVisible(false)} 
+        onClose={() => setModalVisible(false)}
+        onSuccess={() => {
+          setModalVisible(false);
+          setPassVerified(true);
+        }}
         name={name} 
         phoneNumber={phoneNumber} 
         carrier={carrier} 

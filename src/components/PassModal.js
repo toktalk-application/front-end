@@ -4,7 +4,7 @@ import sendPostRequest from '../axios/SendPostRequest';
 import { REACT_APP_API_URL } from '@env';
 import axios from 'axios';
 
-const PassModal = ({ visible, onClose, name, phoneNumber, carrier, residentNumber1, residentNumber2 }) => {
+const PassModal = ({ visible, onClose, onSuccess, name, phoneNumber, carrier, residentNumber1, residentNumber2 }) => {
     const handleComplete = () => {
         const fullResidentNumber = residentNumber1 + residentNumber2;
 
@@ -62,23 +62,26 @@ const PassModal = ({ visible, onClose, name, phoneNumber, carrier, residentNumbe
             switch (code) {
                 case "CF-00000":
                     Alert.alert('인증 성공', "인증이 완료되었습니다.");
-                    onClose();
+                    onSuccess();
                     break;
                 case "CF-00025":
                     Alert.alert('인증 성공', "인증이 이미 완료되었습니다.");
-                    onClose();
+                    onSuccess();
                     break;
                 case "CF-03002":
-                    Alert.alert('인증 실패', "인증이 완료되지 않았습니다.");
+                    Alert.alert('인증 실패', "인증을 완료해주세요.");
                     break;
                 case "CF-12001":
-                    Alert.alert('인증 실패', "요청 시간이 초과되었습니다. 다시 시도해주세요");
+                    Alert.alert('인증 실패', "요청 시간이 초과되었습니다. 잠시 기다렸다가 다시 시도해주세요");
+                    onClose();
                     break;
                 case "CF-00016":
-                    Alert.alert('인증 실패', "동일한 요청이 처리 중입니다. 다시 시도해주세요");
+                    Alert.alert('인증 실패', "동일한 요청이 처리 중입니다. 잠시 기다렸다가 다시 시도해주세요");
+                    onClose();
                     break;
                 default:
                     Alert.alert('인증 실패', "인증에 실패하였습니다.");
+                    onClose();
             }
         } catch (error) {
             /* setModalVisible(false); */
