@@ -4,6 +4,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import EmptyScreen from '../EmptyScreen';
+import LoadingScreen from '../LoadingScreen';
 
 const MemberCounselScreen = () => {
   const { state } = useAuth();
@@ -57,7 +58,7 @@ const MemberCounselScreen = () => {
               <Text style={styles.name}>{item.name} </Text>
               <Text style={styles.star}>  ⭐ {item.rating || '없음'} ({'리뷰 ' + item.reviews + "건"})</Text>
             </View>
-            <Text style={styles.introduction}>{item.introduction}</Text>
+            <Text style={styles.introduction} numberOfLines={2} ellipsizeMode="tail" >{item.introduction}</Text>
             <View style={styles.priceContainer}>
               <Text style={styles.yellowText}>전화 </Text>
               <Text style={styles.grayText}>{formatPrice(item.callPrice)}원 </Text>
@@ -72,7 +73,9 @@ const MemberCounselScreen = () => {
 
   return (
     <View style={styles.container}>
-      {counselors.length === 0 ? <EmptyScreen message="상담사가 없습니다"/> : <FlatList
+      {isLoading ? ( // isLoading이 true일 때 로딩 스피너 표시
+        <LoadingScreen message={'상담사 정보를 불러오는 중입니다..'}/>
+      ) : counselors.length === 0 ? <EmptyScreen message="상담사가 없습니다"/> : <FlatList
         data={counselors}
         renderItem={renderItem}
         keyExtractor={item => item.counselorId.toString()}
@@ -96,6 +99,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderRadius: 10,
     backgroundColor: 'white',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -132,6 +136,7 @@ const styles = StyleSheet.create({
   introduction: {
     fontSize: 14,
     color: 'gray',
+    height:40
   },
   priceContainer: {
     flexDirection: 'row', // 수평 정렬

@@ -149,7 +149,7 @@ function Tabs({ route, navigation }) {
   const { userType } = route.params; 
 
   const getTabIcon = (focusedIcon, unfocusedIcon) => ({ focused, color, size }) => (
-    <Icon name={focused ? focusedIcon : unfocusedIcon} size={size} color={color} />
+    <Icon name={focused ? focusedIcon : unfocusedIcon} size={35} color={color} />
   );
   const FOCUS_COLOR = '#1B3A57';
 
@@ -158,7 +158,7 @@ function Tabs({ route, navigation }) {
       screenOptions={({ route }) => ({
         tabBarActiveTintColor: FOCUS_COLOR,
         tabBarInactiveTintColor: 'gray',
-        tabBarStyle: { paddingBottom: 5 },
+        tabBarStyle: { height:80 },
         header: ({ navigation, route }) => (
           <CustomHeader routeName={route.name} navigation={navigation} />
         ),
@@ -170,7 +170,7 @@ function Tabs({ route, navigation }) {
             tabBarIcon: getTabIcon('home', 'home-outline'),
             tabBarLabel: () => null,
           }} />
-          <Tab.Screen name="상담" component={MemberCounselScreen} options={{
+          <Tab.Screen name="상담사 선택하기" component={MemberCounselScreen} options={{
             tabBarIcon: getTabIcon('heart', 'heart-outline'),
             tabBarLabel: () => null,
           }} />
@@ -218,9 +218,9 @@ function App() {
       <NotificationSetup />
         <NavigationContainer>
           <Stack.Navigator>
+            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
             <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
             <Stack.Screen name="로그인" component={LoginScreen} />
-            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
             <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
             <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
             <Stack.Screen name="알림" component={AlarmScreen} />
@@ -270,16 +270,18 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
   },
   logo: {
-    width: 100,
+    width: 120,
     height: 40,
+    marginLeft:5
   },
   title: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   alarmIcon: {
-    width: 18,
-    height: 20,
+    width: 27,
+    height: 30,
+    marginRight:5
   },
 });
 

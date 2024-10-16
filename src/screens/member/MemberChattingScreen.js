@@ -5,6 +5,7 @@ import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import { useCallback } from 'react';
 import EmptyScreen from '../EmptyScreen';
+import LoadingScreen from '../LoadingScreen';
 
 function MemberChattingScreen() {
   const navigation = useNavigation();
@@ -12,6 +13,7 @@ function MemberChattingScreen() {
   const [chatRooms, setChatRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchChatRooms = async () => {
     setLoading(true);
@@ -30,7 +32,7 @@ function MemberChattingScreen() {
       }, */
     });
 
-    setLoading(false);
+    setIsLoading(false);
   };
 
   // 화면이 포커스될 때마다 데이터를 다시 로드
@@ -40,10 +42,7 @@ function MemberChattingScreen() {
     }, [])
   );
 
-  if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
-  }
-
+  
   if (error) {
     return (
       <View style={styles.container}>
@@ -100,7 +99,9 @@ function MemberChattingScreen() {
 
   return (
     <View style={styles.container}>
-      {chatRooms.length === 0 ? <EmptyScreen message="채팅 내역이 없습니다"/>  : <FlatList
+      {isLoading ? ( // isLoading이 true일 때 로딩 스피너 표시
+        <LoadingScreen message={'채팅 정보를 불러오는 중입니다..'}/>
+      ) : chatRooms.length === 0 ? <EmptyScreen message="채팅 내역이 없습니다"/>  : <FlatList
         data={chatRooms}
         keyExtractor={(item) => item.roomId.toString()}
         renderItem={renderItem}

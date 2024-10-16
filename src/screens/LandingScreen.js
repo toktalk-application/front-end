@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,       // Space between the quote images and text
   },
   text: {
-    fontSize: 13,
+    fontSize: 17,
     fontWeight: 'bold',
     marginVertical: 5,       // Space between the quotes and text
   },

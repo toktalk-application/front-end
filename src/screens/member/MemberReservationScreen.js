@@ -6,6 +6,7 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import EmptyScreen from '../EmptyScreen';
+import LoadingScreen from '../LoadingScreen';
 
 const MemberReservationScreen = () => {
     const { state } = useAuth();
@@ -92,7 +93,7 @@ const MemberReservationScreen = () => {
                 </View>
             </View>
             <ScrollView>
-                {isLoading ? <View></View> : reservations.length === 0 ? 
+                {isLoading ? <LoadingScreen message={'상담 예약 정보를 불러오는 중입니다..'}/> : reservations.length === 0 ? 
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <EmptyScreen message="상담 예약 내역이 없습니다" />
                     </View> : reservations.map(reservation => (
@@ -122,7 +123,7 @@ const MemberReservationScreen = () => {
                                     </View>
                                     <View style={styles.detailsContainer}>
                                         <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담 내용  </Text>
-                                        <Text style={styles.comment}>{reservation.comment}</Text>
+                                        <Text style={styles.comment} numberOfLines={1} ellipsizeMode="tail">{reservation.comment}</Text>
                                     </View>
                                     <View style={styles.divider} />
                                     {reservation.status.startsWith('CANCELLED') ? (
@@ -244,7 +245,8 @@ const styles = StyleSheet.create({
     },
     detailsFirstContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginBottom:5
     },
     nicknameContainer: {
         flexDirection: 'row',
@@ -258,7 +260,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#555',
         marginBottom: 5,
-        marginLeft: 5
+        marginLeft: 5,
+        marginRight:70
     },
     priceContainer: {
         flexDirection: 'row',
