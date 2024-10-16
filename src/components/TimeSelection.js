@@ -10,6 +10,15 @@ const TimeSelection = ({ availability, availableTimes, onTimePress }) => {
       return styles.unavailableButton;
     }
   }
+
+  const getTextStyle = (time) => {
+    if (availableTimes[time]) {
+      return availability[time] ? styles.selectedText : styles.timeButtonText; // 선택된 경우 흰색, 기본은 검은색
+    } else {
+      return styles.disabledText; // 비활성화된 경우 회색
+    }
+  };
+
   const isDisabled = (time) => {
     return !availableTimes[time];
   }
@@ -22,7 +31,7 @@ const TimeSelection = ({ availability, availableTimes, onTimePress }) => {
           onPress={() => onTimePress(time)} // 선택된 시간 전달
           disabled = {isDisabled(time)}
         >
-          <Text style={styles.timeButtonText}>{time}</Text>
+          <Text style={getTextStyle(time)}>{time}</Text>
         </TouchableOpacity>
       ))}
     </View>
@@ -37,7 +46,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   timeButton: {
-    backgroundColor: '#e0f7fa', // 기본 버튼 색상
+    backgroundColor: 'lightgray', // 기본 버튼 색상
     padding: 10,
     margin: 5,
     borderRadius: 5,
@@ -49,11 +58,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  selectedText:{
+    color: 'white', // 텍스트 색상
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+  disabledText:{
+    color: 'lightgray', // 텍스트 색상
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   selectedButton: {
-    backgroundColor: '#00bcd4',
+    backgroundColor: '#215D9A',
   },
   unavailableButton: {
-    backgroundColor: '#bbbbbb',
+    backgroundColor: 'white',
   },
 });
 
