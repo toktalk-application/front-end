@@ -51,11 +51,16 @@ const AlarmScreen = () => {
       
       switch (notification.type) {
         case 'RESERVATION':
-          console.log('Reservation ID:', notification.reservationId);
+          console.log('Reservation :', notification);
           navigation.navigate('CounselDetailScreen', { reservationId: notification.reservationId });
           break;
         case 'CHAT':
-          navigation.navigate('ChatRoomScreen', { roomId: notification.roomId });
+          console.log('Reservation :', notification);
+          navigation.navigate('ChatRoom', { 
+            roomId: notification.roomId,
+            counselorName: notification.counselorName,
+            nickName: notification.nickName
+           });
           break;
         default:
           console.warn('알 수 없는 알림 타입:', notification.type);

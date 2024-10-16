@@ -225,7 +225,6 @@ function App() {
             <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
             <Stack.Screen name="알림" component={AlarmScreen} />
             <Stack.Screen name="CounselDetailScreen" component={CounselDetailScreen} options={{ title: '상담 상세 정보' }} />
-            <Stack.Screen name="ChatRoomScreen" component={ChatRoomScreen} />
             <Stack.Screen name="프로필 관리" component={CounselorProfileScreen} />
             <Stack.Screen name="프로필 수정" component={CounselorEditScreen} />
             <Stack.Screen name="요금 관리" component={CounselorChargeScreen} />
