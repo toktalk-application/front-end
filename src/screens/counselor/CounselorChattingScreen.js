@@ -54,8 +54,8 @@ function CounselorChattingScreen() {
   }
 
 
-  const handleChatRoomPress = (roomId, nickname, counselorName) => {
-    navigation.navigate('ChatRoom', { roomId, nickname, counselorName});
+  const handleChatRoomPress = (roomId, nickname, counselorName, roomStatus) => {
+    navigation.navigate('ChatRoom', { roomId, nickname, counselorName, roomStatus});
   };
 
   const renderItem = ({ item }) => {
@@ -78,7 +78,7 @@ function CounselorChattingScreen() {
     return (
       <TouchableOpacity
         style={styles.chatRoom}
-        onPress={() => handleChatRoomPress(item.roomId, item.nickname, item.counselorName)}
+        onPress={() => handleChatRoomPress(item.roomId, item.nickname, item.counselorName, item.roomStatus)}
       >
         <View style={styles.chatRoomContainer}>
           <View style={styles.infoContainer}>
