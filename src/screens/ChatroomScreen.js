@@ -263,6 +263,7 @@ const styles = StyleSheet.create({
   otherMessage: {
     alignSelf: 'flex-start',
     alignItems: 'flex-end',
+    color: '#FFFFFF'
   },
   oterhMessageColor:{
     marginVertical: 5,
@@ -275,6 +276,7 @@ const styles = StyleSheet.create({
   myMessage: {
     alignSelf: 'flex-end',
     alignItems: 'flex-end',
+    color: 'white'
   },
   myMessageColor: {
     marginVertical: 5,
@@ -282,7 +284,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     maxWidth: '80%', 
     backgroundColor: '#295F98', 
-    color:'#white'
+    color:'white'
   },
   messageText: {
     fontSize: 14,
