@@ -3,14 +3,21 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import DatePicker from 'react-native-date-picker';
 
-const CustomDatePicker = ({ birthDate, setBirthDate }) => {
+const CustomDatePicker = ({ birthDate, setBirthDate, placeholder }) => {
   const [open, setOpen] = useState(false);
 
+  console.log('birthDate: ', birthDate);
+  console.log('placeholder: ', placeholder);
+  console.log('final placeholder: ', birthDate.toISOString().split('T')[0] || placeholder || 'undefined');
+
+  const isToday = () => {
+    return birthDate.toISOString().split('T')[0] == new Date().toISOString().split('T')[0];
+  }
   return (
     <View style={styles.container}>
       <TouchableOpacity onPress={() => setOpen(true)} style={styles.inputContainer}>
         <Text style={styles.placeholderText}>
-          {birthDate.toISOString().split('T')[0] || '날짜 선택'}
+          {isToday() ? (placeholder || 'placeholder가 없습니다') : birthDate.toISOString().split('T')[0] }
         </Text>
       </TouchableOpacity>
       <DatePicker

@@ -161,19 +161,30 @@ const CounselDetailScreen = () => {
         });
     };
 
-     // 채팅방 열기 핸들러
-     const handleOpenChatRoom = () => {
+    // 채팅방 열기 핸들러
+    const handleOpenChatRoom = () => {
         sendPostRequest({
             token: state.token,
             endPoint: `/chat_rooms/open?memberId=${reservation.memberId}`, // 쿼리 파라미터로 memberId 전달
-            
+
             onSuccess: (data) => {
                 const { roomId } = data;
-                // 채팅방으로 네비게이션
-                navigation.navigate('ChatRoom', {
-                    roomId: roomId,
-                    nickname: reservation.memberNickname, // 상담 예약된 멤버 닉네임
-                    counselorName: reservation.counselorName  // 상담사 이름
+                let roomStatus;
+
+                sendGetRequest({
+                    token: state.token,
+                    endPoint: `/chat_rooms/${roomId}`,
+                    onSuccess: (data) => {
+                        // 채팅방으로 네비게이션
+                        console.log("data: ", data.roomStatus);
+
+                        navigation.navigate('ChatRoom', {
+                            roomId: roomId,
+                            nickname: reservation.memberNickname, // 상담 예약된 멤버 닉네임
+                            counselorName: reservation.counselorName,  // 상담사 이름
+                            roomStatus: data.roomStatus,
+                        });
+                    }
                 });
             },
             onFailure: (errorStatus, errorMessage) => {
@@ -264,7 +275,7 @@ const CounselDetailScreen = () => {
                     </View>
                     <View style={styles.cancelDetaiReasonContainer}>
                         <Text style={styles.cencelName}>취소 사유 </Text>
-                        <Text style={{ fontSize: 15,marginTop:10 }}>{reservation.cancelComment}</Text>
+                        <Text style={{ fontSize: 15, marginTop: 10 }}>{reservation.cancelComment}</Text>
                     </View>
                 </View>
             ) : (
@@ -508,7 +519,7 @@ const styles = StyleSheet.create({
         shadowRadius: 4, // 그림자 퍼짐 정도
         elevation: 5, // Android에서의 그림자 깊이
     },
-    cancelDetaiReasonContainer:{
+    cancelDetaiReasonContainer: {
         alignItems: 'flex-start',
         marginBottom: 10,
         marginLeft: 10

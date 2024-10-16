@@ -119,8 +119,21 @@ function CounselorSignUpScreen() {
   };
 
   const handleSignUp = () => {
-    if (!userId || !password || !confirmPassword) {
-      Alert.alert('오류', '모든 필드를 입력해주세요.');
+    if(!userIdDuplChecked){
+      Alert.alert('오류', '아이디 중복 확인을 진행해주세요.');
+      return;
+    }
+    if(!password){
+      Alert.alert('오류', '비밀번호를 입력해주세요.');
+      return;
+    }
+    if(!confirmPassword){
+      Alert.alert('오류', '비밀번호를 확인해주세요.');
+      return;
+    }
+
+    if(!birthDate){
+      Alert.alert('오류', '생년월일을 입력해주세요.');
       return;
     }
 
@@ -259,7 +272,7 @@ function CounselorSignUpScreen() {
     }
   };
 
-
+  console.log("birthDate in screen: ", birthDate);
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.sectionContainer}>
@@ -324,7 +337,7 @@ function CounselorSignUpScreen() {
         </View>
         <View style={{ width : '100%' }}>
           <View style={styles.datePickerContainer}>
-            <CustomDatePicker style={styles.datePicker} birthDate={birthDate} setBirthDate={setBirthDate} />
+            <CustomDatePicker style={styles.datePicker} birthDate={birthDate} setBirthDate={setBirthDate} placeholder='생년월일을 선택해주세요' />
           </View>
         </View>
       </View>
