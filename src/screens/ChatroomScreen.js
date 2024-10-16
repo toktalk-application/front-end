@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Keyboard
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { useAuth } from '../auth/AuthContext';
 import sendGetRequest from '../axios/SendGetRequest';
+import PatchRequest from '../axios/PatchRequest';
 import io from 'socket.io-client';
 
 const ChatRoomScreen = () => {
@@ -99,7 +100,21 @@ const ChatRoomScreen = () => {
       }
     }, []);
 
-
+  const handleCloseChatRoom = () => {
+    PatchRequest({
+      token: state.token,
+      endPoint: `/chat_rooms/${roomId}/close`,  // roomId를 경로 파라미터로 전달
+      onSuccess: () => {
+        console.log("채팅방이 닫혔습니다.");
+        // 채팅방이 닫힌 후 이전 화면으로 이동
+        navigation.goBack();
+      },
+      onFailure: (errorStatus, errorMessage) => {
+        Alert.alert("실패", `채팅방 닫기 실패: ${errorMessage}`);
+      }
+    });
+  };
+      
   // 메시지 렌더링 함수
   const renderMessage = ({ item }) => {
     const nickname = state.nickname;
@@ -152,16 +167,18 @@ const ChatRoomScreen = () => {
     <KeyboardAvoidingView style={styles.container} behavior="padding" keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Image source={require('../../assets/images/back.png')} style={styles.icon} />
+          <Image source={require('../../assets/images/back.png')} style={styles.icon}/>
         </TouchableOpacity>
         {userType === 'COUNSELOR' ? (
               <Text style={styles.memberName}>{nickname} 내담자</Text>
             ) : userType === 'MEMBER' ? (
               <Text style={styles.memberName}>{counselorName} 상담사</Text>
             ) : null}
+        <TouchableOpacity onPress={handleCloseChatRoom} style={styles.backButton}>
           <View style={styles.ImageCover}>
-              <Image source={require('../../assets/images/exist.png')} style={styles.ExistButtonImg}/>
+            <Image source={require('../../assets/images/exist.png')} style={styles.ExistButtonImg}/>
           </View>
+        </TouchableOpacity>
       </View>
       <FlatList
         ref={flatListRef}
