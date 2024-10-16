@@ -3,6 +3,7 @@ import { View, Image, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import messaging from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance, EventType } from '@notifee/react-native'; // notifee 관련 import 추가
@@ -147,69 +148,64 @@ const CustomHeader = ({ routeName, navigation }) => {
 function Tabs({ route, navigation }) {
   const { userType } = route.params; 
 
-  const getTabIcon = (activeIcon, inactiveIcon) => {
-    return ({ focused }) => (
-      <Image
-        source={focused ? activeIcon : inactiveIcon}
-        style={{ width: 34, height: 34 }}
-      />
-    );
-  };
+  const getTabIcon = (focusedIcon, unfocusedIcon) => ({ focused, color, size }) => (
+    <Icon name={focused ? focusedIcon : unfocusedIcon} size={size} color={color} />
+  );
+  const FOCUS_COLOR = '#1B3A57';
 
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
-        header: () => <CustomHeader routeName={route.name} navigation={navigation} />,
-        tabBarStyle: {
-          paddingBottom: 20,
-          paddingTop: 10,
-          paddingHorizontal: 10,
-          height: 80,
-        },
+        tabBarActiveTintColor: FOCUS_COLOR,
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: { paddingBottom: 5 },
+        header: ({ navigation, route }) => (
+          <CustomHeader routeName={route.name} navigation={navigation} />
+        ),
       })}
     >
       {userType === 'MEMBER' ? (
         <>
           <Tab.Screen name="Main" component={MemberMainScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), require('./assets/images/home.png')),
+            tabBarIcon: getTabIcon('home', 'home-outline'),
             tabBarLabel: () => null,
           }} />
           <Tab.Screen name="상담" component={MemberCounselScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), require('./assets/images/counsel.png')),
+            tabBarIcon: getTabIcon('heart', 'heart-outline'),
             tabBarLabel: () => null,
           }} />
           <Tab.Screen name="채팅" component={MemberChattingScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), require('./assets/images/chat.png')),
+            tabBarIcon: getTabIcon('chatbubble', 'chatbubble-outline'),
             tabBarLabel: () => null,
           }} />
           <Tab.Screen name="내 정보" component={MemberMyScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), require('./assets/images/my.png')),
+            tabBarIcon: getTabIcon('person', 'person-outline'),
             tabBarLabel: () => null,
           }} />
         </>
       ) : userType === 'COUNSELOR' ? (
         <>
           <Tab.Screen name="Main" component={CounselorMainScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/homeFill.png'), require('./assets/images/home.png')),
+            tabBarIcon: getTabIcon('home', 'home-outline'),
             tabBarLabel: () => null,
           }} />
           <Tab.Screen name="상담" component={CounselorCounselScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/counselFill.png'), require('./assets/images/counsel.png')),
+            tabBarIcon: getTabIcon('heart', 'heart-outline'),
             tabBarLabel: () => null,
           }} />
           <Tab.Screen name="채팅" component={CounselorChattingScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/chatFill.png'), require('./assets/images/chat.png')),
+            tabBarIcon: getTabIcon('chatbubble', 'chatbubble-outline'),
             tabBarLabel: () => null,
           }} />
           <Tab.Screen name="내 정보" component={CounselorMyScreen} options={{
-            tabBarIcon: getTabIcon(require('./assets/images/myFill.png'), require('./assets/images/my.png')),
+            tabBarIcon: getTabIcon('person', 'person-outline'),
             tabBarLabel: () => null,
           }} />
         </>
       ) : null}
     </Tab.Navigator>
   );
-}
+};
 
 function App() {
     configureNotifications();

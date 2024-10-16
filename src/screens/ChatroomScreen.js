@@ -269,7 +269,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     maxWidth: '100%', 
-    backgroundColor: '#f1f0f0',
+    backgroundColor: '#373A40',
+    color: "white"
   },
   myMessage: {
     alignSelf: 'flex-end',
@@ -280,8 +281,8 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
     maxWidth: '80%', 
-    backgroundColor: '#99A5B2', 
-    color:'#F1F1F1'
+    backgroundColor: '#295F98', 
+    color:'#white'
   },
   messageText: {
     fontSize: 14,
