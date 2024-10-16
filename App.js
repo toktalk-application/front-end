@@ -218,7 +218,6 @@ function App() {
       <NotificationSetup />
         <NavigationContainer>
           <Stack.Navigator>
-            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
             <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
             <Stack.Screen name="로그인" component={LoginScreen} />
             <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
@@ -240,6 +239,7 @@ function App() {
             <Stack.Screen name="MemberCounselorDetail" component={MemberCounselorDetailScreen} options={{ title: '' }} />
             <Stack.Screen name="ChatRoom" component={ChatRoomScreen} options={{ headerShown: false }}/>
             <Stack.Screen name="설정" component={SettingsScreen}/>
+            <Stack.Screen name="Tabs" component={Tabs} options={{ headerShown: false }} />
           </Stack.Navigator>
         </NavigationContainer>
       </NotificationProvider>
