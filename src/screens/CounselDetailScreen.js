@@ -161,6 +161,27 @@ const CounselDetailScreen = () => {
         });
     };
 
+     // 채팅방 열기 핸들러
+     const handleOpenChatRoom = () => {
+        sendPostRequest({
+            token: state.token,
+            endPoint: `/chat_rooms/open?memberId=${reservation.memberId}`, // 쿼리 파라미터로 memberId 전달
+            
+            onSuccess: (data) => {
+                const { roomId } = data;
+                // 채팅방으로 네비게이션
+                navigation.navigate('ChatRoom', {
+                    roomId: roomId,
+                    nickname: reservation.memberNickname, // 상담 예약된 멤버 닉네임
+                    counselorName: reservation.counselorName  // 상담사 이름
+                });
+            },
+            onFailure: (errorStatus, errorMessage) => {
+                Alert.alert("실패", `채팅방 열기 실패: ${errorMessage}`);
+            }
+        });
+    };
+
     // 후에 UserInfo 받아서 처리 할 예정. 
     const userType = state.usertype;
 
@@ -213,7 +234,7 @@ const CounselDetailScreen = () => {
             </View>
             {userType === 'COUNSELOR' && reservation.status === 'PENDING' ? (
                 <View style={styles.pendingButtonContainer}>
-                    <TouchableOpacity style={styles.pendingButton}>
+                    <TouchableOpacity style={styles.pendingButton} onPress={handleOpenChatRoom}>
                         <Text style={styles.buttonText}>채팅방 열기</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.pendingButton} onPress={handleCancelPress}>
