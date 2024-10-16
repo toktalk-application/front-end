@@ -186,7 +186,7 @@ function CounselorPlanScreen() {
               style={[styles.timeButton, timeslots[time] && styles.selectedButton]}
               onPress={() => handleTimePress(time)}
             >
-              <Text style={styles.timeButtonText}>{time}</Text>
+              <Text style={[styles.timeButtonText, timeslots[time] && styles.selectedButtonText]}>{time}</Text>
             </TouchableOpacity>
           ))}
         </View>}
@@ -222,9 +222,10 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   button: {
-    backgroundColor: '#001932', // 버튼 배경 색상
+    backgroundColor: '#215D9A', // 버튼 배경 색상
     padding: 8,
     borderRadius: 8,
+    marginRight:5
   },
   buttonText: {
     color: 'white', // 텍스트 색상
@@ -242,7 +243,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   timeButton: {
-    backgroundColor: '#e0f7fa', // 기본 버튼 색상
+    backgroundColor: 'white', // 기본 버튼 색상
     padding: 10,
     margin: 5,
     borderRadius: 5,
@@ -254,8 +255,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
   },
+  selectedButtonText:{
+    color: '#f1f1f1', // 텍스트 색상
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
   selectedButton: {
-    backgroundColor: '#00bcd4',
+    backgroundColor: '#215D9A',
   },
   notice: {
     textAlign: 'center',
@@ -269,7 +275,7 @@ const styles = StyleSheet.create({
   submitButton: {
     marginBottom: 40,
     padding: 10,
-    backgroundColor: '#001326',
+    backgroundColor: '#215D9A',
     borderRadius: 5,
     alignItems: 'center',
   },
