@@ -60,7 +60,7 @@ const MemberCounselorDetailScreen = () => {
 
   return (
     <>
-    {isLoading ? <LoadingScreen message= {'상담사 정보를 불러오는 중입니다..'}/> :<ScrollView contentContainerStyle={styles.container}>
+    {isLoading ? <LoadingScreen message= {'상담사 정보를 불러오는 중입니다..'}/> : <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.profileContainer}>
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{counselorData.name} 상담사</Text>

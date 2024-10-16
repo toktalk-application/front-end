@@ -210,11 +210,17 @@ function MemberMainScreen() {
                                     <Text style={styles.timeText}> {formatTime(item.endTime)} </Text>
                                 </View>
                                 <View style={styles.detailsContainer}>
-                                    <View style={styles.detailsRow}>
-                                        <Text style={styles.nickNameText}>상담자 {item.counselorName}</Text>
+                                <View style={styles.detailsRow}>
+                                  <View style= {{ flexDirection: 'row', justifyContent: 'space-between', alignItems:'center', marginBottom:10}}>
+                                        <Text style={styles.nickNameText}>상담사 </Text>
+                                        <Text style= {{color :'white'}}>{item.counselorName}</Text>
+                                    </View>
                                         <Text style={styles.typeText}> {item.type} </Text>
                                     </View>
-                                    <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
+                                    <View style= {{ flexDirection: 'row', justifyContent: 'flex-start', alignItems:'center'}}>
+                                        <Text style={styles.commentText}> 상담 내용 </Text> 
+                                        <Text style= {{ color: 'white', marginRight:70}}   numberOfLines={1} ellipsizeMode="tail" > {item.comment || '없음'}</Text>
+                                    </View>
                                 </View>
                             </View>}
                         </TouchableOpacity>
@@ -244,7 +250,7 @@ function MemberMainScreen() {
                                     onPress={() => handleEmotionPress(emotion)}
                                     style={[
                                         styles.emotionButton,
-                                        selectedEmotion === emotion.key && { backgroundColor: '#FFD700' } // 선택된 감정 배경색 변경
+                                        selectedEmotion === emotion.key && { backgroundColor: '#FFD700' }
                                     ]}
                                 >
                                     <Text style={styles.emotionText}>{emotion.label}</Text>
@@ -326,18 +332,19 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     detailsContainer: {
-        backgroundColor: '#001932',
-        flex: 7,
-        paddingLeft: 10,
-        paddingVertical: 3,
+        backgroundColor: '#001932', // 배경 색상
+        flex: 7, // 공간을 더 차지하도록 설정
+        paddingLeft: 10, // 약간의 여백
+        paddingVertical: 10,
+        paddingBottom:15,
         borderRadius: 10,
     },
     detailsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 5,
+        flexDirection: 'row', // 좌우 배치
+        justifyContent: 'space-between', // 양쪽 끝 정렬    
+        alignItems: 'center',
         marginLeft: 5,
-        marginRight: 10,
+        marginRight: 10
     },
     nickNameText: {
         color: 'white',
@@ -350,15 +357,14 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         borderRadius: 10,
         paddingHorizontal: 5,
+        paddingVertical:2,
+        marginBottom:5
     },
     commentText: {
         color: 'white',
-        marginLeft: 5,
-        marginRight: 5,
-        marginTop: 5,
-        marginBottom: 10,
+        fontWeight: 'bold',
         fontSize: 14,
-    },
+      },
     modalBackground: {
         flex: 1,
         backgroundColor: 'rgba(0, 0, 0, 0.5)',

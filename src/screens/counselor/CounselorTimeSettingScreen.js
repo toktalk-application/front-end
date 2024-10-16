@@ -177,13 +177,14 @@ function CounselorTimeSettingScreen({ route, navigation }) {
         ))}
       </View>
       <View style={styles.timeGrid}>
-        {isLoading ? <LoadingScreen message={'기본 시간 설정 정보를 불러오고 있습니다..'}/> : Object.keys(availability[selectedDay]).map((time) => (
+        {isLoading ? <LoadingScreen message={'기본 시간 설정 정보를 불러오는 중입니다..'}/> : Object.keys(availability[selectedDay]).map((time) => (
           <TouchableOpacity
             key={time}
             style={[styles.timeButton, availability[selectedDay][time] && styles.selectedButton]}
             onPress={() => handleTimePress(time)}
           >
-            <Text style={styles.buttonText}>{time}</Text>
+            <Text  
+              style={[styles.timeButtonText, availability[selectedDay][time] && styles.selectedButtonText]}>{time}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -214,26 +215,27 @@ const styles = StyleSheet.create({
   tabContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   tabButton: {
-    padding: 10,
+    padding: 10
   },
   activeTab: {
     borderBottomWidth: 2,
     borderBottomColor: '#001932', // 선택된 탭의 하단 테두리 색상
   },
   tabText: {
-    fontSize: 16,
+    fontSize: 25,
     fontWeight: 'bold',
   },
   timeGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
+    marginBottom:20
   },
   timeButton: {
-    backgroundColor: '#e0f7fa', // 기본 버튼 색상
+    backgroundColor: 'white', // 기본 버튼 색상
     padding: 10,
     margin: 5,
     borderRadius: 5,
@@ -241,26 +243,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedButton: {
-    backgroundColor: '#00bcd4', // 선택된 버튼 색상
+    backgroundColor: '#215D9A', // 선택된 버튼 색상
+  },
+  timeButtonText:{
+    fontSize: 16,
+    fontWeight: '600',
+    color:'black'
+  },
+  selectedButtonText:{
+    fontSize: 16,
+    fontWeight: '600',
+    color:'white'
   },
   buttonContainer: {
     marginTop: 30, // 원하는 여백 추가
     marginBottom: 20, // 필요한 경우 아래쪽 여백 추가
   },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
   notice: {
     textAlign: 'center',
-    fontSize: 12,
+    fontSize: 14,
     color: 'gray',
   },
   submitButton: {
-    marginTop: 10,
+    marginTop: 20,
     marginBottom: 40,
     padding: 10,
-    backgroundColor: '#001326',
+    backgroundColor: '#215D9A',
     borderRadius: 5,
     alignItems: 'center',
   },
