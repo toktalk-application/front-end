@@ -49,6 +49,7 @@ function CounselorSignUpScreen() {
   const [careers, setCareers] = useState( [
     {classification:'', company:'', responsibility:''},
   ])
+  const [passVerified, setPassVerified] = useState(false);
 
   const validateUserId = (input) => {
     const userIdPattern = /^[a-zA-Z0-9]{4,20}$/;
@@ -135,6 +136,11 @@ function CounselorSignUpScreen() {
 
     if(!userIdDuplChecked) {
       Alert.alert('오류', '아이디 중복 확인을 진행해주세요.');
+      return;
+    }
+
+    if(!passVerified){
+      Alert.alert('오류', 'PASS 인증을 진행해주세요.');
       return;
     }
 
@@ -524,6 +530,10 @@ function CounselorSignUpScreen() {
       <PassModal 
         visible={modalVisible} 
         onClose={() => setModalVisible(false)} 
+        onSuccess={() => {
+          setModalVisible(false);
+          setPassVerified(true);
+        }}
         name={name} 
         phoneNumber={phoneNumber} 
         carrier={carrier} 

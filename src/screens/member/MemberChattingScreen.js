@@ -57,12 +57,24 @@ function MemberChattingScreen() {
   };
 
   const renderItem = ({ item }) => {
-    const createdDate = new Date(item.createdAt);
+    // createdAt이 null일 경우 createdDate를 null로 설정
+    const createdDate = item.createdAt ? new Date(item.createdAt) : null; 
     const today = new Date();
-    const isToday = createdDate.toDateString() === today.toDateString();
-    const displayText = isToday
-      ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-      : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
+    
+    // createdDate가 유효할 경우에만 날짜를 포맷팅
+    const displayText = createdDate 
+      ? (createdDate.toDateString() === today.toDateString()
+        ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+        : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }))
+      : null; // createdAt이 null일 경우 null로 설정
+
+          // 상태에 따라 텍스트 배경색 결정
+    const roomStatusBackgroundColor = item.roomStatus === 'open' ? 'lightgreen' : 
+    item.roomStatus === 'close' ? 'lightcoral' : 
+    'transparent'; // 기본값 (기타 상태)
+
+      
+
 
     return (
       <TouchableOpacity
@@ -72,6 +84,9 @@ function MemberChattingScreen() {
         <View style={styles.chatRoomContainer}>
           <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
           <View style={styles.infoContainer}>
+            <Text style={[styles.roomStatus, { backgroundColor: roomStatusBackgroundColor }]}>
+                {item.roomStatus}
+            </Text>
             <View style={styles.row}>
               <Text style={styles.memberName}>{item.counselorName} 상담사</Text>
               <Text style={styles.createdAt}>{displayText}</Text>
@@ -131,22 +146,31 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width:'100%',
     alignItems: 'center',
   },
   memberName: {
     fontWeight: 'bold',
     fontSize: 18,
+    width:180
   },
   createdAt: {
     color: '#666',
     fontSize:16,
-    marginRight:10
   },
   message:{
     marginTop:10,
     marginLeft:0,
     fontSize:16
   },
+  roomStatus:{
+    width:60,
+    textAlign:'center',
+    borderRadius: 5,
+    color:'white',
+    fontSize:15,
+    paddingVertical:2
+  }
 });
 
 export default MemberChattingScreen;

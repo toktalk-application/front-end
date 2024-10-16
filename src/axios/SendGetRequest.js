@@ -6,7 +6,7 @@ const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFail
     /* console.log("token: ", token);
     console.log("endPoint: ", endPoint);
     console.log("requestParams: ", requestParams); */
-    
+    console.log(REACT_APP_API_URL);
     try{
         const response = await axios.get(
             REACT_APP_API_URL + endPoint, 
@@ -23,6 +23,7 @@ const sendGetRequest = async({ token, endPoint, requestParams, onSuccess, onFail
         }
     }catch(error){
         const errorStatus = error.response.status;
+        console.log(error.response.status)
         const errorMessage = error.response.data.message;
         console.error('요청 실패: ', error);
         console.error('message: ', error.message);

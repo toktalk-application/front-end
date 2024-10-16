@@ -5,6 +5,7 @@ import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import { useCallback } from 'react';
 import EmptyScreen from '../EmptyScreen';
+import LoadingScreen from '../LoadingScreen';
 
 function CounselorChattingScreen() {
   const navigation = useNavigation();
@@ -23,6 +24,7 @@ function CounselorChattingScreen() {
       endPoint: '/chat_rooms', // 채팅방 목록을 가져오는 API 엔드포인트
       onSuccess: (data) => {
         setChatRooms(data); // 가져온 데이터로 상태 업데이트
+        console.log(chatRooms);
       },
       onFailure: () => {
         setError('채팅방 목록을 가져오는 데 실패했습니다.');
@@ -40,7 +42,7 @@ function CounselorChattingScreen() {
   );
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return <LoadingScreen message ={'채팅 정보를 불러오는 중 입니다..'}/>;
   }
 
   if (error) {
@@ -51,18 +53,28 @@ function CounselorChattingScreen() {
     );
   }
 
+
   const handleChatRoomPress = (roomId, nickname, counselorName) => {
     navigation.navigate('ChatRoom', { roomId, nickname, counselorName});
   };
 
   const renderItem = ({ item }) => {
-    const createdDate = new Date(item.createdAt);
-    const today = new Date();
-    const isToday = createdDate.toDateString() === today.toDateString();
-    const displayText = isToday
-      ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-      : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' });
+      // createdAt이 null일 경우 createdDate를 null로 설정
+      const createdDate = item.createdAt ? new Date(item.createdAt) : null; 
+      const today = new Date();
+      
+      // createdDate가 유효할 경우에만 날짜를 포맷팅
+      const displayText = createdDate 
+        ? (createdDate.toDateString() === today.toDateString()
+          ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+          : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }))
+        : null; // createdAt이 null일 경우 null로 설정
 
+    // 상태에 따라 텍스트 배경색 결정
+    const roomStatusBackgroundColor = item.roomStatus === 'open' ? '#3C6894' : 
+                                       item.roomStatus === 'close' ? 'lightcoral' : 
+                                       'transparent'; // 기본값 (기타 상태)
+  
     return (
       <TouchableOpacity
         style={styles.chatRoom}
@@ -71,10 +83,15 @@ function CounselorChattingScreen() {
         <View style={styles.chatRoomContainer}>
           <View style={styles.infoContainer}>
             <View style={styles.row}>
-              <Text style={styles.memberName}>{item.nickname} 내담자</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                <Text style={styles.memberName}>{item.nickname} 내담자</Text>
+                <Text style={[styles.roomStatus, { backgroundColor: roomStatusBackgroundColor }]}>
+                  {item.roomStatus}
+                </Text>
+              </View>
               <Text style={styles.createdAt}>{displayText}</Text>
             </View>
-              <Text style= {styles.message}>{item.message}</Text>
+            <Text style={styles.message}>{item.message}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -83,7 +100,7 @@ function CounselorChattingScreen() {
 
   return (
     <View style={styles.container}>
-      {chatRooms.length === 0 ? <EmptyScreen message=""/> :<FlatList
+      {chatRooms.length === 0 ? <EmptyScreen message="채팅 내역이 없습니다"/> :<FlatList
         data={chatRooms}
         keyExtractor={(item) => item.roomId.toString()}
         renderItem={renderItem}
@@ -121,27 +138,37 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   infoContainer: {
-    flex: 1,
     justifyContent: 'center',
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width:'100%',
     alignItems: 'center',
   },
   memberName: {
     fontWeight: 'bold',
     fontSize: 18,
+    width:180
   },
   createdAt: {
     color: '#666',
-    fontSize:16
+    fontSize:16,
   },
   message:{
     marginTop:5,
     marginLeft:0,
     fontSize:16
   },
+  roomStatus:{
+    width:60,
+    justifyContent: 'space-between',
+    textAlign:'center',
+    borderRadius: 5,
+    color:'white',
+    fontSize:15,
+    paddingVertical:3
+  }
 });
 
 export default CounselorChattingScreen;

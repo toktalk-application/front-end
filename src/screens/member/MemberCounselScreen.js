@@ -44,10 +44,14 @@ const MemberCounselScreen = () => {
   };
 
   const renderItem = ({ item }) => {
+    const imageSource = item && item.profileImage 
+    ? { uri: item.profileImage } 
+    : require('../../../assets/images/emptyImage.png'); // 대체 이미지
+    
     return (
       <TouchableOpacity onPress={() => navigation.navigate('MemberCounselorDetail', { counselorId: item.counselorId })}>
         <View style={styles.card}>
-          <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
+          <Image source={imageSource} style={styles.image} />
           <View style={styles.infoContainer}>
             <View style={styles.nameContainer}>
               <Text style={styles.name}>{item.name} </Text>

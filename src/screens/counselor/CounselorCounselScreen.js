@@ -21,38 +21,6 @@ const CounselorCounselScreen = () => {
 
     const [isLoading, setIsLoading] = useState(true);
 
-    // useEffect(() => {
-    //     sendGetRequest({
-    //         token: state.token,
-    //         endPoint: `/reservations/${state.identifier}/monthly-detail`,
-    //         requestParams: {
-    //             month: selectedYear + "-" + selectedMonth.padStart(2, '0') // 월 형식을 9 -> 09와 같이 변환
-    //         },
-    //         onSuccess: (data) => {
-    //             console.log("data: ", data);
-
-    //             // 날짜와 시간으로 정렬
-    //             const sortedReservations = data.data.sort((a, b) => {
-    //                 const dateA = new Date(`${a.date}T${a.startTime}`);
-    //                 const dateB = new Date(`${b.date}T${b.startTime}`);
-    //                 return dateA - dateB; // 오름차순 정렬
-    //             });
-
-    //             const completedReservations = sortedReservations.filter(reservation => !reservation.status.includes("CANCELLED"));
-    //             const total = completedReservations.reduce((sum, reservation) => sum + reservation.fee, 0);
-
-    //             setReservations(sortedReservations); // 정렬된 예약을 설정
-    //             setTotalAmount(total);
-    //             setCompletedCount(completedReservations.length);
-
-    //             setIsLoading(false);
-    //         },
-    //         /* onFailure: () => Alert.alert("실패", "내 특정월 상담 목록 조회 실패!") */
-    //     }, [selectedMonth, selectedYear]);
-
-    //     fetchReservations(selectedYear, selectedMonth);
-    // }, [selectedYear, selectedMonth]); // year와 month가 변경될 때마다 호출
-
     useFocusEffect(
         useCallback(() => {
             sendGetRequest({
@@ -107,23 +75,27 @@ const CounselorCounselScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.dropdown}>
-                <Picker
-                    selectedValue={selectedYear}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setSelectedYear(itemValue)}
-                >
-                    <Picker.Item label={`${currentDate.getFullYear()}년`} value={currentDate.getFullYear().toString()} />
-                    <Picker.Item label={`${currentDate.getFullYear() - 1}년`} value={(currentDate.getFullYear() - 1).toString()} />
-                </Picker>
-                <Picker
-                    selectedValue={selectedMonth}
-                    style={styles.picker}
-                    onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-                >
-                    {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
-                        <Picker.Item key={month} label={`${month}월`} value={month.toString()} />
-                    ))}
-                </Picker>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedYear}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setSelectedYear(itemValue)}
+                    >
+                        <Picker.Item label={`${currentDate.getFullYear()}년`} value={currentDate.getFullYear().toString()} />
+                        <Picker.Item label={`${currentDate.getFullYear() - 1}년`} value={(currentDate.getFullYear() - 1).toString()} />
+                    </Picker>
+                </View>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedMonth}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setSelectedMonth(itemValue)}
+                    >
+                        {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
+                            <Picker.Item key={month} label={`${month}월`} value={month.toString()} />
+                        ))}
+                    </Picker>
+                </View>
             </View>
             <ScrollView>
                 {isLoading ? <View /> : reservations.length === 0 ? <EmptyScreen message="상담이 없습니다"/> : reservations.map(reservation => (
@@ -174,7 +146,7 @@ const CounselorCounselScreen = () => {
             </ScrollView>
             <View style={styles.totalAmountContainer}>
                 <View style={styles.totalAmountTitle}>
-                    <Text style={styles.totalAmount}>총 매출액 </Text>
+                    <Text style={styles.totalAmount}>총 매출 금액 </Text>
                     <Text style={{ marginTop: 3 }}> {completedCount} 건 </Text>
                 </View>
                 <Text style={{ fontSize: 16 }} >{totalAmount.toLocaleString()} 원</Text>
@@ -191,11 +163,30 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         flexDirection: 'row', // 가로 방향으로 정렬
-        justifyContent: 'flex-start', // 아이템 사이의 간격 조정
+        justifyContent: 'flex-end', // 아이템 사이의 간격 조정
+    },
+    pickerContainer: {
+        backgroundColor: '#fff', // 배경색
+        width: '32%', // 너비 설정
+        borderRadius: 10, // 둥근 테두리
+        borderWidth: 1, // 테두리 두께
+        borderColor: '#ccc', // 테두리 색
+        shadowColor: '#000', // 그림자 색
+        shadowOffset: {
+          width: 0,
+          height: 2, // 그림자 수직 위치
+        },
+        shadowOpacity: 0.1, // 그림자 투명도
+        shadowRadius: 4, // 그림자 크기
+        elevation: 2, // 안드로이드에서 그림자 효과
+        marginTop:5,
+        marginRight: 15
     },
     picker: {
-        height: 20,
-        width: '40%', // 두 Picker가 가로로 배치되도록 일부 너비 설정
+    height: 50, // 높이 설정
+    width: '100%', // 너비 설정
+    marginTop:-8,
+    marginLeft:5
     },
     title: {
         fontSize: 24,
@@ -319,3 +310,4 @@ const styles = StyleSheet.create({
 });
 
 export default CounselorCounselScreen;
+

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, Alert } from 'react-native';
 import MemberCalendar from '../../components/Calendar/MemberCalendar'; // 경로를 상황에 맞게 수정하세요.
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
@@ -166,7 +166,7 @@ function MemberMainScreen() {
         const lastDayOfNextMonth = new Date(currentYear, nextMonth + 1, 0).getDate();
 
         // 최대 날짜 설정
-        return(`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
+        return (`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
     }
 
     useEffect(() => {
@@ -174,52 +174,52 @@ function MemberMainScreen() {
             flatListRef.current.scrollToEnd({
                 y: flatListRef.current.scrollHeight,
                 animated: true, // 부드럽게 스크롤
-              });
+            });
             // 데이터가 변경될 때마다 FlatList의 끝으로 스크롤
         }
     }, [selectedDate, reservations]);
 
     return (
         <View style={{ flex: 1, backgroundColor: 'white' }}>
-            {isReservationLoading || isMoodLoading ? <View /> : 
-            <FlatList
-                ref={flatListRef}
-                data={reservations}
-                keyExtractor={(item) => item.reservationId.toString()}
-                ListHeaderComponent={() => (
-                    <View style={{ marginBottom: 10 }}>
-                        <TouchableOpacity style={styles.Button} onPress={toggleModal}>
-                            <Text style={styles.buttonText}>오늘의 기분은?</Text>
-                        </TouchableOpacity>
-                        <MemberCalendar
-                            moodDates={moodDates}
-                            markedDates={markedDates}
-                            onDayPress={handleDayPress}
-                            selectedDate={selectedDate}
-                            minDate={getMinDate()}
-                            maxDate={getMaxDate()}
-                        />
-                    </View>
-                )}
-                renderItem={({ item }) => (
-                    <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
-                        {selectedDate === '' ? <View /> : <View style={styles.row}>
-                            <View style={styles.timeContainer}>
-                                <Text style={styles.timeText}> {formatTime(item.startTime)} </Text>
-                                <Text style={styles.timeText}> | </Text>
-                                <Text style={styles.timeText}> {formatTime(item.endTime)} </Text>
-                            </View>
-                            <View style={styles.detailsContainer}>
-                                <View style={styles.detailsRow}>
-                                    <Text style={styles.nickNameText}>상담자 {item.counselorName}</Text>
-                                    <Text style={styles.typeText}> {item.type} </Text>
+            {isReservationLoading || isMoodLoading ? <View /> :
+                <FlatList
+                    ref={flatListRef}
+                    data={reservations}
+                    keyExtractor={(item) => item.reservationId.toString()}
+                    ListHeaderComponent={() => (
+                        <View style={{ marginBottom: 10 }}>
+                            <TouchableOpacity style={styles.Button} onPress={toggleModal}>
+                                <Text style={styles.buttonText}>오늘의 기분은?</Text>
+                            </TouchableOpacity>
+                            <MemberCalendar
+                                moodDates={moodDates}
+                                markedDates={markedDates}
+                                onDayPress={handleDayPress}
+                                selectedDate={selectedDate}
+                                minDate={getMinDate()}
+                                maxDate={getMaxDate()}
+                            />
+                        </View>
+                    )}
+                    renderItem={({ item }) => (
+                        <TouchableOpacity onPress={() => handleReservationPress(item.reservationId)} style={styles.itemContainer}>
+                            {selectedDate === '' ? <View /> : <View style={styles.row}>
+                                <View style={styles.timeContainer}>
+                                    <Text style={styles.timeText}> {formatTime(item.startTime)} </Text>
+                                    <Text style={styles.timeText}> | </Text>
+                                    <Text style={styles.timeText}> {formatTime(item.endTime)} </Text>
                                 </View>
-                                <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
-                            </View>
-                        </View>}
-                    </TouchableOpacity>
-                )}
-            />}
+                                <View style={styles.detailsContainer}>
+                                    <View style={styles.detailsRow}>
+                                        <Text style={styles.nickNameText}>상담자 {item.counselorName}</Text>
+                                        <Text style={styles.typeText}> {item.type} </Text>
+                                    </View>
+                                    <Text style={styles.commentText}>상담 내용 {item.comment}</Text>
+                                </View>
+                            </View>}
+                        </TouchableOpacity>
+                    )}
+                />}
             <Modal
                 transparent
                 visible={modalVisible}
@@ -229,7 +229,13 @@ function MemberMainScreen() {
                     <View style={styles.modalContainer}>
                         {/* 텍스트를 감싸는 View 추가 */}
                         <View style={styles.textContainer}>
-                            <Text style={styles.textStyle}>오늘의 기분을 선택하세요</Text>
+                            <View style={{ position: 'relative', flexDirection: 'row', width: '100%', justifyContent: 'space-between' }}>
+                                <Text></Text>
+                                <Text style={styles.textStyle}>오늘의 기분을 선택하세요</Text>
+                                <TouchableOpacity style={{ alignSelf: 'center', marginRight: 10 }} onPress={() => setModalVisible(false)}>
+                                    <Text style={{fontSize: 15}}>❌</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                         <View style={styles.emotionContainer}>
                             {moodOptions.map((emotion) => (
@@ -246,6 +252,10 @@ function MemberMainScreen() {
                             ))}
                         </View>
                         <TouchableOpacity onPress={() => {
+                            if (!selectedEmotion) {
+                                Alert.alert("실패", "오늘의 기분을 선택해주세요");
+                                return;
+                            }
                             console.log("selectedEmotion: ", selectedEmotion);
                             console.log("today: ", new Date().toISOString().slice(0, 10));
 
@@ -302,12 +312,12 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
-        fontSize:15
+        fontSize: 15
     },
     timeContainer: {
         flex: 2,
         padding: 3,
-        marginBottom:2,
+        marginBottom: 2,
         alignItems: 'center',
         flexDirection: 'column',
     },
@@ -367,6 +377,7 @@ const styles = StyleSheet.create({
     textStyle: {
         fontSize: 18, // 텍스트 크기 조정
         fontWeight: 'bold', // 텍스트 두께 조정
+        marginLeft: 20,
     },
     emotionContainer: {
         flexDirection: 'row', // 가로 방향 정렬

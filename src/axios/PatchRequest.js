@@ -3,6 +3,7 @@ import {REACT_APP_API_URL} from '@env';
 import handleErrorMessage from "./ErrorMessageHandler";
 
 const sendPatchRequest = async({ token, endPoint, requestBody, onSuccess, onFailure, disableDefaultAlert }) => {
+    console.log('REACT_APP_API_URL:', REACT_APP_API_URL);
     try{
         console.log('REACT_APP_API_URL:', REACT_APP_API_URL);
         

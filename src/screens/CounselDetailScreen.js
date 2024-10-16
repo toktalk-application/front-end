@@ -259,12 +259,12 @@ const CounselDetailScreen = () => {
                 <View style={styles.cancelReasonContainer}>
                     <Text style={styles.subtitle}>취소 내용</Text>
                     <View style={styles.cancelDetailContainer}>
-                        <Text style={styles.cencelName}> 취소자 </Text>
+                        <Text style={styles.cencelName}>취소자 </Text>
                         <Text style={{ fontSize: 15 }}>  상담사 </Text>
                     </View>
-                    <View style={styles.cancelDetailContainer}>
-                        <Text style={styles.cencelName}> 취소 사유 </Text>
-                        <Text style={{ fontSize: 15 }}>  {reservation.cancelComment}</Text>
+                    <View style={styles.cancelDetaiReasonContainer}>
+                        <Text style={styles.cencelName}>취소 사유 </Text>
+                        <Text style={{ fontSize: 15,marginTop:10 }}>{reservation.cancelComment}</Text>
                     </View>
                 </View>
             ) : (
@@ -507,6 +507,11 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1, // 그림자 투명도
         shadowRadius: 4, // 그림자 퍼짐 정도
         elevation: 5, // Android에서의 그림자 깊이
+    },
+    cancelDetaiReasonContainer:{
+        alignItems: 'flex-start',
+        marginBottom: 10,
+        marginLeft: 10
     },
     cancelDetailContainer: {
         flexDirection: 'row', // 가로 방향 정렬

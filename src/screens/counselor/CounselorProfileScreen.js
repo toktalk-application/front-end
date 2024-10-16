@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Alert, Act
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+import LoadingScreen from '../LoadingScreen';
 
 
 
@@ -11,6 +12,10 @@ function CounselorProfileScreen() {
   const { state } = useAuth();
   const [counselorData, setCounselorData] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const imageSource = counselorData && counselorData.profileImage 
+  ? { uri: counselorData.profileImage } 
+  : require('../../../assets/images/emptyImage.png'); // 대체 이미지
+
   
   useFocusEffect(
     React.useCallback(() => {
@@ -40,15 +45,17 @@ function CounselorProfileScreen() {
   
   return (
     <>
-        {isLoading ? (<ActivityIndicator/>) : (
+        {isLoading ? (<LoadingScreen message={'프로필 정보를 불러오는 중입니다..'}/>) : (
           <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.profileContainer}>
             {/* 상담사 이름 및 정보 */}
             <View style={styles.infoContainer}>
-              <Text style={styles.name}>{counselorData.name} 상담사</Text>
-              <View style={styles.ratingContainer}>
-                <Text>⭐</Text>
-                <Text>{' ' + counselorData.rating}</Text>
+              <View style={styles.nameContainer}>
+                <Text style={styles.name}>{counselorData.name} 상담사</Text>
+                <View style={styles.ratingContainer}>
+                  <Text style={{fontSize:16}}>   ⭐</Text>
+                  <Text style={{fontSize:16}}>{' ' + counselorData.rating}</Text>
+                </View>
               </View>
               <Text style={styles.introduce}>{counselorData.introduction}</Text>
               <View style={styles.pricingContainer}>
@@ -61,7 +68,7 @@ function CounselorProfileScreen() {
             
             {/* 상담사 이미지 */}
             <View style={styles.imageContainer}>
-              <Image source={{ uri: counselorData.profileImage || 'https://via.placeholder.com/120' }} style={styles.image} />
+              <Image source={imageSource} style={styles.image} />
             </View>
           </View>
           <View style={styles.descriptionContainer}>
@@ -109,6 +116,10 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: 'white',
   },
+  nameContainer:{
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   profileContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -124,7 +135,8 @@ const styles = StyleSheet.create({
   },
   introduce: {
     fontSize: 14,
-    marginVertical: 5,
+    marginVertical: 6,
+    marginRight: 5
   },
   pricingContainer: {
     /* marginTop: 10, */
@@ -187,9 +199,9 @@ const styles = StyleSheet.create({
   ratingContainer:{
     flexDirection: 'row',
     alignItems: 'center', // 별점과 점수를 수평 중앙 정렬
-    marginTop: 5,
-    marginBottom: -18,
+    fontSize:14
   }
 });
 
 export default CounselorProfileScreen;
+
