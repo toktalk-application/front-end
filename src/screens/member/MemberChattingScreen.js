@@ -52,8 +52,8 @@ function MemberChattingScreen() {
     );
   }
 
-  const handleChatRoomPress = (roomId, memberNickname, counselorName) => {
-    navigation.navigate('ChatRoom', { roomId, memberNickname, counselorName });
+  const handleChatRoomPress = (roomId, memberNickname, counselorName, roomStatus) => {
+    navigation.navigate('ChatRoom', { roomId, memberNickname, counselorName, roomStatus });
   };
 
   const renderItem = ({ item }) => {
@@ -79,7 +79,7 @@ function MemberChattingScreen() {
     return (
       <TouchableOpacity
         style={styles.chatRoom}
-        onPress={() => handleChatRoomPress(item.roomId, item.memberNickname, item.counselorName)}
+        onPress={() => handleChatRoomPress(item.roomId, item.memberNickname, item.counselorName, item.roomStatus)}
       >
         <View style={styles.chatRoomContainer}>
           <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
