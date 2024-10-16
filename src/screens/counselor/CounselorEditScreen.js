@@ -146,7 +146,7 @@ function CounselorEditScreen() {
                 {profileImage ? (
                     <Image source={{ uri: profileImage }} style={styles.image} />
                 ) : (
-                    <Image source={{ uri: 'https://via.placeholder.com/120' }} style={styles.image} />
+                    <Image source={require('../../../assets/images/emptyImage.png')} style={styles.image} />
                 )}
                 <TouchableOpacity onPress={selectImage}>
                     <Text style={styles.albumButton}>앨범에서 사진 선택</Text>
@@ -203,8 +203,6 @@ const styles = StyleSheet.create({
         width: 120,
         height: 120,
         borderRadius: 60,
-        borderWidth: 2,
-        borderColor: '#d3d3d3',
     },
     albumButton: {
         marginTop: 10,

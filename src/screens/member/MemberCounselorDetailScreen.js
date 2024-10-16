@@ -4,6 +4,7 @@ import { useFocusEffect, useRoute } from '@react-navigation/native';
 import ReservationModal from '../../components/ReservationModal';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
+import LoadingScreen from '../LoadingScreen';
 
 
 const MemberCounselorDetailScreen = () => {
@@ -13,6 +14,10 @@ const MemberCounselorDetailScreen = () => {
   const { state } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [counselorData, setCounselorData] = useState({});
+  const imageSource = counselorData && counselorData.profileImage 
+  ? { uri: counselorData.profileImage } 
+  : require('../../../assets/images/emptyImage.png'); // 대체 이미지
+  
 
   // useEffect(() => {
   //   sendGetRequest({
@@ -54,8 +59,9 @@ const MemberCounselorDetailScreen = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {isLoading ? <View/> : <View style={styles.profileContainer}>
+    <>
+    {isLoading ? <LoadingScreen message= {'상담사 정보를 불러오는 중입니다..'}/> :<ScrollView contentContainerStyle={styles.container}>
+      <View style={styles.profileContainer}>
         <View style={styles.infoContainer}>
           <Text style={styles.name}>{counselorData.name} 상담사</Text>
           <Text style={styles.introduce}>{counselorData.introduction}</Text>
@@ -68,10 +74,10 @@ const MemberCounselorDetailScreen = () => {
         </View>
 
         <View style={styles.imageContainer}>
-          <Image source={{ uri: counselorData.profileImage || 'https://via.placeholder.com/120' }} style={styles.image} />
+          <Image source={imageSource} style={styles.image} />
         </View>
-      </View>}
-      {isLoading ? <View/> : <View style={styles.descriptionContainer}>
+      </View>
+         <View style={styles.descriptionContainer}>
         <Text style={styles.sectionTitle}>📍 전문 분야 소개</Text>
         <Text style={styles.detaiDescription}>안녕하세요, {counselorData.name} 상담사입니다. </Text>
         <Text style={styles.detaiDescription}>{counselorData.expertise}</Text>
@@ -91,7 +97,7 @@ const MemberCounselorDetailScreen = () => {
 
         <Text style={styles.sectionTitle}>📑 상담 세션 소개</Text>
         <Text style={styles.detaiDescription}>{counselorData.sessionDescription}</Text>
-      </View>}
+      </View>
       <TouchableOpacity style={styles.button} onPress={() => setModalVisible(true)}>
         <Text style={styles.buttonText}>상담 신청 </Text>
       </TouchableOpacity>
@@ -103,7 +109,8 @@ const MemberCounselorDetailScreen = () => {
         chatPrice={counselorData?.chatPrice}  // 옵셔널 체이닝 사용
         callPrice={counselorData?.callPrice}  // 옵셔널 체이닝 사용
       />
-    </ScrollView>
+    </ScrollView>}
+    </>
 
   );
 };
@@ -130,6 +137,7 @@ const styles = StyleSheet.create({
   introduce: {
     fontSize: 14,
     marginVertical: 5,
+    marginRight:5
   },
   pricingContainer: {
     marginTop: 10,
