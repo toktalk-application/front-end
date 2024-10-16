@@ -98,7 +98,7 @@ const CounselorCounselScreen = () => {
                 </View>
             </View>
             <ScrollView>
-                {isLoading ? <View /> : reservations.length === 0 ? <EmptyScreen message="상담이 없습니다"/> : reservations.map(reservation => (
+                {isLoading ? <View /> : reservations.length === 0 ? <EmptyScreen message="상담이 없습니다" /> : reservations.map(reservation => (
                     <TouchableOpacity
                         key={reservation.reservationId}
                         onPress={() => handleReservationPress(reservation.reservationId)}
@@ -107,13 +107,18 @@ const CounselorCounselScreen = () => {
                         <View style={styles.row}>
                             <View style={styles.verticalLine} />
                             <View style={styles.infoContainer}>
-                                <View style={styles.dateContainer}>
-                                    <Text style={styles.dateText}>
-                                        {reservation.date} ({new Date(`${reservation.date}T${reservation.startTime}`).toLocaleString('ko-KR', { weekday: 'short' })})
-                                    </Text>
-                                    <Text style={styles.timeText}>
-                                        {reservation.startTime} - {reservation.endTime}
-                                    </Text>
+                                <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+                                    <View style={styles.dateContainer}>
+                                        <Text style={styles.dateText}>
+                                            {reservation.date} ({new Date(`${reservation.date}T${reservation.startTime}`).toLocaleString('ko-KR', { weekday: 'short' })})
+                                        </Text>
+                                        <Text style={styles.timeText}>
+                                            {reservation.startTime} - {reservation.endTime}
+                                        </Text>
+                                    </View>
+                                    {reservation.status.includes("CANCELLED") ? <Text style={styles.cancelledText}>취소됨</Text> : 
+                                    reservation.status.includes("PENDING") ? <Text style={{color: '#215D9A', fontWeight: 'bold', marginRight: 5,}}>상담 대기중</Text> : 
+                                    <Text style={{color: 'grey', fontWeight: 'bold', marginRight: 5,}}>상담 완료</Text>}
                                 </View>
                                 <View style={styles.contentsContainer}>
                                     <View style={styles.detailsFirstContainer}>
@@ -124,11 +129,15 @@ const CounselorCounselScreen = () => {
                                         <Text style={styles.type}>{reservation.type}</Text>
                                     </View>
                                     <View style={styles.detailsContainer}>
-                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담 내용  </Text>
+                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894', marginBottom: 5, }}>상담 내용  </Text>
                                         <Text style={styles.comment} numberOfLines={1} ellipsizeMode="tail">{reservation.comment}</Text>
                                     </View>
                                     <View style={styles.divider} />
-                                    {reservation.status.startsWith('CANCELLED') ? (
+                                    <View style={styles.priceContainer}>
+                                        <Text style={{ fontSize: 16, fontWeight: 'bold' }}>가격</Text>
+                                        <Text style={styles.price}>{reservation.fee.toLocaleString()} 원</Text>
+                                    </View>
+                                    {/* {reservation.status.startsWith('CANCELLED') ? (
                                         <View style={styles.cancelledTextContainer}>
                                             <Text style={styles.cancelledText}>취소됨</Text>
                                         </View>
@@ -137,7 +146,7 @@ const CounselorCounselScreen = () => {
                                             <Text style={{ fontSize: 16, fontWeight: 'bold' }}>가격</Text>
                                             <Text style={styles.price}>{reservation.fee.toLocaleString()} 원</Text>
                                         </View>
-                                    )}
+                                    )} */}
                                 </View>
                             </View>
                         </View>
@@ -173,20 +182,20 @@ const styles = StyleSheet.create({
         borderColor: '#ccc', // 테두리 색
         shadowColor: '#000', // 그림자 색
         shadowOffset: {
-          width: 0,
-          height: 2, // 그림자 수직 위치
+            width: 0,
+            height: 2, // 그림자 수직 위치
         },
         shadowOpacity: 0.1, // 그림자 투명도
         shadowRadius: 4, // 그림자 크기
         elevation: 2, // 안드로이드에서 그림자 효과
-        marginTop:5,
+        marginTop: 5,
         marginRight: 15
     },
     picker: {
-    height: 50, // 높이 설정
-    width: '100%', // 너비 설정
-    marginTop:-8,
-    marginLeft:5
+        height: 50, // 높이 설정
+        width: '100%', // 너비 설정
+        marginTop: -8,
+        marginLeft: 5
     },
     title: {
         fontSize: 24,
@@ -243,11 +252,12 @@ const styles = StyleSheet.create({
     detailsContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
+        marginTop: 5,
     },
     detailsFirstContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom:5
+        marginBottom: 5
     },
     nicknameContainer: {
         flexDirection: 'row',
@@ -262,7 +272,7 @@ const styles = StyleSheet.create({
         color: '#555',
         marginBottom: 5,
         marginLeft: 5,
-        marginRight:70
+        marginRight: 70
     },
     priceContainer: {
         flexDirection: 'row',
@@ -277,6 +287,8 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 1,
         backgroundColor: '#ccc',
+        marginTop: 5, 
+        marginBottom: 5,
     },
     totalAmountContainer: {
         flexDirection: 'row',
@@ -295,7 +307,7 @@ const styles = StyleSheet.create({
     type: {
         color: 'white',
         fontSize: 11,
-        backgroundColor: '#778DA9',
+        backgroundColor: '#215D9A',
         borderRadius: 9,
         paddingHorizontal: 6,
         paddingTop: 2
@@ -308,6 +320,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         color: '#CA6767', // 취소 텍스트 색상
+        marginRight: 5,
     },
 });
 

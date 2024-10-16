@@ -93,54 +93,63 @@ const MemberReservationScreen = () => {
                 </View>
             </View>
             <ScrollView>
-                {isLoading ? <LoadingScreen message={'상담 예약 정보를 불러오는 중입니다..'}/> : reservations.length === 0 ? 
+                {isLoading ? <LoadingScreen message={'상담 예약 정보를 불러오는 중입니다..'} /> : reservations.length === 0 ?
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                         <EmptyScreen message="상담 예약 내역이 없습니다" />
                     </View> : reservations.map(reservation => (
-                    <TouchableOpacity
-                        key={reservation.reservationId}
-                        onPress={() => handleReservationPress(reservation.reservationId)}
-                        style={styles.card}
-                    >
-                        <View style={styles.row}>
-                            <View style={styles.verticalLine} />
-                            <View style={styles.infoContainer}>
-                                <View style={styles.dateContainer}>
-                                    <Text style={styles.dateText}>
-                                        {reservation.date} ({new Date(`${reservation.date}T${reservation.startTime}`).toLocaleString('ko-KR', { weekday: 'short' })})
-                                    </Text>
-                                    <Text style={styles.timeText}>
-                                        {reservation.startTime} - {reservation.endTime}
-                                    </Text>
-                                </View>
-                                <View style={styles.contentsContainer}>
-                                    <View style={styles.detailsFirstContainer}>
-                                        <View style={styles.nicknameContainer}>
-                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담사    </Text>
-                                            <Text style={styles.nickname}>{reservation.counselorName}</Text>
+                        <TouchableOpacity
+                            key={reservation.reservationId}
+                            onPress={() => handleReservationPress(reservation.reservationId)}
+                            style={styles.card}
+                        >
+                            <View style={styles.row}>
+                                <View style={styles.verticalLine} />
+                                <View style={styles.infoContainer}>
+                                    <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
+                                        <View style={styles.dateContainer}>
+                                            <Text style={styles.dateText}>
+                                                {reservation.date} ({new Date(`${reservation.date}T${reservation.startTime}`).toLocaleString('ko-KR', { weekday: 'short' })})
+                                            </Text>
+                                            <Text style={styles.timeText}>
+                                                {reservation.startTime} - {reservation.endTime}
+                                            </Text>
                                         </View>
-                                        <Text style={styles.type}>{reservation.type}</Text>
+                                        {reservation.status.includes('CANCELLED') ? <Text style={styles.cancelledText}>취소됨</Text> :
+                                        reservation.status.includes("PENDING") ? <Text style={{color: '#215D9A', fontWeight: 'bold', marginRight: 5}}>상담 대기중</Text> : 
+                                        <Text style={{color: 'grey', fontWeight: 'bold', marginRight: 5}}>상담 완료</Text>}
                                     </View>
-                                    <View style={styles.detailsContainer}>
-                                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담 내용  </Text>
-                                        <Text style={styles.comment} numberOfLines={1} ellipsizeMode="tail">{reservation.comment}</Text>
-                                    </View>
-                                    <View style={styles.divider} />
-                                    {reservation.status.startsWith('CANCELLED') ? (
-                                        <View style={styles.cancelledTextContainer}>
-                                            <Text style={styles.cancelledText}>취소됨</Text>
+                                    <View style={styles.contentsContainer}>
+                                        <View style={styles.detailsFirstContainer}>
+                                            <View style={styles.nicknameContainer}>
+                                                <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담사    </Text>
+                                                <Text style={styles.nickname}>{reservation.counselorName}</Text>
+                                            </View>
+                                            <Text style={styles.type}>{reservation.type}</Text>
                                         </View>
-                                    ) : (
+                                        <View style={styles.detailsContainer}>
+                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>상담 내용  </Text>
+                                            <Text style={styles.comment} numberOfLines={1} ellipsizeMode="tail">{reservation.comment}</Text>
+                                        </View>
+                                        <View style={styles.divider} />
                                         <View style={styles.priceContainer}>
-                                            <Text style={{ fontSize: 16, fontWeight: 'bold' }}>가격</Text>
+                                            <Text style={{ fontSize: 16, fontWeight: 'bold', marginTop: 5 }}>가격</Text>
                                             <Text style={styles.price}>{reservation.fee.toLocaleString()} 원</Text>
                                         </View>
-                                    )}
+                                        {/* {reservation.status.startsWith('CANCELLED') ? (
+                                            <View style={styles.cancelledTextContainer}>
+                                                <Text style={styles.cancelledText}>취소됨</Text>
+                                            </View>
+                                        ) : (
+                                            <View style={styles.priceContainer}>
+                                                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>가격</Text>
+                                                <Text style={styles.price}>{reservation.fee.toLocaleString()} 원</Text>
+                                            </View>
+                                        )} */}
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    </TouchableOpacity>
-                ))}
+                        </TouchableOpacity>
+                    ))}
             </ScrollView>
             <View style={styles.totalAmountContainer}>
                 <View style={styles.totalAmountTitle}>
@@ -172,20 +181,20 @@ const styles = StyleSheet.create({
         borderColor: '#ccc', // 테두리 색
         shadowColor: '#000', // 그림자 색
         shadowOffset: {
-          width: 0,
-          height: 2, // 그림자 수직 위치
+            width: 0,
+            height: 2, // 그림자 수직 위치
         },
         shadowOpacity: 0.1, // 그림자 투명도
         shadowRadius: 4, // 그림자 크기
         elevation: 2, // 안드로이드에서 그림자 효과
-        marginTop:5,
+        marginTop: 5,
         marginRight: 15
     },
     picker: {
-    height: 50, // 높이 설정
-    width: '100%', // 너비 설정
-    marginTop:-8,
-    marginLeft:5
+        height: 50, // 높이 설정
+        width: '100%', // 너비 설정
+        marginTop: -8,
+        marginLeft: 5
     },
     title: {
         fontSize: 24,
@@ -242,11 +251,12 @@ const styles = StyleSheet.create({
     detailsContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
+        marginTop: 5,
     },
     detailsFirstContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        marginBottom:5
+        marginBottom: 5
     },
     nicknameContainer: {
         flexDirection: 'row',
@@ -261,7 +271,7 @@ const styles = StyleSheet.create({
         color: '#555',
         marginBottom: 5,
         marginLeft: 5,
-        marginRight:70
+        marginRight: 70
     },
     priceContainer: {
         flexDirection: 'row',
@@ -276,6 +286,8 @@ const styles = StyleSheet.create({
         flex: 1,
         height: 1,
         backgroundColor: '#ccc',
+        marginTop: 5,
+        marginBottom: 5,
     },
     totalAmountContainer: {
         flexDirection: 'row',
@@ -294,7 +306,7 @@ const styles = StyleSheet.create({
     type: {
         color: 'white',
         fontSize: 11,
-        backgroundColor: '#778DA9',
+        backgroundColor: '#215D9A',
         borderRadius: 9,
         paddingHorizontal: 6,
         paddingTop: 2
