@@ -319,6 +319,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         fontWeight: 'bold',
         color: '#CA6767', // 취소 텍스트 색상
+        marginRight: 5,
     },
 });
 
