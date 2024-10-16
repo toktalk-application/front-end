@@ -17,17 +17,19 @@ const CounselorCounselScreen = () => {
 
     const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear().toString());
     const [selectedMonth, setSelectedMonth] = useState((currentDate.getMonth() + 1).toString());
-    const [sortVisible, setSortVisible] = useState(false);
+    const [filteredBy, setFilteredBy] = useState('ALL');
 
     const [isLoading, setIsLoading] = useState(true);
 
     useFocusEffect(
         useCallback(() => {
+            console.log('filteredBy: ', filteredBy);
             sendGetRequest({
                 token: state.token,
                 endPoint: `/reservations/${state.identifier}/monthly-detail`,
                 requestParams: {
-                    month: selectedYear + "-" + selectedMonth.padStart(2, '0') // 월 형식을 9 -> 09와 같이 변환
+                    month: selectedYear + "-" + selectedMonth.padStart(2, '0'), // 월 형식을 9 -> 09와 같이 변환
+                    status: filteredBy,
                 },
                 onSuccess: (data) => {
                     console.log("data: ", data);
@@ -52,7 +54,7 @@ const CounselorCounselScreen = () => {
             }, [selectedMonth, selectedYear]);
 
             fetchReservations(selectedYear, selectedMonth);
-        }, [selectedYear, selectedMonth])
+        }, [selectedYear, selectedMonth, filteredBy])
     );
 
     const fetchReservations = async (year, month) => {
@@ -94,6 +96,18 @@ const CounselorCounselScreen = () => {
                         {Array.from({ length: 12 }, (_, i) => i + 1).map(month => (
                             <Picker.Item key={month} label={`${month}월`} value={month.toString()} />
                         ))}
+                    </Picker>
+                </View>
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={filteredBy}
+                        style={styles.picker}
+                        onValueChange={(itemValue) => setFilteredBy(itemValue)}
+                    >
+                        <Picker.Item key={'ALL'} label='전체' value={'ALL'}/>
+                        <Picker.Item key={'PENDING'} label='상담 대기중' value={'PENDING'}/>
+                        <Picker.Item key={'CANCELLED'} label='취소됨' value={'CANCELLED'}/>
+                        <Picker.Item key={'COMPLETED'} label='상담 완료' value={'COMPLETED'}/>
                     </Picker>
                 </View>
             </View>
@@ -172,11 +186,11 @@ const styles = StyleSheet.create({
     },
     dropdown: {
         flexDirection: 'row', // 가로 방향으로 정렬
-        justifyContent: 'flex-end', // 아이템 사이의 간격 조정
+        justifyContent: 'space-between', // 아이템 사이의 간격 조정
     },
     pickerContainer: {
         backgroundColor: '#fff', // 배경색
-        width: '32%', // 너비 설정
+        width: '30%', // 너비 설정
         borderRadius: 10, // 둥근 테두리
         borderWidth: 1, // 테두리 두께
         borderColor: '#ccc', // 테두리 색
@@ -189,13 +203,14 @@ const styles = StyleSheet.create({
         shadowRadius: 4, // 그림자 크기
         elevation: 2, // 안드로이드에서 그림자 효과
         marginTop: 5,
-        marginRight: 15
+        marginLeft: 5,
+        marginRight: 5,
     },
     picker: {
         height: 50, // 높이 설정
         width: '100%', // 너비 설정
         marginTop: -8,
-        marginLeft: 5
+        marginLeft: 5,
     },
     title: {
         fontSize: 24,

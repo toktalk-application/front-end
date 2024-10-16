@@ -16,6 +16,7 @@ const getPrettyMessage = (status, message) => {
             if(message.includes('licenses')) return '자격증은 총 1~3개로만 등록할 수 있습니다.'
             if(message.includes('careers')) return '경력사항은 총 1~3개로만 등록할 수 있습니다.'
             if(message.includes('month')) return '달은 1월~12월이어야 합니다.'
+            if(message.includes('status')) return '잘못된 예약 상태 파라미터입니다.'
             break;
         case 403:
             if(message.includes('denied')) return '요청이 거부되었습니다.'
