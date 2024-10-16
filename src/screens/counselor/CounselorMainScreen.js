@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback,useRef } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 import CounselorCalendar from '../../components/Calendar/CounselorCalendar';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
@@ -11,6 +11,7 @@ function CounselorMainScreen() {
   const [markedDates, setMarkedDates] = useState({});
   const [reservations, setReservations] = useState([]);
   const [selectedDate, setSelectedDate] = useState('');
+  const flatListRef = useRef(null);
 
   // useFocusEffect(
   //   React.useCallback(() => {
@@ -91,6 +92,16 @@ function CounselorMainScreen() {
       fetchReservations(day.dateString);
     }
   };
+  
+  useEffect(() => {
+    if (flatListRef.current) {
+        flatListRef.current.scrollToEnd({
+            y: flatListRef.current.scrollHeight,
+            animated: true, // 부드럽게 스크롤
+          });
+        // 데이터가 변경될 때마다 FlatList의 끝으로 스크롤
+    }
+}, [selectedDate, reservations]);
 
   const formatTime = (time) => {
     const [hour, minute] = time.split(':');
@@ -118,6 +129,7 @@ function CounselorMainScreen() {
 
   return (
     <FlatList
+      ref={flatListRef}
       data={reservations}
       keyExtractor={(item) => item.reservationId.toString()}
       style={{ backgroundColor: 'white' }} // 여기에서 배경색을 흰색으로 설정
@@ -139,7 +151,7 @@ function CounselorMainScreen() {
                 <Text style={styles.nickNameText}>내담자 {item.memberNickname}</Text>
                 <Text style={styles.typeText}> {item.type} </Text>
               </View>
-              <Text style={styles.commentText}>상담 내용: {item.comment || '없음'}</Text>
+              <Text style={styles.commentText}>상담 내용  {item.comment || '없음'}</Text>
             </View>
           </View>}
         </TouchableOpacity>
@@ -162,13 +174,13 @@ const styles = StyleSheet.create({
   },
   timeContainer: {
     flex: 2, // 공간을 차지하도록 설정
-    padding: 5,
+    padding: 3,
     alignItems: 'center', // 왼쪽 정렬
     flexDirection: 'colum',
   },
   timeText: {
     color: 'black', // 시간 텍스트 색상
-    fontSize: 12,
+    fontSize: 14,
   },
   detailsContainer: {
     backgroundColor: '#001932', // 배경 색상
@@ -186,12 +198,12 @@ const styles = StyleSheet.create({
   },
   nickNameText: {
     color: 'white',
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: 'bold',
   },
   typeText: {
     color: 'black',
-    fontSize: 11,
+    fontSize: 13,
     backgroundColor: 'white',
     borderRadius: 10,
     paddingHorizontal: 5
@@ -202,9 +214,10 @@ const styles = StyleSheet.create({
     marginRight: 5,
     marginTop: 5,
     marginBottom: 10,
-    fontSize: 12,
+    fontSize: 14,
   },
 });
 
 
 export default CounselorMainScreen;
+

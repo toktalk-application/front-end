@@ -32,7 +32,7 @@ const CustomDayComponent = ({ date, isDisabled, isToday, isSelected, isMarked, o
         paddingHorizontal: 8, 
         borderRadius: 5,
         alignItems: 'center', // 수평 중앙 정렬
-        height:45
+        height:55
       }} // 배경 색상 및 패딩
     >
       {/* 날짜와 점을 감싸는 View */}

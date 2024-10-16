@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/AuthContext';
 import sendPatchRequest from '../../axios/PatchRequest';
 import sendPostRequest from '../../axios/SendPostRequest';
 import { useFocusEffect } from '@react-navigation/native';
+import LoadingScreen from '../LoadingScreen';
 
 function CounselorTimeSettingScreen({ route, navigation }) {
   const { state } = useAuth();
@@ -176,7 +177,7 @@ function CounselorTimeSettingScreen({ route, navigation }) {
         ))}
       </View>
       <View style={styles.timeGrid}>
-        {isLoading ? <View/> : Object.keys(availability[selectedDay]).map((time) => (
+        {isLoading ? <LoadingScreen message={'기본 시간 설정 정보를 불러오고 있습니다..'}/> : Object.keys(availability[selectedDay]).map((time) => (
           <TouchableOpacity
             key={time}
             style={[styles.timeButton, availability[selectedDay][time] && styles.selectedButton]}

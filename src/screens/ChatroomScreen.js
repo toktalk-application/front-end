@@ -174,11 +174,13 @@ const ChatRoomScreen = () => {
             ) : userType === 'MEMBER' ? (
               <Text style={styles.memberName}>{counselorName} 상담사</Text>
             ) : null}
-        <TouchableOpacity onPress={handleCloseChatRoom} style={styles.backButton}>
-          <View style={styles.ImageCover}>
-            <Image source={require('../../assets/images/exist.png')} style={styles.ExistButtonImg}/>
-          </View>
-        </TouchableOpacity>
+        {userType === 'COUNSELOR' && (
+          <TouchableOpacity onPress={handleCloseChatRoom} style={styles.backButton}>
+            <View style={styles.ImageCover}>
+              <Image source={require('../../assets/images/exist.png')} style={styles.ExistButtonImg} />
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
       <FlatList
         ref={flatListRef}

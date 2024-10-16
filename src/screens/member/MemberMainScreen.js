@@ -233,7 +233,7 @@ function MemberMainScreen() {
                                 <Text></Text>
                                 <Text style={styles.textStyle}>오늘의 기분을 선택하세요</Text>
                                 <TouchableOpacity style={{ alignSelf: 'center', marginRight: 10 }} onPress={() => setModalVisible(false)}>
-                                    <Text>닫기</Text>
+                                    <Text style={{fontSize: 15}}>❌</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>

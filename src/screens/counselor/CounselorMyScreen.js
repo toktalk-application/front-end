@@ -11,6 +11,17 @@ import { useAuth } from '../../auth/AuthContext.js';
 const CounselorMyScreen = () => {
   const { state } = useAuth();
   const navigation = useNavigation();
+  const imageSource = myData && myData.profileImage 
+  ? { uri: myData.profileImage } 
+  : require('../../../assets/images/emptyImage.png'); // 대체 이미지
+
+  const getImageSource = () => {
+    if (myData && myData.profileImage) {
+      return { uri: myData.profileImage };
+    }
+    return require('../../../assets/images/emptyImage.png');
+  };
+
 
   const handleMenuPress = (menu) => {
     if (menu === '프로필 관리') {
@@ -47,15 +58,18 @@ const CounselorMyScreen = () => {
     <View style={styles.containder}>
       <View style={styles.infoContainer}>
         <View style={styles.nameBingContainer}>
-          <Image source={{ uri: myData.profileImage || 'https://via.placeholder.com/120' }} style={styles.image} />
+          <Image 
+            source={getImageSource()} 
+            style={styles.image} 
+          />
           <View style = {{flexDirection: 'column'}}>
             <View style={styles.nameContainer}>
               <Text style={styles.name}>{myData.name}</Text>
               <Text style={styles.counselor}> 상담사님 </Text>
             </View>
             <View style={{flexDirection: 'row'}}>
-              <Text>⭐</Text>
-              <Text>{' ' + myData.rating}</Text>
+              <Text style={{fontSize:17}}>⭐</Text>
+              <Text style={{fontSize:17}}>{' ' + myData.rating}</Text>
             </View>
           </View>
         </View>
@@ -134,3 +148,4 @@ const styles = StyleSheet.create({
 });
 
 export default CounselorMyScreen;
+

@@ -9,6 +9,7 @@ import { useFocusEffect } from '@react-navigation/native';
 
 // 일반 사용자 로그인 화면
 function MemberLoginScreen({ navigation }) {
+  url = process.env.REACT_APP_API_URL;
   const { login } = useAuth('');
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
