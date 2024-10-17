@@ -31,7 +31,7 @@ const ChatRoomScreen = () => {
       const fetchChatRoomInfo = () => {
         sendGetRequest({
           token: state.token,
-          endPoint: `/chat_rooms/${roomId}`,
+          endPoint: `/chat-rooms/${roomId}`,
           onSuccess: (data) => {
             const sortedMessages = data.chatLogs.sort((a, b) => b.logId - a.logId);
             /* console.log("data: ", data); */
@@ -54,7 +54,7 @@ const ChatRoomScreen = () => {
   //   const fetchChatRoomInfo = () => {
   //     sendGetRequest({
   //       token: state.token,
-  //       endPoint: `/chat_rooms/${roomId}`,
+  //       endPoint: `/chat-rooms/${roomId}`,
   //       onSuccess: (data) => {
   //         const sortedMessages = data.chatLogs.sort((a, b) => b.logId - a.logId);
   //         /* console.log("data: ", data); */
@@ -74,6 +74,11 @@ const ChatRoomScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
+      if (roomStatus === 'close') {
+        console.log('채팅방이 닫혀있습니다. Socket.IO 연결을 하지 않습니다.');
+        return;
+      }
+
       // Socket.IO 연결
       const socket = io('http://10.0.2.2:9092', {
         transports: ['websocket'],
@@ -179,7 +184,7 @@ const ChatRoomScreen = () => {
   const handleCloseChatRoom = () => {
     PatchRequest({
       token: state.token,
-      endPoint: `/chat_rooms/${roomId}/close`,  // roomId를 경로 파라미터로 전달
+      endPoint: `/chat-rooms/${roomId}/close`,  // roomId를 경로 파라미터로 전달
       onSuccess: () => {
         console.log("채팅방이 닫혔습니다.");
         // 채팅방이 닫힌 후 이전 화면으로 이동
@@ -250,7 +255,7 @@ const ChatRoomScreen = () => {
         ) : userType === 'MEMBER' ? (
           <Text style={styles.memberName}>{counselorName} 상담사</Text>
         ) : null}
-        {userType === 'COUNSELOR' && (
+        {userType === 'COUNSELOR' &&  roomStatus === 'open' && (
           <TouchableOpacity onPress={handleCloseChatRoom} style={styles.backButton}>            
               <Ionicons name="exit-outline" size={30} color="#000" />
           </TouchableOpacity>

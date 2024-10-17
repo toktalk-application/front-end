@@ -22,7 +22,7 @@ function MemberChattingScreen() {
     // 서버로부터 채팅방 목록 요청
     sendGetRequest({
       token: state.token,
-      endPoint: '/chat_rooms', // 채팅방 목록을 가져오는 API 엔드포인트
+      endPoint: '/chat-rooms', // 채팅방 목록을 가져오는 API 엔드포인트
       onSuccess: (data) => {
         setChatRooms(data); // 가져온 데이터로 상태 업데이트
         console.log(chatRooms);

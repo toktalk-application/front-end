@@ -165,7 +165,7 @@ const CounselDetailScreen = () => {
     const handleOpenChatRoom = () => {
         sendPostRequest({
             token: state.token,
-            endPoint: `/chat_rooms/open?memberId=${reservation.memberId}`, // 쿼리 파라미터로 memberId 전달
+            endPoint: `/chat-rooms/open?memberId=${reservation.memberId}`, // 쿼리 파라미터로 memberId 전달
 
             onSuccess: (data) => {
                 const { roomId } = data;
@@ -173,7 +173,7 @@ const CounselDetailScreen = () => {
 
                 sendGetRequest({
                     token: state.token,
-                    endPoint: `/chat_rooms/${roomId}`,
+                    endPoint: `/chat-rooms/${roomId}`,
                     onSuccess: (data) => {
                         // 채팅방으로 네비게이션
                         console.log("data: ", data.roomStatus);
