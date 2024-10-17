@@ -82,7 +82,7 @@ const ReservationCalendar = ({ onDayPress, selectedDate }) => {
 
   useFocusEffect(
     useCallback(() => {
-      const today = new Date();
+      const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
       setMinDate(today.toISOString().split('T')[0]);
 
       const currentYear = today.getFullYear();
@@ -98,12 +98,12 @@ const ReservationCalendar = ({ onDayPress, selectedDate }) => {
 
   return (
     <Calendar
-      current={new Date().toISOString().split('T')[0]}
+      current={new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]}
       minDate={minDate}
       maxDate={maxDate}
       dayComponent={({ date }) => {
         const isDisabled = new Date(date.dateString) < new Date(minDate) || new Date(date.dateString) > new Date(maxDate);
-        const isToday = date.dateString === new Date().toISOString().split('T')[0]; // 오늘 날짜 확인
+        const isToday = date.dateString === new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0]; // 오늘 날짜 확인
         const isSelected = date.dateString === selectedDate; // 선택된 날짜 확인
 
         return (
