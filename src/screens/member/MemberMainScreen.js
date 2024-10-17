@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
         marginRight: 20,
     },
     buttonText: {
-        backgroundColor: '#FFCE50',
+        backgroundColor: '#215D9A',
         padding: 10,
         borderRadius: 10,
         shadowColor: '#000',
@@ -318,7 +318,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.3,
         shadowRadius: 4,
         elevation: 5,
-        fontSize: 15
+        fontSize: 15,
+        color:'#f1f1f1'
     },
     timeContainer: {
         flex: 2,

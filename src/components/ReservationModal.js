@@ -402,7 +402,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
                 </View>
               </View>
               <View style={styles.footer}>
-                <Text style={styles.cost}>총 결제금액</Text>
+                <Text style={styles.cost}>총 결제 금액</Text>
                 <Text style={styles.costValue}>{getTotalFee()}</Text>
                 <TouchableOpacity style={styles.submitButton} onPress={handlePaymentRequest} >
                   <Text style={styles.buttonText}>결제하기</Text>
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   submitButton: {
-    backgroundColor: '#001326',
+    backgroundColor: '#215D9A',
     padding: 10,
     borderRadius: 5,
     marginBottom: 10,
@@ -523,7 +523,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   buttonText: {
-    color: '#fff',
+    color: 'white',
     textAlign: 'center',
   },
   container: {
