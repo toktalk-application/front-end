@@ -246,7 +246,7 @@ const ChatRoomScreen = () => {
           <Ionicons name="arrow-back-outline" size={30} color="#000" />
         </TouchableOpacity>
         {userType === 'COUNSELOR' ? (
-          <Text style={styles.memberName}>{nickname} 내담자</Text>
+          <Text style={styles.memberName}>{nickname} 회원</Text>
         ) : userType === 'MEMBER' ? (
           <Text style={styles.memberName}>{counselorName} 상담사</Text>
         ) : null}

@@ -57,13 +57,13 @@ const ReportModal = ({ visible, onClose, reservationId, onSubmit }) => {
                         </Text>
                     <View style={{ alignItems: 'flex-start',marginBottom:20}}>
                         <Text style={styles.sectionDescriptionDetail}>
-                            상담 중 내담자가 언급한 문제점, 요구사항, 논의한 주요 주제
+                            상담 중 회원이 언급한 문제점, 요구사항, 논의한 주요 주제
                         </Text>
                         <Text style={styles.sectionDescriptionDetail}>
                             상담 중 제안된 대처 방법이나 행동 계획
                         </Text>
                         <Text style={styles.sectionDescriptionDetail}>
-                            내담자에게 요청한 후속 행동 등
+                            회원에게 요청한 후속 행동 등
                         </Text>
                     </View>
 
@@ -78,7 +78,7 @@ const ReportModal = ({ visible, onClose, reservationId, onSubmit }) => {
                     />
 
                     <Text style={styles.sectionDescription}>
-                            - 리포트 내용은 내담자에게 전송됩니다.
+                            - 리포트 내용은 회원에게 전송됩니다.
                         </Text>
                     <View style={styles.buttonContainer}>
                         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     submitButton: {
-        backgroundColor: '#001326',
+        backgroundColor: '#215D9A',
         borderRadius: 5,
         padding: 10,
         flex: 1,

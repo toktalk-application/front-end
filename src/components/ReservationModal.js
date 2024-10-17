@@ -332,10 +332,10 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
                 <View style={styles.accordionContent}>
                   <View style={styles.typeContainer}>
                     <TouchableOpacity onPress={() => { setSelectedType('채팅 상담'); setIsDateOpen(true); }} style={selectedType === '채팅 상담' ? styles.selectedType : styles.typeButton}>
-                      <Text>채팅 상담</Text>
+                      <Text style={selectedType === '채팅 상담' ? styles.selectedTypeText : styles.typeButtonText} >채팅 상담</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => { setSelectedType('전화 상담'); setIsDateOpen(true); }} style={selectedType === '전화 상담' ? styles.selectedType : styles.typeButton}>
-                      <Text>전화 상담</Text>
+                      <Text onPress={() => { setSelectedType('전화 상담'); setIsDateOpen(true); }} style={selectedType === '전화 상담' ? styles.selectedTypeText : styles.typeButtonText}>전화 상담</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -412,7 +412,7 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
                 <Text style={styles.cost}>총 결제 금액</Text>
                 <Text style={styles.costValue}>{getTotalFee()}</Text>
                 <TouchableOpacity style={styles.submitButton} onPress={handlePaymentRequest} >
-                  <Text style={styles.buttonText}>결제하기</Text>
+                  <Text style={styles.submitButtonText}>결제하기</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -476,8 +476,16 @@ const styles = StyleSheet.create({
   selectedType: {
     padding: 10,
     marginRight: 10,
-    backgroundColor: '#ffa500',
+    backgroundColor: '#215D9A',
     borderRadius: 5,
+  },
+  typeButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
+  },
+  selectedTypeText: {
+    color: '#FFF',
+    fontWeight: 'bold',
   },
   dateButton: {
     padding: 10,
@@ -501,10 +509,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffa500',
     borderRadius: 5,
   },
-  selectedTypeText: {
-    marginTop: 10,
-    fontWeight: 'bold',
-  },
   textInput: {
     height: 150,
     borderColor: 'gray',
@@ -516,12 +520,6 @@ const styles = StyleSheet.create({
   },
   cost: {
     fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  submitButton: {
-    backgroundColor: '#215D9A',
-    padding: 10,
-    borderRadius: 5,
     marginBottom: 10,
   },
   closeButton: {
@@ -600,14 +598,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   submitButton: {
-    backgroundColor: '#e0f7fa',
+    backgroundColor: '#215D9A',
     padding: 10,
     borderRadius: 5,
     width: 120,
     alignItems: 'center',
   },
-  buttonText: {
-    color: '#00796b',
+  submitButtonText: {
+    color: 'white',
     fontWeight: 'bold',
   },
 });

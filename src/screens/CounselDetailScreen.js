@@ -215,7 +215,7 @@ const CounselDetailScreen = () => {
                 <View style={styles.memberContainer}>
                     {userType === 'COUNSELOR' ? (
                         <>
-                            <Text style={styles.subtitle}>내담자 정보</Text>
+                            <Text style={styles.subtitle}>회원 정보</Text>
                             <View style={styles.memberDetailContainer}>
                                 <View style={styles.memberDetail}>
                                     <Text style={styles.memberDetailTitleNickname}>닉네임</Text>
@@ -263,7 +263,7 @@ const CounselDetailScreen = () => {
                     <Text style={styles.subtitle}>취소 내용</Text>
                     <View style={styles.cancelDetailContainer}>
                         <Text style={styles.cencelName}> 취소자 </Text>
-                        <Text style={{ fontSize: 15 }}>  내담자 </Text>
+                        <Text style={{ fontSize: 15 }}>  회원 </Text>
                     </View>
                 </View>
             ) : reservation.status === "CANCELLED_BY_COUNSELOR" ? (
@@ -549,14 +549,14 @@ const styles = StyleSheet.create({
     pendingButton: {
         marginTop: 10,
         padding: 10,
-        backgroundColor: '#001326',
+        backgroundColor: '#215D9A',
         borderRadius: 5,
         alignItems: 'center',
     },
     button: {
         marginTop: 10,
         padding: 10,
-        backgroundColor: '#001326',
+        backgroundColor: '#215D9A',
         borderRadius: 5,
         alignItems: 'center',
     },
@@ -602,7 +602,7 @@ const styles = StyleSheet.create({
         width: '70%',
     },
     confirmButton: {
-        backgroundColor: '#3C6894', // 확인 버튼 색상
+        backgroundColor: '#215D9A', // 확인 버튼 색상
         borderRadius: 5,
         padding: 10,
         flex: 1,
@@ -614,7 +614,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
     },
     cancelButton: {
-        backgroundColor: '#CA6767', // 취소 버튼 색상
+        backgroundColor: '#215D9A', // 취소 버튼 색상
         borderRadius: 5,
         padding: 10,
         flex: 1,

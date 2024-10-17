@@ -69,7 +69,7 @@ function CounselorChattingScreen() {
 
     // 상태에 따른 뱃지 색상 및 텍스트 설정
     const statusText = item.roomStatus === 'open' ? 'Open' : 'Closed';
-    const statusBackgroundColor = item.roomStatus === 'open' ? '#4CAF50' : 'red';
+    const statusBackgroundColor = item.roomStatus === 'open' ? '#215D9A' : '#CA6767';
 
     return (
       <TouchableOpacity
@@ -80,18 +80,18 @@ function CounselorChattingScreen() {
           {/* 프로필 아이콘 */}
           <Icon name="person" size={40} color="#215D9A" marginRight={10}style={styles.userIcon} />
           <View style={styles.infoContainer}>
-            <Text style={styles.memberName}>{item.nickname} 내담자</Text>
+            <Text style={styles.memberName}>{item.nickname} 회원</Text>
             {/* 메시지가 null일 경우 빈 문자열로 처리 */}
             <Text numberOfLines={1} ellipsizeMode="tail" style={styles.messagePreview}>
-              {item.message ? (item.message.length > 5 ? item.message.substring(0, 15) + '...' : item.message) : ''}
+              {item.message ? (item.message.length > 5 ? item.message.substring(0, 25) + '...' : item.message) : ''}
             </Text>
           </View>
           <View style={styles.rightContainer}>
-            <Text style={styles.createdAt}>{displayText}</Text>
-            {/* Open/Closed 상태 뱃지 */}
             <View style={[styles.statusBadge, { backgroundColor: statusBackgroundColor }]}>
               <Text style={styles.statusText}>{statusText}</Text>
             </View>
+            <Text style={styles.createdAt}>{displayText}</Text>
+            {/* Open/Closed 상태 뱃지 */}
           </View>
         </View>
       </TouchableOpacity>
@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   chatRoom: {
-    paddingVertical: 15,
+    paddingVertical: 5,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -141,10 +141,12 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     justifyContent: 'center',
+    marginTop:8
   },
   rightContainer: {
     justifyContent: 'center',
     alignItems: 'flex-end',
+    marginBottom:7
   },
   memberName: {
     fontWeight: 'bold',
@@ -153,29 +155,30 @@ const styles = StyleSheet.create({
   messagePreview: {
     color: '#666',
     fontSize: 14,
-    marginTop: 4,
+    marginTop: 10,
     maxWidth: '100%',
   },
   createdAt: {
     color: '#999',
-    fontSize: 14, 
+    fontSize: 13, 
     textAlign: 'right',
     minWidth: 80, 
-    marginRight: 10, 
+    marginRight: 3, 
     margintop: 50,
   },
   statusBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 15, 
-    minWidth: 80, // 뱃지 최소 너비 설정
+    marginBottom:10,
+    minWidth: 60, // 뱃지 최소 너비 설정
   },
   statusText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
   },
 });

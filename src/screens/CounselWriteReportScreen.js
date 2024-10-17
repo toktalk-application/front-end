@@ -48,9 +48,9 @@ const CounselWriteReportScreen = () => {
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>상담 리포트</Text>
                 <Text style={styles.sectionDescription}>- 상담 내용 및 피드백을 작성해주세요.</Text>
-                <Text style={styles.sectionDescriptionDetail}>상담 중 내담자가 언급한 문제점, 요구사항, 논의한 주요 주제</Text>
+                <Text style={styles.sectionDescriptionDetail}>상담 중 회원이 언급한 문제점, 요구사항, 논의한 주요 주제</Text>
                 <Text style={styles.sectionDescriptionDetail}>상담 중 제안된 대처 방법이나 행동 계획</Text>
-                <Text style={styles.sectionDescriptionDetail}>내담자에게 요청한 후속 행동 등 </Text>     
+                <Text style={styles.sectionDescriptionDetail}>회원에게 요청한 후속 행동 등 </Text>     
                 
                 <TextInput 
                     style={styles.bingInput} 

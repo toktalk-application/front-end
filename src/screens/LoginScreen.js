@@ -161,7 +161,7 @@ function MemberLoginScreen({ navigation }) {
       {/* 회원가입 안내 메시지와 버튼 */}
       <View style={styles.signupContainer}>
         <Text style={styles.signupText}>아직 회원이 아니신가요?  </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('내담자 회원가입')}>
+        <TouchableOpacity onPress={() => navigation.navigate('회원가입')}>
           <Text style={styles.signupButton}>회원가입</Text>
         </TouchableOpacity>
       </View>
@@ -311,8 +311,8 @@ function CounselorLoginScreen({ navigation }) {
       </View>
       {/* 회원가입 안내 메시지와 버튼 */}
       <View style={styles.signupContainer}>
-        <Text style={styles.signupText}> 상담자님을 기다리고 있어요!  </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('상담자 회원가입')}>
+        <Text style={styles.signupText}> 상담사님을 기다리고 있어요!  </Text>
+        <TouchableOpacity onPress={() => navigation.navigate('상담사 회원가입')}>
           <Text style={styles.signupButton}>회원가입</Text>
         </TouchableOpacity>
       </View>
@@ -331,13 +331,13 @@ export default function LoginScreen({ navigation }) {
           style={[styles.tabButton, activeTab === 'User' && styles.activeTab]}
           onPress={() => setActiveTab('User')}
         >
-          <Text style={styles.tabText}>내담자 로그인</Text>
+          <Text style={styles.tabText}>회원 로그인</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.tabButton, activeTab === 'Counselor' && styles.activeTab]}
           onPress={() => setActiveTab('Counselor')}
         >
-          <Text style={styles.tabText}>상담자 로그인</Text>
+          <Text style={styles.tabText}>상담사 로그인</Text>
         </TouchableOpacity>
       </View>
 

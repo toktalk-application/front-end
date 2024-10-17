@@ -220,8 +220,8 @@ function App() {
           <Stack.Navigator>
             <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
             <Stack.Screen name="로그인" component={LoginScreen} />
-            <Stack.Screen name="내담자 회원가입" component={MemberSignUpScreen} />
-            <Stack.Screen name="상담자 회원가입" component={CounselorSignUpScreen} />
+            <Stack.Screen name="회원가입" component={MemberSignUpScreen} />
+            <Stack.Screen name="상담사 회원가입" component={CounselorSignUpScreen} />
             <Stack.Screen name="알림" component={AlarmScreen} />
             <Stack.Screen name="CounselDetailScreen" component={CounselDetailScreen} options={{ title: '상담 상세 정보' }} />
             <Stack.Screen name="프로필 관리" component={CounselorProfileScreen} />
