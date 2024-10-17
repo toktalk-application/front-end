@@ -82,6 +82,8 @@ const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate, minD
     setIsLoading(false); 
   }, []);
 
+  const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
+
   return (
     <Calendar
       current={selectedDate || new Date().toISOString().split('T')[0]}
@@ -89,9 +91,9 @@ const MemberCalendar = ({ markedDates, moodDates, onDayPress, selectedDate, minD
       maxDate={maxDate}
       dayComponent={({ date }) => {
         const isDisabled = new Date(date.dateString) < new Date(minDate) || new Date(date.dateString) > new Date(maxDate);
-        const isToday = date.dateString === new Date().toISOString().split('T')[0]; // 오늘 날짜 확인
-        const isSelected = date.dateString === selectedDate; // 선택된 날짜 확인
-        const isMarked = markedDates[date.dateString]; // 마킹된 날짜 확인
+        const isToday = date.dateString === today;
+        const isSelected = date.dateString === selectedDate;
+        const isMarked = markedDates[date.dateString];
         const mood = moodDates[date.dateString];
 
         return (
