@@ -73,6 +73,10 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
     console.log('Updated time:', time); // time 상태가 변경될 때마다 출력
   }, [time]); 
 
+  /* useEffect(() => {
+    setAvailability(initialTimes);
+  }, [selectedDate]); */
+
   // useFocusEffect(
   //   useCallback(() => {
   //     if (visible) {
@@ -142,6 +146,9 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
   }
 
   const handleDayPress = (day) => {
+    setAvailability(initialTimes);
+    setTime([]);
+    
     if (selectedDate === day.dateString) {
       // 이미 선택된 날짜를 다시 선택하면 선택 취소
       setSelectedDate('');
