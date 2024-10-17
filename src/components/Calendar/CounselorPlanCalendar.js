@@ -11,7 +11,7 @@ const CustomDayComponent = ({ date, isDisabled, isToday, isSelected, onDayPress 
   let backgroundColor = 'transparent'; // 기본 배경 색상
 
   if (isSelected) {
-    backgroundColor = '#001932'; // 선택된 날짜 배경색
+    backgroundColor = '#215D9A'; // 선택된 날짜 배경색
     textColor = 'white'; // 선택된 날짜 텍스트 색상
   } else if (isToday) {
     textColor = '#67A0CA';
@@ -43,7 +43,7 @@ const CustomDayComponent = ({ date, isDisabled, isToday, isSelected, onDayPress 
       }}>
         {/* 날짜 텍스트의 배경색을 위한 View */}
         <View style={{
-          backgroundColor: isSelected ? '#001932' : 'transparent', // 선택된 날짜일 경우 배경색 설정
+          backgroundColor: isSelected ? '#215D9A' : 'transparent', // 선택된 날짜일 경우 배경색 설정
           borderRadius: 5,
           marginBottom: 2, // 점과의 간격 설정
           alignItems: 'center', // 수평 중앙 정렬

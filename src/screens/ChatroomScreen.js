@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import sendGetRequest from '../axios/SendGetRequest';
 import PatchRequest from '../axios/PatchRequest';
 import io from 'socket.io-client';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const ChatRoomScreen = () => {
   const { state } = useAuth();
@@ -242,7 +243,7 @@ const ChatRoomScreen = () => {
     <KeyboardAvoidingView style={styles.container} behavior="padding" keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Image source={require('../../assets/images/back.png')} style={styles.icon} />
+          <Ionicons name="arrow-back-outline" size={30} color="#000" />
         </TouchableOpacity>
         {userType === 'COUNSELOR' ? (
           <Text style={styles.memberName}>{nickname} 내담자</Text>
@@ -250,10 +251,8 @@ const ChatRoomScreen = () => {
           <Text style={styles.memberName}>{counselorName} 상담사</Text>
         ) : null}
         {userType === 'COUNSELOR' && (
-          <TouchableOpacity onPress={handleCloseChatRoom} style={styles.backButton}>
-            <View style={styles.ImageCover}>
-              <Image source={require('../../assets/images/exist.png')} style={styles.ExistButtonImg} />
-            </View>
+          <TouchableOpacity onPress={handleCloseChatRoom} style={styles.backButton}>            
+              <Ionicons name="exit-outline" size={30} color="#000" />
           </TouchableOpacity>
         )}
       </View>
@@ -288,7 +287,7 @@ const ChatRoomScreen = () => {
           }}
         />
         <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
-          <Image source={require('../../assets/images/send.png')} style={styles.sendButtonText} />
+          <Ionicons name="send-outline" size={25} color="white" />
         </TouchableOpacity>
       </View>}
     </KeyboardAvoidingView>
@@ -443,7 +442,7 @@ const styles = StyleSheet.create({
     marginTop: 2
   },
   sendButton: {
-    backgroundColor: '#001F3F',
+    backgroundColor: '#215D9A',
     borderRadius: 20,
     padding: 10,
     marginTop: 2,

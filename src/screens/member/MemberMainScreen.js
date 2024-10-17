@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
     detailsContainer: {
-        backgroundColor: '#001932', // 배경 색상
+        backgroundColor: '#215D9A', // 배경 색상
         flex: 7, // 공간을 더 차지하도록 설정
         paddingLeft: 10, // 약간의 여백
         paddingVertical: 10,

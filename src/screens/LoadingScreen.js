@@ -4,7 +4,7 @@ import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 const LoadingScreen = ({message}) => {
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#001932" />
+      <ActivityIndicator size="large" color="#215D9A" />
       <Text style={styles.loadingText}>{message}</Text>
     </View>
   );
