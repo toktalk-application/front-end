@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: '#001932', // 선택된 탭의 하단 테두리 색상
+    borderBottomColor: '#215D9A', // 선택된 탭의 하단 테두리 색상
   },
   tabText: {
     fontSize: 25,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
@@ -67,13 +67,7 @@ function MemberChattingScreen() {
         : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }))
       : null; // createdAt이 null일 경우 null로 설정
 
-          // 상태에 따라 텍스트 배경색 결정
-    const roomStatusBackgroundColor = item.roomStatus === 'open' ? 'lightgreen' : 
-    item.roomStatus === 'close' ? 'lightcoral' : 
-    'transparent'; // 기본값 (기타 상태)
-
-      
-
+    const roomStatusBackgroundColor = item.roomStatus === 'open' ? '#4CAF50' : 'red';
 
     return (
       <TouchableOpacity
@@ -81,16 +75,18 @@ function MemberChattingScreen() {
         onPress={() => handleChatRoomPress(item.roomId, item.memberNickname, item.counselorName, item.roomStatus)}
       >
         <View style={styles.chatRoomContainer}>
-          <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.image} />
+          <Image source={{ uri: item.profileImage || "https://via.placeholder.com/80" }} style={styles.profileImage} />
           <View style={styles.infoContainer}>
-            <Text style={[styles.roomStatus, { backgroundColor: roomStatusBackgroundColor }]}>
-                {item.roomStatus}
+            <Text style={styles.memberName}>{item.counselorName} 상담사</Text>
+            <Text style={styles.messagePreview}>
+              {item.message ? (item.message.length > 15 ? item.message.substring(0, 15) + '...' : item.message) : ''}
             </Text>
-            <View style={styles.row}>
-              <Text style={styles.memberName}>{item.counselorName} 상담사</Text>
-              <Text style={styles.createdAt}>{displayText}</Text>
+          </View>
+          <View style={styles.rightContainer}>
+            <Text style={styles.createdAt}>{displayText}</Text>
+            <View style={[styles.statusBadge, { backgroundColor: roomStatusBackgroundColor }]}>
+              <Text style={styles.statusText}>{item.roomStatus === 'open' ? 'Open' : 'Closed'}</Text>
             </View>
-              <Text style= {styles.message}>{item.message}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -99,8 +95,8 @@ function MemberChattingScreen() {
 
   return (
     <View style={styles.container}>
-      {isLoading ? ( // isLoading이 true일 때 로딩 스피너 표시
-        <LoadingScreen message={'채팅 정보를 불러오는 중입니다..'}/>
+      {isLoading ? ( 
+        <LoadingScreen message={'채팅 정보를 불러오는 중입니다..'} />
       ) : chatRooms.length === 0 ? <EmptyScreen message="채팅 내역이 없습니다"/>  : <FlatList
         data={chatRooms}
         keyExtractor={(item) => item.roomId.toString()}
@@ -117,61 +113,63 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   listContainer: {
+    paddingVertical: 10,
   },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 50,
-    marginRight: 10,
+  chatRoom: {
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
   chatRoomContainer: {
     flexDirection: 'row',
-    padding: 20,
-    marginVertical: 10,
-    marginHorizontal: 20,
-    borderRadius: 10,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 5,
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
   },
   infoContainer: {
     flex: 1,
     justifyContent: 'center',
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width:'100%',
-    alignItems: 'center',
+  rightContainer: {
+    justifyContent: 'center',
+    alignItems: 'flex-end',
   },
   memberName: {
     fontWeight: 'bold',
     fontSize: 18,
-    width:180
+  },
+  messagePreview: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 4,
+    maxWidth: '100%',
   },
   createdAt: {
-    color: '#666',
-    fontSize:16,
+    color: '#999',
+    fontSize: 13,
+    textAlign: 'right',
+    minWidth: 80,
+    marginRight: 10,
   },
-  message:{
-    marginTop:10,
-    marginLeft:0,
-    fontSize:16
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 5,
+    minWidth: 80,
   },
-  roomStatus:{
-    width:60,
-    textAlign:'center',
-    borderRadius: 5,
-    color:'white',
-    fontSize:15,
-    paddingVertical:2
-  }
+  statusText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 });
 
 export default MemberChattingScreen;

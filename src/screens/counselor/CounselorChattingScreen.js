@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import sendGetRequest from '../../axios/SendGetRequest';
 import { useAuth } from '../../auth/AuthContext';
 import { useCallback } from 'react';
 import EmptyScreen from '../EmptyScreen';
 import LoadingScreen from '../LoadingScreen';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 function CounselorChattingScreen() {
   const navigation = useNavigation();
@@ -24,7 +25,6 @@ function CounselorChattingScreen() {
       endPoint: '/chat_rooms', // 채팅방 목록을 가져오는 API 엔드포인트
       onSuccess: (data) => {
         setChatRooms(data); // 가져온 데이터로 상태 업데이트
-        console.log(chatRooms);
       },
       onFailure: () => {
         setError('채팅방 목록을 가져오는 데 실패했습니다.');
@@ -42,7 +42,7 @@ function CounselorChattingScreen() {
   );
 
   if (loading) {
-    return <LoadingScreen message ={'채팅 정보를 불러오는 중 입니다..'}/>;
+    return <LoadingScreen message={'채팅 정보를 불러오는 중 입니다..'} />;
   }
 
   if (error) {
@@ -53,45 +53,45 @@ function CounselorChattingScreen() {
     );
   }
 
-
   const handleChatRoomPress = (roomId, nickname, counselorName, roomStatus) => {
-    navigation.navigate('ChatRoom', { roomId, nickname, counselorName, roomStatus});
+    navigation.navigate('ChatRoom', { roomId, nickname, counselorName, roomStatus });
   };
 
   const renderItem = ({ item }) => {
-      // createdAt이 null일 경우 createdDate를 null로 설정
-      const createdDate = item.createdAt ? new Date(item.createdAt) : null; 
-      const today = new Date();
-      
-      // createdDate가 유효할 경우에만 날짜를 포맷팅
-      const displayText = createdDate 
-        ? (createdDate.toDateString() === today.toDateString()
-          ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
-          : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }))
-        : null; // createdAt이 null일 경우 null로 설정
+    const createdDate = item.createdAt ? new Date(item.createdAt) : null; 
+    const today = new Date();
 
-    // 상태에 따라 텍스트 배경색 결정
-    const roomStatusBackgroundColor = item.roomStatus === 'open' ? '#3C6894' : 
-                                       item.roomStatus === 'close' ? 'lightcoral' : 
-                                       'transparent'; // 기본값 (기타 상태)
-  
+    const displayText = createdDate 
+      ? (createdDate.toDateString() === today.toDateString()
+        ? createdDate.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+        : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }))
+      : null; // createdAt이 null일 경우 null로 설정
+
+    // 상태에 따른 뱃지 색상 및 텍스트 설정
+    const statusText = item.roomStatus === 'open' ? 'Open' : 'Closed';
+    const statusBackgroundColor = item.roomStatus === 'open' ? '#4CAF50' : 'red';
+
     return (
       <TouchableOpacity
         style={styles.chatRoom}
         onPress={() => handleChatRoomPress(item.roomId, item.nickname, item.counselorName, item.roomStatus)}
       >
         <View style={styles.chatRoomContainer}>
+          {/* 프로필 아이콘 */}
+          <Icon name="person" size={40} color="#215D9A" marginRight={10}style={styles.userIcon} />
           <View style={styles.infoContainer}>
-            <View style={styles.row}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                <Text style={styles.memberName}>{item.nickname} 내담자</Text>
-                <Text style={[styles.roomStatus, { backgroundColor: roomStatusBackgroundColor }]}>
-                  {item.roomStatus}
-                </Text>
-              </View>
-              <Text style={styles.createdAt}>{displayText}</Text>
+            <Text style={styles.memberName}>{item.nickname} 내담자</Text>
+            {/* 메시지가 null일 경우 빈 문자열로 처리 */}
+            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.messagePreview}>
+              {item.message ? (item.message.length > 5 ? item.message.substring(0, 15) + '...' : item.message) : ''}
+            </Text>
+          </View>
+          <View style={styles.rightContainer}>
+            <Text style={styles.createdAt}>{displayText}</Text>
+            {/* Open/Closed 상태 뱃지 */}
+            <View style={[styles.statusBadge, { backgroundColor: statusBackgroundColor }]}>
+              <Text style={styles.statusText}>{statusText}</Text>
             </View>
-            <Text style={styles.message}>{item.message}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -100,12 +100,16 @@ function CounselorChattingScreen() {
 
   return (
     <View style={styles.container}>
-      {chatRooms.length === 0 ? <EmptyScreen message="채팅 내역이 없습니다"/> :<FlatList
-        data={chatRooms}
-        keyExtractor={(item) => item.roomId.toString()}
-        renderItem={renderItem}
-        contentContainerStyle={styles.listContainer}
-      />}
+      {chatRooms.length === 0 ? (
+        <EmptyScreen message="채팅 내역이 없습니다" />
+      ) : (
+        <FlatList
+          data={chatRooms}
+          keyExtractor={(item) => item.roomId.toString()}
+          renderItem={renderItem}
+          contentContainerStyle={styles.listContainer}
+        />
+      )}
     </View>
   );
 }
@@ -113,62 +117,67 @@ function CounselorChattingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: '#f4f4f4',
   },
   listContainer: {
+    paddingVertical: 10,
   },
   chatRoom: {
-    borderBottomColor: '#ccc',
-    marginBottom: 5,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
   },
-  chatRoomContainer:{
+  chatRoomContainer: {
     flexDirection: 'row',
-    padding: 20,
-    marginVertical: 10,
-    marginHorizontal: 20,
-    borderRadius: 10,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 5,
+    alignItems: 'center',
+  },
+  profileImage: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginRight: 15,
   },
   infoContainer: {
+    flex: 1,
     justifyContent: 'center',
   },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width:'100%',
-    alignItems: 'center',
+  rightContainer: {
+    justifyContent: 'center',
+    alignItems: 'flex-end',
   },
   memberName: {
     fontWeight: 'bold',
     fontSize: 18,
-    width:180
+  },
+  messagePreview: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 4,
+    maxWidth: '100%',
   },
   createdAt: {
-    color: '#666',
-    fontSize:16,
+    color: '#999',
+    fontSize: 14, 
+    textAlign: 'right',
+    minWidth: 80, 
+    marginRight: 10, 
+    margintop: 50,
   },
-  message:{
-    marginTop:5,
-    marginLeft:0,
-    fontSize:16
+  statusBadge: {
+    paddingVertical: 6,
+    paddingHorizontal: 15,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 15, 
+    minWidth: 80, // 뱃지 최소 너비 설정
   },
-  roomStatus:{
-    width:60,
-    justifyContent: 'space-between',
-    textAlign:'center',
-    borderRadius: 5,
-    color:'white',
-    fontSize:15,
-    paddingVertical:3
-  }
+  statusText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
 });
 
 export default CounselorChattingScreen;

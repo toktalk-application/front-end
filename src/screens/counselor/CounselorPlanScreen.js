@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   button: {
-    backgroundColor: '#001932', // 버튼 배경 색상
+    backgroundColor: '#215D9A', // 버튼 배경 색상
     padding: 8,
     borderRadius: 8,
   },

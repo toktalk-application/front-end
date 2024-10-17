@@ -192,13 +192,13 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   button: {
-    backgroundColor: '#001326',
+    backgroundColor: '#295F98',
     padding: 10,
     borderRadius: 5,
     marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: '#ffffff',
     textAlign: 'center',
     fontWeight: 'bold',
   },

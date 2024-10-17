@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        backgroundColor: '#f7f7f7',
+        backgroundColor: '#215D9A',
     },
     section: {
         marginBottom: 10,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
         marginTop: 10,
         marginBottom: 40,
         padding: 10,
-        backgroundColor: '#001326',
+        backgroundColor: '#215D9A',
         borderRadius: 5,
         alignItems: 'center',
     },

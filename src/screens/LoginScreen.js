@@ -372,7 +372,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 2,
-    borderBottomColor: '#001932',
+    borderBottomColor: '#215D9A',
   },
   formContainer: {
     justifyContent: 'center',
