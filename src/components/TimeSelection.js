@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   timeButton: {
-    backgroundColor: '#e0f7fa', // 기본 버튼 색상
+    backgroundColor: '#215D9A', // 기본 버튼 색상
     padding: 10,
     margin: 5,
     borderRadius: 5,
