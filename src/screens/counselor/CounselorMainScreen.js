@@ -149,7 +149,7 @@ function CounselorMainScreen() {
             <View style={styles.detailsContainer}>
               <View style={styles.detailsRow}>
                 <View style= {{ flexDirection: 'row', justifyContent: 'space-between', alignItems:'center', marginBottom:10}}>
-                  <Text style={styles.nickNameText}>내담자 </Text>
+                  <Text style={styles.nickNameText}>회원 </Text>
                   <Text style= {{color :'white'}}>{item.memberNickname}</Text>
                 </View>
                 <Text style={styles.typeText}> {item.type} </Text>

@@ -137,7 +137,7 @@ const CounselorCounselScreen = () => {
                                 <View style={styles.contentsContainer}>
                                     <View style={styles.detailsFirstContainer}>
                                         <View style={styles.nicknameContainer}>
-                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>내담자     </Text>
+                                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#3C6894' }}>회원     </Text>
                                             <Text style={styles.nickname}>{reservation.memberNickname}</Text>
                                         </View>
                                         <Text style={styles.type}>{reservation.type}</Text>

@@ -67,7 +67,7 @@ function MemberChattingScreen() {
         : createdDate.toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' }))
       : null; // createdAt이 null일 경우 null로 설정
 
-    const roomStatusBackgroundColor = item.roomStatus === 'open' ? '#4CAF50' : 'red';
+    const roomStatusBackgroundColor = item.roomStatus === 'open' ? '#215D9A' : '#CA6767';
 
     return (
       <TouchableOpacity
@@ -83,10 +83,10 @@ function MemberChattingScreen() {
             </Text>
           </View>
           <View style={styles.rightContainer}>
-            <Text style={styles.createdAt}>{displayText}</Text>
             <View style={[styles.statusBadge, { backgroundColor: roomStatusBackgroundColor }]}>
               <Text style={styles.statusText}>{item.roomStatus === 'open' ? 'Open' : 'Closed'}</Text>
             </View>
+            <Text style={styles.createdAt}>{displayText}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   chatRoom: {
-    paddingVertical: 15,
+    paddingVertical: 5,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
@@ -134,10 +134,12 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     justifyContent: 'center',
+    marginTop:8
   },
   rightContainer: {
     justifyContent: 'center',
     alignItems: 'flex-end',
+    marginBottom:7
   },
   memberName: {
     fontWeight: 'bold',
@@ -146,7 +148,7 @@ const styles = StyleSheet.create({
   messagePreview: {
     color: '#666',
     fontSize: 14,
-    marginTop: 4,
+    marginTop: 10,
     maxWidth: '100%',
   },
   createdAt: {
@@ -154,20 +156,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     textAlign: 'right',
     minWidth: 80,
+    marginRight: 3, 
     marginRight: 10,
   },
   statusBadge: {
-    paddingVertical: 6,
-    paddingHorizontal: 15,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 5,
+    marginTop: 15,
+    marginBottom:10,
     minWidth: 80,
   },
   statusText: {
     color: 'white',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
   },
 });

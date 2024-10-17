@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   chargeContainer: {
-    backgroundColor: '#CCD2D9',
+    backgroundColor: '#f1f1f1',
     padding: 20,
     borderRadius: 10,
     marginBottom: 20, // 각 컨테이너 사이의 간격
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   button: {
-    backgroundColor: '#001F3F', // 버튼 배경 색상
+    backgroundColor: '#215D9A', // 버튼 배경 색상
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 5,
