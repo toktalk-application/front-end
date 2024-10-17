@@ -25,7 +25,8 @@ function MemberMainScreen() {
     const [selectedDate, setSelectedDate] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [selectedEmotion, setSelectedEmotion] = useState(null);
-    const today = new Date().toISOString().split('T')[0];
+    /* const today = new Date().toISOString().split('T')[0]; */
+    const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
     const [isReservationLoading, setIsReservationLoading] = useState(true);
     const [isMoodLoading, setIsMoodLoading] = useState(true);
     const flatListRef = useRef(null);
@@ -54,10 +55,12 @@ function MemberMainScreen() {
 
     useFocusEffect(
         useCallback(() => {
+            console.log('today: ', today);
             setSelectedDate("");
             /* handleDayPress(selectedDate); */
 
-            const now = new Date();
+            /* const now = new Date(); */
+            const now = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
             const year = now.getFullYear();
             const month = (now.getMonth() + 1).toString().padStart(2, '0');
             const formattedMonth = `${year}-${month}`;
@@ -153,20 +156,16 @@ function MemberMainScreen() {
     };
 
     const getMinDate = () => {
-        return new Date().toISOString().split('T')[0];
+        return new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
     }
 
     const getMaxDate = () => {
-        const today = new Date();
-
+        const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
         const currentYear = today.getFullYear();
         const nextMonth = today.getMonth() + 1;
-
-        // 다음 달의 마지막 날 계산
-        const lastDayOfNextMonth = new Date(currentYear, nextMonth + 1, 0).getDate();
-
-        // 최대 날짜 설정
-        return (`${currentYear}-${String(nextMonth + 1).padStart(2, '0')}-${lastDayOfNextMonth}`);
+        const lastDayOfNextMonth = new Date(currentYear, nextMonth + 1, 0);
+        lastDayOfNextMonth.setHours(lastDayOfNextMonth.getHours() + 9);
+        return lastDayOfNextMonth.toISOString().split('T')[0];
     }
 
     useEffect(() => {
@@ -271,7 +270,7 @@ function MemberMainScreen() {
                                 token: state.token,
                                 endPoint: "/members/daily-moods",
                                 requestBody: {
-                                    date: new Date().toISOString().slice(0, 10),
+                                    date: new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10),
                                     mood: selectedEmotion
                                 },
                                 onSuccess: () => toggleModal(),
