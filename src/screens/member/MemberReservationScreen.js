@@ -10,7 +10,7 @@ import LoadingScreen from '../LoadingScreen';
 
 const MemberReservationScreen = () => {
     const { state } = useAuth();
-    const currentDate = new Date();
+    const currentDate = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
     const navigation = useNavigation();
     const [reservations, setReservations] = useState([]);
     const [totalAmount, setTotalAmount] = useState(0);

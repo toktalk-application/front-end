@@ -29,7 +29,7 @@ function CounselorMainScreen() {
   useFocusEffect(
     useCallback(() => {
       //setSelectedDate('');
-      const today = new Date();
+      const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
       const year = today.getFullYear();
       const month = String(today.getMonth() + 1).padStart(2, '0'); // 두 자리로 맞추기 위해 padStart 사용
 
@@ -111,11 +111,11 @@ function CounselorMainScreen() {
   };
 
   const getMinDate = () => {
-    return new Date().toISOString().split('T')[0];
+    return new Date(new Date().getTime() + 9 * 60 * 60 * 1000).toISOString().split('T')[0];
   }
 
   const getMaxDate = () => {
-    const today = new Date();
+    const today = new Date(new Date().getTime() + 9 * 60 * 60 * 1000);
 
     const currentYear = today.getFullYear();
     const nextMonth = today.getMonth() + 1;
