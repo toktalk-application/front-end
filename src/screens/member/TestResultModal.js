@@ -28,7 +28,7 @@ const TestResultModal = ({ route, visible, onClose, navigation }) => {
             <View style={styles.modalContainer}>
                 <View style={styles.resultContainer}>
                     <View style={styles.dateContainer}>
-                        <Text style={styles.Resulttitle}>우울 검사 결과</Text>
+                        <Text style={styles.Resulttitle}>우울증 자가 진단 결과</Text>
                         <Text style={styles.date}>{formattedDate}</Text>
                     </View>
                     <View style={styles.row}>

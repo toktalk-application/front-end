@@ -230,8 +230,8 @@ function App() {
             <Stack.Screen name="일정 관리" component={CounselorPlanScreen} />
             <Stack.Screen name="기본 시간 설정" component={CounselorTimeSettingScreen}/>
             <Stack.Screen name="내 상담 내역" component={MemberReservationScreen} />
-            <Stack.Screen name="우울 검사" component={TestScreen}/>
-            <Stack.Screen name="우울 검사 내역" component={TestResultScreen}/>
+            <Stack.Screen name="우울증 자가 진단" component={TestScreen}/>
+            <Stack.Screen name="우울증 자가 진단 내역" component={TestResultScreen}/>
             <Stack.Screen name="TestResult" component={TestResultModal} options={{ title: '' }} />
             <Stack.Screen name="CounselDetail" component={CounselDetailScreen} options={{ title: '상담 상세 정보' }} />
             <Stack.Screen name="CounselWriteReport" component={CounselWriteReportScreen} options={{ title: '리포트 작성' }} />

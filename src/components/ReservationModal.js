@@ -320,9 +320,9 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
             <ScrollView 
               ref={scrollViewRef} //
               contentContainerStyle={styles.scrollContainer}>
-              {/* 상담 종류 선택 섹션 */}
+              {/* 상담 방식 선택 섹션 */}
               <TouchableOpacity onPress={() => setIsTypeOpen(!isTypeOpen)} style={styles.accordionHeader}>
-                <Text style={styles.label}>📞  상담 종류 선택 </Text>
+                <Text style={styles.label}>📞  상담 방식 선택 </Text>
                 <Image
                   source={isTypeOpen ? require('../../assets/images/up.png') : require('../../assets/images/down.png')}
                   style={styles.icon}
@@ -390,11 +390,11 @@ const ReservationModal = ({ visible, onClose, counselorId, chatPrice, callPrice,
                 </>
               )}
             </ScrollView>
-            {/* 선택한 상담 종류 표시 */}
+            {/* 선택한 상담 방식 표시 */}
             <View style={styles.container}>
               <View style={styles.row}>
                 <View style={styles.column}>
-                  <Text style={styles.selectedLabel}>상담 종류</Text>
+                  <Text style={styles.selectedLabel}>상담 방식</Text>
                   <Text style={styles.value}>{selectedType}</Text>
                 </View>
                 <View style={styles.column}>

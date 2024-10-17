@@ -15,10 +15,10 @@ const MemberMyScreenScreen = () => {
   const handleMenuPress = (menu) => {
     if (menu === '내 상담 내역') {
       navigation.navigate('내 상담 내역');
-    } else if (menu === '우울 검사') {
-      navigation.navigate('우울 검사'); // 일정 관리 화면으로 이동
-    } else if (menu === '우울 검사 내역') {
-      navigation.navigate('우울 검사 내역'); // 일정 관리 화면으로 이동
+    } else if (menu === '우울증 자가 진단') {
+      navigation.navigate('우울증 자가 진단'); // 일정 관리 화면으로 이동
+    } else if (menu === '우울증 자가 진단 내역') {
+      navigation.navigate('우울증 자가 진단 내역'); // 일정 관리 화면으로 이동
     }
   };
 
@@ -70,13 +70,13 @@ const MemberMyScreenScreen = () => {
         />
         <MenuItem 
           icon={require('../../../assets/images/list.png')}// 
-          title="우울 검사 내역"
-          onPress={() => handleMenuPress('우울 검사 내역')}
+          title="우울증 자가 진단 내역"
+          onPress={() => handleMenuPress('우울증 자가 진단 내역')}
         />
         <MenuItem 
           icon={require('../../../assets/images/test.png')}// 
-          title="우울 검사"
-          onPress={() => handleMenuPress('우울 검사')}
+          title="우울증 자가 진단"
+          onPress={() => handleMenuPress('우울증 자가 진단')}
         />
       </View>
     </View>

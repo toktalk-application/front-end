@@ -156,7 +156,7 @@ export default function ExPaymentWidget({ onClose, orderInfo, resetState }) {
               <Text style={styles.counselorName}>{orderInfo.counselorName}</Text>
             </View>
             <View style={styles.counselorInfo}>
-              <Text style={styles.sectionTitle}>상담 종류</Text>
+              <Text style={styles.sectionTitle}>상담 방식</Text>
               <Text style={styles.counselingType}>{orderInfo.counselingType}</Text>
             </View>
           </View>

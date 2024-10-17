@@ -98,12 +98,12 @@ function MemberMainScreen() {
                     console.log("data: ", data);
                     if (!data.data.lastTestResult || Object.keys(data.data.lastTestResult).length === 0) {
                         Alert.alert(
-                            "우울 검사 필요",
-                            "우울 검사를 진행해야 합니다.",
+                            "우울증 자가 진단 필요",
+                            "우울증 자가 진단을 진행해야 합니다.",
                             [
                                 {
                                     text: "확인",
-                                    onPress: () => navigation.navigate("우울 검사"),
+                                    onPress: () => navigation.navigate("우울증 자가 진단"),
                                 },
                             ],
                             { cancelable: false }
